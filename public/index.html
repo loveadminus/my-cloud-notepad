@@ -3,35 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>云端私密记事本 Pro</title>
+    <title>云端私密记事本 Pro (防崩溃版)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="https://unpkg.com/turndown/dist/turndown.js"></script>
     <style>
         body { font-size: 19px; }
         .panel-large-text { font-size: 16px !important; font-weight: 800 !important; }
         .sync-btn-font { font-size: 16px !important; font-weight: 900 !important; }
         .md-preview h1 { font-size: 2.6rem; font-weight: 800; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.3em; margin-top: 1.6rem; margin-bottom: 1rem; color: #0f172a; }
         .md-preview h2 { font-size: 2.1rem; font-weight: 700; border-bottom: 1px solid #edf2f7; padding-bottom: 0.3em; margin-top: 1.4rem; margin-bottom: 0.8rem; color: #1e293b; }
-        .md-preview h3 { font-size: 1.8rem; font-weight: 600; margin-top: 1.2rem; margin-bottom: 0.6rem; color: #334155; }
         .md-preview p, .md-preview div { margin-bottom: 0.6rem; line-height: 1.2; color: #334155; font-size: 15px; }
-        .md-preview code { background-color: #fee2e2; padding: 0.2em 0.5em; border-radius: 6px; font-size: 95%; font-family: monospace; color: #be185d; }
-        .md-preview pre { background-color: #1e293b; color: #f8fafc; padding: 1.5rem; border-radius: 10px; overflow-x: auto; margin-bottom: 1.5rem; }
-        .md-preview pre code { background-color: transparent; color: inherit; padding: 0; font-size: 17px; }
-        .md-preview a { color: #2563eb; text-decoration: underline; font-weight: bold; cursor: pointer; transition: all 0.2; }
-        .md-preview a:hover { color: #1e40af; text-decoration-style: dashed; }
-        .md-preview img { max-width: 100%; height: auto; border-radius: 10px; margin: 14px 0; box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: inline-block; transition: outline 0.2, box-shadow 0.2, transform 0.1; object-fit: contain; }
-        .md-preview img:hover { outline: 3px dashed #60a5fa; outline-offset: 2px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); cursor: ns-resize; }
-        [contenteditable]:empty:before { content: attr(placeholder); color: #cbd5e1; pointer-events: none; display: block; }
         .resizer { width: 6px; cursor: col-resize; background-color: #e2e8f0; transition: background-color 0.2; position: relative; z-index: 10; }
         .resizer:hover, .resizer.resizing { background-color: #2563eb; width: 6px; }
         .no-select { user-select: none; -webkit-user-select: none; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        .dragging-node { opacity: 0.4; border: 2px dashed #3b82f6 !important; background-color: #eff6ff !important; }
     </style>
 </head>
 <body class="bg-slate-900 font-sans h-screen flex flex-col overflow-hidden text-slate-800">
@@ -39,7 +27,9 @@
     <div id="auth-overlay" class="fixed inset-0 bg-slate-900 z-[100] flex items-center justify-center transition-opacity">
         <div class="bg-white p-8 rounded-2xl shadow-2xl w-96 flex flex-col gap-4">
             <h2 class="text-2xl font-black mb-2 text-center text-slate-800" id="auth-title">登入云端工作台</h2>
-            <div id="auth-error" class="hidden bg-red-100 text-red-600 p-2 rounded text-sm font-bold text-center"></div>
+            
+            <div id="auth-error" class="hidden bg-red-100 text-red-600 p-2 rounded text-sm font-bold text-center break-all"></div>
+            
             <input type="text" id="auth-username" placeholder="请输入账号" class="w-full border-2 border-slate-200 p-3 rounded-xl outline-none focus:border-blue-500 transition-colors font-bold text-slate-700">
             <input type="password" id="auth-password" placeholder="请输入密码" class="w-full border-2 border-slate-200 p-3 rounded-xl outline-none focus:border-blue-500 transition-colors font-bold text-slate-700">
             <button onclick="handleAuth()" id="auth-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-3 rounded-xl shadow-md transition-all mt-2">登入</button>
@@ -47,133 +37,63 @@
         </div>
     </div>
 
-    <header class="bg-slate-800 text-slate-200 py-1.5 px-6 flex items-center justify-between flex-shrink-0 select-none border-b border-slate-700 shadow-md relative">
-        <div class="flex items-center gap-3 z-10">
-            <button onclick="toggleLeftPanel()" class="bg-blue-700 hover:bg-blue-800 text-white font-black px-3 py-1.5 rounded-xl text-sm transition-all shadow-md flex items-center gap-2 border border-blue-600 mr-2">
-                <i id="left-panel-toggle-icon" class="fa-solid fa-folder-tree text-xs"></i> <span id="btn-toggle-left-text">关闭侧栏</span>
-            </button>
-        </div>
-        <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-2 pointer-events-none w-max">
-            <i class="fa-solid fa-cubes text-blue-400 text-3xl"></i>
-            <span class="font-black tracking-wider text-xl lg:text-xl bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-300">云端私密记事本</span>
-        </div>
-        <div class="flex items-center gap-5 text-slate-400 text-base z-10">
-            <button onclick="logout()" class="text-slate-300 hover:text-white font-bold text-sm mr-4 transition-colors">
-                <i class="fa-solid fa-right-from-bracket"></i> 退出账号
-            </button>
-            <button onclick="toggleRightPanel()" class="bg-red-700 hover:bg-red-800 text-white font-black px-3 py-1.5 rounded-xl text-sm transition-all shadow-md flex items-center gap-2 border border-red-600">
-                <i id="right-panel-toggle-icon" class="fa-solid fa-dumpster-fire text-xs"></i> <span id="btn-toggle-right-text">开启回收站</span>
-            </button>
-        </div>
+    <header class="bg-slate-800 text-slate-200 py-1.5 px-6 flex items-center justify-between flex-shrink-0 select-none shadow-md">
+        <div class="flex items-center gap-3 z-10"><button onclick="logout()" class="text-slate-300 hover:text-white font-bold text-sm transition-colors"><i class="fa-solid fa-right-from-bracket"></i> 退出/重载</button></div>
+        <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-black tracking-wider text-xl text-white">云端私密记事本</div>
+        <div class="flex items-center gap-5 z-10"></div>
     </header>
-
-    <div id="workspace-container" class="flex flex-1 overflow-hidden w-full bg-slate-200">
-        <aside id="left-panel" class="bg-slate-50 flex flex-col flex-shrink-0 overflow-hidden border-r border-slate-200 panel-large-text transition-all" style="width: 275px; min-width: 200px; max-width: 480px;">
-            <div class="p-2 border-b border-slate-200 bg-slate-100/80 flex flex-col gap-1.5 flex-shrink-0">
-                <div class="flex items-center gap-1.5 px-1">
-                    <button id="btn-new-note" onclick="createNewNote()" class="flex-1 py-2 px-1 flex items-center justify-center gap-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-black transition-all shadow-sm text-xs"><i class="fa-solid fa-file-plus"></i> 新建笔记</button>
-                    <button onclick="createNewCategory()" class="flex-1 py-2 px-1 flex items-center justify-center gap-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-black transition-all shadow-sm text-xs"><i class="fa-solid fa-folder-plus"></i> 新建分类</button>
-                </div>
-                <div class="flex flex-col gap-1 bg-white/70 p-1.5 rounded-lg border border-slate-200/60">
-                    <div class="flex items-center gap-1.5">
-                        <button onclick="triggerImport('md')" class="flex-1 py-2 px-1 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-black transition-all text-center truncate text-xs shadow-sm">导入 MD</button>
-                        <button onclick="exportFile('md')" class="flex-1 py-2 px-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-black transition-all text-center truncate text-xs shadow-sm">导出 MD</button>
-                    </div>
-                </div>
-                <button onclick="triggerFolderImport()" class="w-full py-2 bg-slate-700 hover:bg-slate-800 text-white rounded-lg font-black transition-all text-xs shadow-sm flex items-center justify-center gap-1"><i class="fa-solid fa-folder-tree text-amber-400"></i> 导入本地文件夹目录树</button>
-                <input type="file" id="import-md-input" accept=".md" class="hidden" onchange="handleImportFile(event, 'md')">
-                <input type="file" id="import-folder-input" webkitdirectory directory multiple class="hidden" onchange="handleFolderImport(event)">
-            </div>
-            <div class="px-3.5 py-2 bg-slate-200/60 flex items-center justify-between flex-shrink-0 select-none border-b border-slate-200">
-                <span class="sync-btn-font text-slate-700">文件夹目录</span>
-                <div class="flex items-center gap-0.5 bg-white border border-slate-300 rounded p-0.5 shadow-inner scale-95 origin-right">
-                    <button id="view-tree-list" onclick="toggleTreeLayout('list')" class="px-2 py-0.5 text-xs font-black rounded">列表</button>
-                    <button id="view-tree-grid" onclick="toggleTreeLayout('grid')" class="px-2 py-0.5 text-xs font-black rounded">九宫格</button>
-                </div>
-            </div>
-            <div id="category-tree-container" class="p-2 border-b border-slate-200 bg-slate-100/40 flex-shrink-0 max-h-64 overflow-y-auto"></div>
-            <div class="px-3.5 py-2 bg-slate-200/60 flex items-center justify-between flex-shrink-0 select-none border-b border-slate-200">
-                <span class="sync-btn-font text-slate-700">内容展示</span>
-                <div class="flex items-center gap-0.5 bg-white border border-slate-300 rounded p-0.5 shadow-inner scale-95 origin-right">
-                    <button id="view-left-list" onclick="toggleLeftView('list')" class="px-2 py-0.5 text-xs font-black rounded">列表</button>
-                    <button id="view-left-grid" onclick="toggleLeftView('grid')" class="px-2 py-0.5 text-xs font-black rounded">九宫格</button>
-                </div>
-            </div>
-            <div id="left-notes-container" class="flex-1 overflow-y-auto p-2 bg-slate-50/50"></div>
-        </aside>
-
-        <div id="resizer-left" class="resizer"></div>
-
-        <section id="middle-panel" class="bg-white flex flex-col flex-1 overflow-hidden min-w-[450px]">
-            <div class="bg-slate-50 border-b border-slate-200 px-5 py-3 flex flex-col gap-2.5 select-none flex-shrink-0 shadow-sm z-10">
-                <div class="flex items-center justify-between flex-wrap gap-2">
-                    <div class="flex items-center gap-1.5 bg-emerald-100/50 text-emerald-700 border border-emerald-200 px-4 py-2 rounded-xl shadow-sm font-black text-sm"><i class="fa-solid fa-pen-nib"></i> 实时编辑模式</div>
-                    <div class="flex items-center gap-1.5 bg-white border border-slate-300 px-4 py-2 rounded-xl shadow-sm">
-                        <span class="text-sm font-black text-slate-400"><i class="fa-solid fa-folder"></i> 归属文件夹:</span>
-                        <select id="note-category-select" onchange="changeNoteCategory(this.value)" class="text-sm font-black text-slate-700 bg-transparent outline-none cursor-pointer"></select>
-                    </div>
-                </div>
-                <div id="editor-format-bar" class="flex items-center gap-1.5 flex-wrap bg-white border border-slate-200 p-2 rounded-xl shadow-inner">
-                    <button onmousedown="event.preventDefault();" onclick="execCmd('formatBlock', 'H1')" class="px-3 py-1 text-sm font-black text-slate-700 hover:bg-slate-100 rounded-md border border-slate-200">H1</button>
-                    <button onmousedown="event.preventDefault();" onclick="execCmd('formatBlock', 'H2')" class="px-3 py-1 text-sm font-black text-slate-700 hover:bg-slate-100 rounded-md border border-slate-200">H2</button>
-                    <button onmousedown="event.preventDefault();" onclick="execCmd('formatBlock', 'H3')" class="px-3 py-1 text-sm font-black text-slate-700 hover:bg-slate-100 rounded-md border border-slate-200">H3</button>
-                    <button onmousedown="event.preventDefault();" onclick="execCmd('bold')" class="px-3 py-1 text-sm font-bold text-slate-700 hover:bg-slate-100 rounded-md border border-slate-200"><i class="fa-solid fa-bold"></i></button>
-                    <button onmousedown="event.preventDefault();" onclick="wrapHTML('<code>', '</code>')" class="px-3 py-1 text-sm font-mono text-slate-700 hover:bg-slate-100 rounded-md border border-slate-200"><i class="fa-solid fa-code"></i></button>
-                </div>
-            </div>
-            <div class="flex-1 flex flex-col p-8 overflow-y-auto w-full bg-white relative">
-                <input id="note-title-input" oninput="handleEditorInput()" type="text" placeholder="此处输入新随笔标题..." class="w-full font-black text-3xl border-none outline-none mb-6 text-slate-900 placeholder-slate-300 bg-transparent flex-shrink-0">
-                <div id="note-editor-richtext" contenteditable="true" oninput="handleEditorInput()" placeholder="在这里直接排版书写您的文字..." class="md-preview w-full flex-1 outline-none text-slate-800 break-words"></div>
-            </div>
-        </section>
-
-        <div id="resizer-right" class="resizer hidden"></div>
-
-        <aside id="right-panel" class="hidden bg-slate-50 flex flex-col flex-shrink-0 overflow-hidden border-l border-slate-200 panel-large-text" style="width: 340px;">
-            <div class="p-4 bg-slate-800 text-white flex flex-col gap-3 flex-shrink-0 shadow-md">
-                <span class="sync-btn-font tracking-wide flex items-center gap-1.5 text-slate-200 text-lg"><i class="fa-solid fa-dumpster-fire text-red-500"></i> 回收站 (<span id="trash-count-badge">0</span>)</span>
-                <div class="flex items-center gap-2">
-                    <button onclick="recoverAllTrash()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-black py-2 rounded-xl text-xs transition-all flex items-center justify-center gap-1"><i class="fa-solid fa-trash-arrow-up"></i> 一键恢复</button>
-                    <button onclick="clearTrashCompletely()" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-black py-2 rounded-xl text-xs transition-all flex items-center justify-center gap-1"><i class="fa-solid fa-fire"></i> 一键清空</button>
-                </div>
-            </div>
-            <div id="right-trash-flow" class="flex-1 overflow-y-auto p-2 space-y-2 bg-slate-100/50"></div>
-        </aside>
+    <div id="workspace-container" class="flex flex-1 overflow-hidden w-full bg-slate-200 p-8 items-center justify-center">
+        <div class="text-center text-slate-500 font-bold text-xl">登入成功后，这里将加载您的云端数据。<br>（如果您能看到这句话且没有登录框，说明已经登录！）</div>
     </div>
 
     <script>
-        let notes = [];
-        let trashBin = [];
-        let categories = ["未分类", "工作", "生活"];
-        let categoryColors = { "未分类": "#64748b", "工作": "#3b82f6", "生活": "#10b981" };
-        let folderTreeRelations = {};
-        let leftExpandedFolders = {};
-        let currentFilterCategory = "全部";
-        let activeNoteId = null;
-        let saveTimeout = null;
-        let leftPanelClosed = false;
-        let rightPanelClosed = true;
-        let treeLayoutView = "grid";
-        let leftLayoutView = "grid";
+        // === 1. 致命错误拦截器：直接将报错显示在网页上 ===
+        window.onerror = function(msg, url, lineNo, columnNo, error) {
+            const errDiv = document.getElementById('auth-error');
+            if(errDiv) {
+                errDiv.innerText = "页面报错拦截: " + msg;
+                errDiv.classList.remove('hidden');
+            }
+            return false;
+        };
 
+        // === 2. 安全读取本地存储 (防止隐私模式或拦截工具导致JS崩溃) ===
         let isLoginMode = true;
-        let cfUser = localStorage.getItem('cfUser');
-        let cfPass = localStorage.getItem('cfPass');
-
-        // ==== 核心：验证模式切换逻辑 ====
-        function toggleAuthMode() {
-            isLoginMode = !isLoginMode;
-            document.getElementById('auth-title').innerText = isLoginMode ? '登入云端工作台' : '注册新账号';
-            document.getElementById('auth-btn').innerText = isLoginMode ? '登入' : '立即注册';
-            document.getElementById('auth-toggle').innerText = isLoginMode ? '没有账号？点击注册新账号' : '已有账号？点击返回登入';
-            document.getElementById('auth-error').classList.add('hidden');
+        let cfUser = null;
+        let cfPass = null;
+        
+        try {
+            cfUser = localStorage.getItem('cfUser');
+            cfPass = localStorage.getItem('cfPass');
+        } catch(e) {
+            document.getElementById('auth-error').innerText = "警告：浏览器禁止了本地存储，可能处于无痕模式。";
+            document.getElementById('auth-error').classList.remove('hidden');
         }
 
+        // === 3. 核心：切换注册/登入模式 ===
+        function toggleAuthMode() {
+            try {
+                isLoginMode = !isLoginMode;
+                document.getElementById('auth-title').innerText = isLoginMode ? '登入云端工作台' : '注册新账号';
+                document.getElementById('auth-btn').innerText = isLoginMode ? '登入' : '立即注册';
+                document.getElementById('auth-toggle').innerText = isLoginMode ? '没有账号？点击注册新账号' : '已有账号？点击返回登入';
+                document.getElementById('auth-error').classList.add('hidden');
+            } catch(e) {
+                alert("切换模式失败: " + e.message);
+            }
+        }
+
+        // === 4. 发起验证或注册请求 ===
         async function handleAuth() {
             const u = document.getElementById('auth-username').value;
             const p = document.getElementById('auth-password').value;
             const errDiv = document.getElementById('auth-error');
-            if(!u || !p) { errDiv.innerText = "请输入账号和密码"; errDiv.classList.remove('hidden'); return; }
+            
+            if(!u || !p) { 
+                errDiv.innerText = "请输入账号和密码"; 
+                errDiv.classList.remove('hidden'); 
+                return; 
+            }
 
             const endpoint = isLoginMode ? '/api/login' : '/api/register';
             document.getElementById('auth-btn').innerText = "请稍候...";
@@ -184,181 +104,40 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username: u, password: p })
                 });
+                
                 const data = await res.json();
                 
                 if(res.ok && (data.success || isLoginMode)) {
-                    cfUser = u; cfPass = p;
-                    localStorage.setItem('cfUser', u);
-                    localStorage.setItem('cfPass', p);
+                    try {
+                        localStorage.setItem('cfUser', u);
+                        localStorage.setItem('cfPass', p);
+                    } catch(e) { /* 忽略存储异常 */ }
+                    
                     document.getElementById('auth-overlay').classList.add('hidden');
-                    loadCloudData();
+                    alert("验证成功！");
                 } else {
-                    errDiv.innerText = data.message || "执行失败，请检查数据库绑定";
+                    errDiv.innerText = data.message || "请求被后端拒绝，检查数据库绑定";
                     errDiv.classList.remove('hidden');
                 }
             } catch(e) {
-                errDiv.innerText = "网络请求失败，请确保已绑定KV并重试部署";
+                errDiv.innerText = "连接后端 API 失败，是不是 Functions 没生效？ (" + e.message + ")";
                 errDiv.classList.remove('hidden');
             }
             document.getElementById('auth-btn').innerText = isLoginMode ? '登入' : '立即注册';
         }
 
         function logout() {
-            localStorage.removeItem('cfUser');
-            localStorage.removeItem('cfPass');
+            try { localStorage.removeItem('cfUser'); localStorage.removeItem('cfPass'); } catch(e){}
             location.reload();
         }
 
-        function getAuthHeaders() {
-            return {
-                'Authorization': 'Basic ' + btoa(unescape(encodeURIComponent(cfUser + ':' + cfPass))),
-                'Content-Type': 'application/json'
-            };
-        }
-
         window.addEventListener('DOMContentLoaded', () => {
-            initResizers();
             if (cfUser && cfPass) {
                 document.getElementById('auth-overlay').classList.add('hidden');
-                loadCloudData();
             } else {
                 document.getElementById('auth-overlay').classList.remove('hidden');
             }
         });
-
-        // ==== 云端同步与视图渲染逻辑 ====
-        async function loadCloudData() {
-            marked.use({ breaks: true, gfm: true });
-            try {
-                const response = await fetch('/api/sync', { headers: getAuthHeaders() });
-                if (response.status === 401) { logout(); return; }
-                if (!response.ok) throw new Error('网络响应异常');
-                const data = await response.json();
-
-                if (data.notes) notes = data.notes;
-                if (data.categories) categories = data.categories;
-                if (data.categoryColors) categoryColors = data.categoryColors;
-                if (data.trashBin) trashBin = data.trashBin;
-                if (data.folderTreeRelations) folderTreeRelations = data.folderTreeRelations;
-                if (data.leftExpandedFolders) leftExpandedFolders = data.leftExpandedFolders;
-            } catch (error) {
-                console.log("数据拉取失败或首次建档");
-            }
-
-            refreshAllViews();
-            if (notes.length > 0) {
-                const sorted = [...notes].sort((a,b) => b.updatedAt - a.updatedAt);
-                openNote(sorted[0].id);
-            } else {
-                createNewNote();
-            }
-        }
-
-        async function saveCloudData() {
-            if(!cfUser) return;
-            const allData = {
-                notes: notes, categories: categories, categoryColors: categoryColors,
-                trashBin: trashBin, folderTreeRelations: folderTreeRelations, leftExpandedFolders: leftExpandedFolders,
-                treeLayoutView: treeLayoutView, leftLayoutView: leftLayoutView
-            };
-            try {
-                await fetch('/api/sync', { method: 'POST', headers: getAuthHeaders(), body: JSON.stringify(allData) });
-            } catch (error) { console.error("同步失败", error); }
-        }
-
-        function refreshAllViews() { renderCategoryTree(); renderCategorySelectOptions(); renderLeftNotesView(); renderTrashBin(); document.getElementById('trash-count-badge').innerText = trashBin.length; }
-        function toggleTreeLayout(mode) { treeLayoutView = mode; saveCloudData(); refreshAllViews(); }
-        function toggleLeftView(mode) { leftLayoutView = mode; saveCloudData(); renderLeftNotesView(); }
-
-        function renderCategoryTree() {
-            const container = document.getElementById('category-tree-container'); container.innerHTML = '';
-            const allBtn = document.createElement('div');
-            allBtn.className = `px-3 py-1.5 rounded-lg border flex items-center gap-1.5 mb-2 cursor-pointer transition-all text-sm font-black ${currentFilterCategory === '全部' ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'}`;
-            allBtn.innerHTML = `<i class="fa-solid fa-list-check text-xs"></i> 全部目录展示`;
-            allBtn.onclick = () => { currentFilterCategory = "全部"; refreshAllViews(); };
-            container.appendChild(allBtn);
-
-            const mainFolders = categories.filter(c => !folderTreeRelations[c]);
-            const gridWrapper = document.createElement('div'); gridWrapper.className = "grid grid-cols-3 gap-1 w-full"; 
-            mainFolders.forEach(mainCat => {
-                const isSelected = currentFilterCategory === mainCat;
-                const catColor = categoryColors[mainCat] || "#64748b";
-                const noteCount = notes.filter(n => n.category === mainCat).length;
-                const cell = document.createElement('div');
-                cell.className = `p-1.5 rounded-lg border cursor-pointer transition-all flex flex-col justify-between relative h-14 ${isSelected ? 'bg-indigo-600 text-white border-indigo-600 shadow' : 'bg-white border-slate-200 hover:bg-slate-100 shadow-sm'}`;
-                cell.innerHTML = `<div class="truncate w-full pr-3"><div class="flex items-center gap-1 truncate"><span class="w-2 h-2 rounded-full shrink-0" style="background-color:${isSelected ? '#ffffff' : catColor}"></span><span class="font-extrabold text-[12px] truncate">${mainCat}</span></div><span class="text-[10px] block mt-0.5 font-bold opacity-80">(${noteCount}篇)</span></div>`;
-                cell.onclick = () => { currentFilterCategory = mainCat; refreshAllViews(); };
-                gridWrapper.appendChild(cell);
-            });
-            container.appendChild(gridWrapper);
-        }
-
-        function renderLeftNotesView() {
-            const container = document.getElementById('left-notes-container'); container.innerHTML = '';
-            let displayNotes = notes;
-            if (currentFilterCategory !== "全部") { displayNotes = notes.filter(n => n.category === currentFilterCategory); }
-            const sorted = [...displayNotes].sort((a,b) => b.updatedAt - a.updatedAt);
-            if (sorted.length === 0) { container.innerHTML = `<p class="text-slate-400 text-center text-sm py-4 font-bold">无数据</p>`; return; }
-
-            const gridWrapper = document.createElement('div'); gridWrapper.className = "grid grid-cols-3 gap-1 w-full";
-            sorted.forEach(note => {
-                const box = document.createElement('div');
-                box.className = `w-full h-16 p-1.5 rounded-lg border cursor-pointer flex flex-col justify-between transition-all text-xs bg-white border-slate-200 hover:bg-slate-100 shadow-sm relative group ${note.id === activeNoteId ? 'bg-blue-50 border-blue-400 ring-1 ring-blue-100 shadow' : ''}`;
-                box.onclick = () => openNote(note.id);
-                const plainText = note.content ? note.content.replace(/<[^>]+>/g, '').substring(0, 15) : '...';
-                box.innerHTML = `<button class="absolute right-1 top-1 p-0.5 text-slate-400 hover:text-red-600 z-10" onclick="event.stopPropagation(); deleteNote('${note.id}')"><i class="fa-solid fa-trash-can text-[10px]"></i></button><div class="w-full overflow-hidden flex flex-col flex-1 pr-2"><div class="font-extrabold text-[11px] text-slate-950 line-clamp-1 leading-tight mb-0.5">${note.title || '无标题'}</div><p class="text-[9px] text-slate-400 line-clamp-1 leading-none mt-0.5">${plainText}</p></div>`;
-                gridWrapper.appendChild(box);
-            });
-            container.appendChild(gridWrapper);
-        }
-
-        function renderTrashBin() {
-            const container = document.getElementById('right-trash-flow'); container.innerHTML = '';
-            if (rightPanelClosed) return;
-            if (trashBin.length === 0) { container.innerHTML = `<p class="text-center py-8 text-slate-400 text-sm font-bold flex flex-col items-center gap-2"><i class="fa-solid fa-wind text-2xl"></i> 回收站空空如也</p>`; return; }
-            trashBin.forEach((note) => {
-                const card = document.createElement('div'); card.className = "bg-white border border-slate-200 p-3 rounded-xl relative group text-xs shadow-sm hover:shadow transition-all mb-2";
-                card.innerHTML = `<div class="pr-16 truncate"><div class="font-bold text-slate-900 truncate mb-1 text-sm">${note.title || '无标题记录'}</div><span class="text-[11px] text-slate-500 font-medium block flex items-center gap-1"><i class="fa-solid fa-folder-open text-slate-400"></i> 原位置: ${note.category}</span></div><div class="absolute right-2 top-2 flex gap-1.5 opacity-60 group-hover:opacity-100 transition-opacity"><button onclick="recoverDeletedFile('${note.id}')" class="p-1.5 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-600 font-bold"><i class="fa-solid fa-rotate-left"></i></button><button onclick="permanentlyDeleteFile('${note.id}')" class="p-1.5 bg-red-50 border border-red-200 rounded-lg text-red-600"><i class="fa-solid fa-xmark"></i></button></div>`;
-                container.appendChild(card);
-            });
-        }
-
-        function createNewNote() { const newDoc = { id: 'md_' + Date.now(), title: '', content: '', category: currentFilterCategory !== "全部" ? currentFilterCategory : "未分类", updatedAt: Date.now() }; notes.push(newDoc); saveCloudData(); openNote(newDoc.id); }
-        function openNote(id) { activeNoteId = id; const target = notes.find(n => n.id === id); if (target) { document.getElementById('note-title-input').value = target.title; document.getElementById('note-editor-richtext').innerHTML = target.content; refreshAllViews(); document.getElementById('note-category-select').value = target.category || "未分类"; } }
-        function deleteNote(id) { const idx = notes.findIndex(n => n.id === id); if (idx !== -1) { trashBin.push(notes.splice(idx, 1)[0]); saveCloudData(); if (activeNoteId === id) { if (notes.length > 0) openNote(notes[0].id); else createNewNote(); } else { refreshAllViews(); } } }
-        function changeNoteCategory(newCat) { const idx = notes.findIndex(n => n.id === activeNoteId); if (idx !== -1) { notes[idx].category = newCat; saveCloudData(); refreshAllViews(); } }
-        function handleEditorInput() { if (!activeNoteId) return; if (saveTimeout) clearTimeout(saveTimeout); saveTimeout = setTimeout(() => { const idx = notes.findIndex(n => n.id === activeNoteId); if (idx !== -1) { notes[idx].title = document.getElementById('note-title-input').value; notes[idx].content = document.getElementById('note-editor-richtext').innerHTML; notes[idx].updatedAt = Date.now(); saveCloudData(); renderLeftNotesView(); } }, 1500); }
-        function createNewCategory() { const name = prompt("创建新分类名称："); if (!name || !name.trim()) return; categories.push(name.trim()); saveCloudData(); refreshAllViews(); }
-        function renderCategorySelectOptions() { const select = document.getElementById('note-category-select'); select.innerHTML = ''; categories.forEach(cat => { const opt = document.createElement('option'); opt.value = cat; opt.innerText = cat; select.appendChild(opt); }); }
-        
-        function recoverAllTrash() { if(trashBin.length>0 && confirm("确定恢复?")) { notes.push(...trashBin); trashBin=[]; saveCloudData(); refreshAllViews(); } }
-        function clearTrashCompletely() { if(trashBin.length>0 && confirm("确定清空?")) { trashBin=[]; saveCloudData(); refreshAllViews(); } }
-        function recoverDeletedFile(id) { const idx = trashBin.findIndex(t => t.id === id); if (idx !== -1) { notes.push(trashBin.splice(idx, 1)[0]); saveCloudData(); refreshAllViews(); } }
-        function permanentlyDeleteFile(id) { if (confirm("永久删除?")) { trashBin = trashBin.filter(t => t.id !== id); saveCloudData(); refreshAllViews(); } }
-
-        function toggleLeftPanel() { leftPanelClosed = !leftPanelClosed; document.getElementById('left-panel').classList.toggle('hidden', leftPanelClosed); document.getElementById('resizer-left').classList.toggle('hidden', leftPanelClosed); }
-        function toggleRightPanel() { rightPanelClosed = !rightPanelClosed; document.getElementById('right-panel').classList.toggle('hidden', rightPanelClosed); refreshAllViews(); }
-        
-        function initResizers() {
-            const container = document.getElementById('workspace-container'); const leftPanel = document.getElementById('left-panel'); const resizerLeft = document.getElementById('resizer-left');
-            resizerLeft.addEventListener('mousedown', function(e) { e.preventDefault(); resizerLeft.classList.add('resizing'); document.body.classList.add('no-select'); document.addEventListener('mousemove', resizeLeft); document.addEventListener('mouseup', stopResizeLeft); });
-            function resizeLeft(e) { let newWidth = e.clientX - container.getBoundingClientRect().left; if (newWidth >= 200 && newWidth <= 480) leftPanel.style.width = newWidth + 'px'; }
-            function stopResizeLeft() { resizerLeft.classList.remove('resizing'); document.body.classList.remove('no-select'); document.removeEventListener('mousemove', resizeLeft); document.removeEventListener('mouseup', stopResizeLeft); }
-        }
-        
-        function execCmd(c, v=null) { document.execCommand(c, false, v); handleEditorInput(); }
-        function wrapHTML(, e) { const sel = window.getSelection(); if (!sel.rangeCount) return; execCmd('insertHTML',  + sel.toString() + e); }
-
-        function triggerImport(type) { if (type === 'md') document.getElementById('import-md-input').click(); }
-        function triggerFolderImport() { document.getElementById('import-folder-input').click(); }
-        function exportFile(formatType) {
-            const title = document.getElementById('note-title-input').value || '未命名随笔';
-            let content = document.getElementById('note-editor-richtext').innerText;
-            if (formatType === 'md' && typeof TurndownService !== 'undefined') { content = new TurndownService().turndown(document.getElementById('note-editor-richtext').innerHTML); }
-            const blob = new Blob([content], {type: 'text/plain;charset=utf-8'});
-            const url = 网站.createObjectURL(blob); const a = document.createElement('a');
-            a.download = `${title}.${formatType}`; a.href = url; a.click(); 网站.revokeObjectURL(url);
-        }
     </script>
 </body>
 </html>
