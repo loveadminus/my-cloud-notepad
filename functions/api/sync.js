@@ -1,6 +1,10 @@
-// 核心鉴权函数
-async function verifyAuth(请求, env) {
-    const authHeader = 请求.headers.get('Authorization');
+function extractEnv(arg1, arg2) {
+    if (arg1 && arg1.请求) return { req: arg1.请求, env: arg1.env };
+    return { req: arg1, env: arg2 };
+}
+
+async function verifyAuth(req, env) {
+    const authHeader = req.headers.get('Authorization');
     if (!authHeader || !authHeader.startsWith('Basic ')) return null;
     
     const b64 = authHeader.substring(6);
@@ -16,38 +20,48 @@ async function verifyAuth(请求, env) {
     return null;
 }
 
-// 获取云端数据 (拉取)
-export async function onRequestGet(context) {
-    const { 请求, env } = context;
-    const username = await verifyAuth(请求, env);
-    
-    if (!username) {
-        return new Response(JSON.stringify({ message: "未授权" }), { status: 401 });
+async function handleGet(req, env) {
+    try {
+        const username = await verifyAuth(req, env);
+        if (!username) return new Response(JSON.stringify({ message: "未授权或登录失效" }), { status: 401 });
+
+        let data = await env.NOTE_KV.get(`data:${username}`);
+        if (!data) data = "{}";
+
+        return new Response(data, { status: 200, headers: { "Content-Type": "application/json" } });
+    } catch(err) {
+        return new Response(JSON.stringify({ message: err.message }), { status: 500 });
     }
-
-    let data = await env.NOTE_KV.get(`data:${username}`);
-    if (!data) data = "{}";
-
-    return new Response(data, {
-        status: 200,
-        headers: { "Content-Type": "application/json" }
-    });
 }
 
-// 保存数据到云端 (推送)
-export async function onRequestPost(context) {
-    const { 请求, env } = context;
-    const username = await verifyAuth(请求, env);
-    
-    if (!username) {
-        return new Response(JSON.stringify({ message: "未授权" }), { status: 401 });
+async function handlePost(req, env) {
+    try {
+        const username = await verifyAuth(req, env);
+        if (!username) return new Response(JSON.stringify({ message: "未授权或登录失效" }), { status: 401 });
+
+        const data = await req.text();
+        await env.NOTE_KV.put(`data:${username}`, data);
+
+        return new Response(JSON.stringify({ success: true }), { status: 200, headers: { "Content-Type": "application/json" } });
+    } catch(err) {
+        return new Response(JSON.stringify({ message: err.message }), { status: 500 });
     }
+}
 
-    const data = await 请求.text();
-    await env.NOTE_KV.put(`data:${username}`, data);
+export async function onRequestGet(arg1, arg2) {
+    const { req, env } = extractEnv(arg1, arg2);
+    return await handleGet(req, env);
+}
 
-    return new Response(JSON.stringify({ success: true }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" }
-    });
+export async function onRequestPost(arg1, arg2) {
+    const { req, env } = extractEnv(arg1, arg2);
+    return await handlePost(req, env);
+}
+
+export default {
+    async fetch(请求, env, ctx) {
+        if (请求.method === "GET") return await handleGet(请求, env);
+        if (请求.method === "POST") return await handlePost(请求, env);
+        return new Response("Method not allowed", { status: 405 });
+    }
 }
