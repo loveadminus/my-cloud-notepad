@@ -137,9 +137,9 @@
                     <div class="flex items-center gap-1.5 bg-emerald-100/50 text-emerald-700 border border-emerald-200 px-4 py-2 rounded-xl shadow-sm font-black text-sm">
                         <i class="fa-solid fa-pen-nib"></i> 实时编辑模式
                     </div>
-                    <div class="flex items-center gap-1.5 bg-white border border-slate-300 px-4 py-2 rounded-xl shadow-sm">
-                        <span class="text-sm font-black text-slate-400"><i class="fa-solid fa-folder"></i> 归属文件夹:</span>
-                        <select id="note-category-select" onchange="changeNoteCategory(this.value)" class="text-sm font-black text-slate-700 bg-transparent outline-none cursor-pointer"></select>
+                    <div class="flex items-center gap-1.5 bg-blue-50 border border-blue-200 px-4 py-2 rounded-xl shadow-sm">
+                        <span class="text-sm font-black text-blue-600"><i class="fa-solid fa-folder text-blue-500"></i> 归属文件夹:</span>
+                        <select id="note-category-select" onchange="changeNoteCategory(this.value)" class="text-sm font-black text-blue-700 bg-transparent outline-none cursor-pointer"></select>
                     </div>
                 </div>
                 
@@ -355,7 +355,7 @@
             document.getElementById('view-tree-list').style.backgroundColor = treeLayoutView === 'list' ? '#cbd5e1' : 'transparent';
             document.getElementById('view-tree-grid').style.backgroundColor = treeLayoutView === 'grid' ? '#cbd5e1' : 'transparent';
             document.getElementById('view-left-list').style.backgroundColor = leftLayoutView === 'list' ? '#cbd5e1' : 'transparent';
-            document.getElementById('view-left-grid').style.backgroundColor = leftLayoutView === 'grid' ? '#cbd5e1' : 'transparent';
+            document.getElementById('view-left-grid').style.backgroundColor = leftLayoutView === 'grid' ? '#3b82f6' : 'transparent';
 
             renderCategoryTree();
             renderCategorySelectOptions();
