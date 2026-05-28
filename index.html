@@ -111,7 +111,7 @@
             </div>
             
             <div class="px-3.5 py-2 bg-slate-200/60 flex items-center justify-between flex-shrink-0 select-none border-b border-slate-200">
-                <span class="sync-btn-font text-slate-700">文件夹树层级</span>
+                <span class="sync-btn-font text-slate-700">文件夹层级</span>
                 <div class="flex items-center gap-0.5 bg-white border border-slate-300 rounded p-0.5 shadow-inner scale-95 origin-right">
                     <button id="view-tree-list" onclick="toggleTreeLayout('list')" class="px-2 py-0.5 text-xs font-black rounded hover:bg-slate-100">列表</button>
                     <button id="view-tree-grid" onclick="toggleTreeLayout('grid')" class="px-2 py-0.5 text-xs font-black rounded hover:bg-slate-100">九宫格</button>
@@ -352,10 +352,10 @@
         }
         
         function refreshAllViews() {
-            document.getElementById('view-tree-list').style.backgroundColor = treeLayoutView === 'list' ? '#3b82f6' : 'transparent';
-            document.getElementById('view-tree-grid').style.backgroundColor = treeLayoutView === 'grid' ? '#3b82f6' : 'transparent';
-            document.getElementById('view-left-list').style.backgroundColor = leftLayoutView === 'list' ? '#3b82f6' : 'transparent';
-            document.getElementById('view-left-grid').style.backgroundColor = leftLayoutView === 'grid' ? '#3b82f6' : 'transparent';
+            document.getElementById('view-tree-list').style.backgroundColor = treeLayoutView === 'list' ? '#10b981' : 'transparent';
+            document.getElementById('view-tree-grid').style.backgroundColor = treeLayoutView === 'grid' ? '#10b981' : 'transparent';
+            document.getElementById('view-left-list').style.backgroundColor = leftLayoutView === 'list' ? '#10b981' : 'transparent';
+            document.getElementById('view-left-grid').style.backgroundColor = leftLayoutView === 'grid' ? '#10b981' : 'transparent';
 
             renderCategoryTree();
             renderCategorySelectOptions();
