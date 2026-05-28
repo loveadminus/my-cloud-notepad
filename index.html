@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -387,7 +388,7 @@
 
             const allBtn = document.createElement('div');
             allBtn.className = `px-3 py-1.5 rounded-lg border flex items-center gap-1.5 mb-2 cursor-pointer transition-all text-sm font-black ${currentFilterCategory === '全部' ? activeStyle : defaultStyle}`;
-            allBtn.innerHTML = `<i class="fa-solid fa-list-check text-[16px]"></i> 全部内容目录`;
+            allBtn.innerHTML = `<i class="fa-solid fa-list-check text-[14px]"></i> 全部内容目录`;
             allBtn.onclick = () => { currentFilterCategory = "全部"; refreshAllViews(); };
             container.appendChild(allBtn);
 
