@@ -1,15 +1,34 @@
 export async function onRequestPost(context) {
     try {
-        const 请求 = context.请求;
+        if (!context) throw new Error("运行环境上下文(context)完全丢失");
+
+        const req = context.请求;
         const env = context.env;
 
-        // 【终极雷达】：打印出当前环境里到底加载了什么
-        if (!env || !env.NOTE_KV) {
-            const availableKeys = env ? Object.keys(env).join(', ') : 'env对象完全为空';
-            throw new Error(`KV绑定失败！系统当前只读到了这些变量: [${availableKeys}]。请确保面板变量名严格为 NOTE_KV`);
+        // 1. 如果是 request 对象丢失，直接打印现场证据
+        if (!req) {
+            throw new Error(`找不到请求对象(request)。当前 context 包含的属性有: [${Object.keys(context).join(', ')}]`);
         }
 
-        const body = await 请求.json();
+        if (!env || !env.NOTE_KV) {
+            throw new Error("读取不到 NOTE_KV 空间，请确认绑定");
+        }
+
+        // 2. 绕过系统自带的 .json()，使用最底层的纯文本读取，避免 CF 引擎报错
+        let text = "";
+        try {
+            text = await req.text();
+        } catch(e) {
+            throw new Error("读取请求数据文本失败: " + e.message);
+        }
+
+        let body = {};
+        try {
+            body = JSON.parse(text);
+        } catch(e) {
+            throw new Error("解析 JSON 数据失败: " + e.message + "，收到的原文: " + text);
+        }
+
         const username = body.username;
         const password = body.password;
 
@@ -30,7 +49,7 @@ export async function onRequestPost(context) {
             headers: { "Content-Type": "application/json" } 
         });
     } catch (err) {
-        return new Response(JSON.stringify({ success: false, message: "后端报错: " + err.message }), { 
+        return new Response(JSON.stringify({ success: false, message: "终极捕获报错: " + err.message }), { 
             status: 500, 
             headers: { "Content-Type": "application/json" } 
         });
