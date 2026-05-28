@@ -44,7 +44,6 @@
     </style>
 </head>
 <body class="bg-slate-900 font-sans h-screen flex flex-col overflow-hidden text-slate-800">
-
     <div id="auth-overlay" class="fixed inset-0 bg-slate-900 z-[100] flex items-center justify-center transition-opacity">
         <div class="bg-white p-8 rounded-2xl shadow-2xl w-96 flex flex-col gap-4">
             <h2 class="text-2xl font-black mb-2 text-center text-slate-800" id="auth-title">登入云端工作台</h2>
@@ -55,7 +54,6 @@
             <div class="text-center text-sm font-bold text-slate-500 cursor-pointer hover:text-blue-600 transition-colors mt-2" onclick="toggleAuthMode()" id="auth-toggle">没有账号？点击注册新账号</div>
         </div>
     </div>
-
     <header class="bg-slate-800 text-slate-200 py-1.5 px-6 flex items-center justify-between flex-shrink-0 select-none border-b border-slate-700 shadow-md relative">
         <div class="flex items-center gap-3 z-10">
             <button onclick="toggleLeftPanel()" class="bg-blue-700 hover:bg-blue-800 text-white font-black px-3 py-1.5 rounded-xl text-sm transition-all shadow-md flex items-center gap-2 border border-blue-600 mr-2">
@@ -79,7 +77,6 @@
             </button>
         </div>
     </header>
-
     <div id="workspace-container" class="flex flex-1 overflow-hidden w-full bg-slate-200">
         <aside id="left-panel" class="bg-slate-50 flex flex-col flex-shrink-0 overflow-hidden border-r border-slate-200 panel-large-text transition-all" style="width: 275px; min-width: 200px; max-width: 480px;">
             <div class="p-2 border-b border-slate-200 bg-slate-100/80 flex flex-col gap-1.5 flex-shrink-0">
@@ -102,7 +99,6 @@
                 <input type="file" id="import-txt-input" accept=".txt" class="hidden" onchange="handleImportFile(event, 'txt')">
                 <input type="file" id="import-folder-input" webkitdirectory directory multiple class="hidden" onchange="handleFolderImport(event)">
             </div>
-
             <div class="px-3.5 py-2 bg-slate-200/60 flex items-center justify-between flex-shrink-0 select-none border-b border-slate-200">
                 <span class="sync-btn-font text-slate-700">文件夹目录</span>
                 <div class="flex items-center gap-0.5 bg-white border border-slate-300 rounded p-0.5 shadow-inner scale-95 origin-right">
@@ -111,7 +107,6 @@
                 </div>
             </div>
             <div id="category-tree-container" class="p-2 border-b border-slate-200 bg-slate-100/40 flex-shrink-0 max-h-64 overflow-y-auto"></div>
-
             <div class="px-3.5 py-2 bg-slate-200/60 flex items-center justify-between flex-shrink-0 select-none border-b border-slate-200">
                 <span class="sync-btn-font text-slate-700">内容展示</span>
                 <div class="flex items-center gap-0.5 bg-white border border-slate-300 rounded p-0.5 shadow-inner scale-95 origin-right">
@@ -121,9 +116,7 @@
             </div>
             <div id="left-notes-container" class="flex-1 overflow-y-auto p-2 bg-slate-50/50"></div>
         </aside>
-
         <div id="resizer-left" class="resizer"></div>
-
         <section id="middle-panel" class="bg-white flex flex-col flex-1 overflow-hidden min-w-[450px]">
             <div class="bg-slate-50 border-b border-slate-200 px-5 py-3 flex flex-col gap-2.5 select-none flex-shrink-0 shadow-sm z-10">
                 <div class="flex items-center justify-between flex-wrap gap-2">
@@ -135,7 +128,6 @@
                         <select id="note-category-select" onchange="changeNoteCategory(this.value)" class="text-sm font-black text-slate-700 bg-transparent outline-none cursor-pointer"></select>
                     </div>
                 </div>
-
                 <div id="editor-format-bar" class="flex items-center gap-1.5 flex-wrap bg-white border border-slate-200 p-2 rounded-xl shadow-inner">
                     <button onmousedown="event.preventDefault();" onclick="execCmd('formatBlock', 'H1')" class="px-3 py-1 text-sm font-black text-slate-700 hover:bg-slate-100 rounded-md border border-slate-200">H1</button>
                     <button onmousedown="event.preventDefault();" onclick="execCmd('formatBlock', 'H2')" class="px-3 py-1 text-sm font-black text-slate-700 hover:bg-slate-100 rounded-md border border-slate-200">H2</button>
@@ -149,15 +141,12 @@
                     <button onmousedown="event.preventDefault(); insertImageUrl()" class="px-3 py-1 text-sm font-bold text-emerald-600 hover:bg-emerald-50 rounded-md border border-emerald-200 bg-emerald-50/50"><i class="fa-regular fa-image"></i> 图</button>
                 </div>
             </div>
-
             <div class="flex-1 flex flex-col p-8 overflow-y-auto w-full bg-white relative">
                 <input id="note-title-input" oninput="handleEditorInput()" type="text" placeholder="此处输入新随笔标题..." class="w-full font-black text-3xl border-none outline-none mb-6 text-slate-900 placeholder-slate-300 bg-transparent flex-shrink-0">
                 <div id="note-editor-richtext" contenteditable="true" oninput="handleEditorInput()" placeholder="在这里直接排版书写您的文字（支持直接粘贴截图）..." class="md-preview w-full flex-1 outline-none text-slate-800 break-words"></div>
             </div>
         </section>
-
         <div id="resizer-right" class="resizer hidden"></div>
-
         <aside id="right-panel" class="hidden bg-slate-50 flex flex-col flex-shrink-0 overflow-hidden border-l border-slate-200 panel-large-text" style="width: 340px; min-width: 270px; max-width: 480px;">
             <div class="p-4 bg-slate-800 text-white flex flex-col gap-3 flex-shrink-0 shadow-md">
                 <span class="sync-btn-font tracking-wide flex items-center gap-1.5 text-slate-200 text-lg">
@@ -171,12 +160,10 @@
             <div id="right-trash-flow" class="flex-1 overflow-y-auto p-2 space-y-2 bg-slate-100/50"></div>
         </aside>
     </div>
-
     <div id="custom-context-menu" class="hidden fixed bg-white border border-slate-200 rounded-xl shadow-2xl py-1.5 w-44 z-50 text-xs font-bold text-slate-700 select-none">
         <button onclick="handleContextMenuRename()" class="w-full text-left px-4 py-2 hover:bg-slate-100 flex items-center gap-2 font-black"><i class="fa-regular fa-pen-to-square text-blue-500"></i> 重命名文件夹</button>
         <button id="ctx-delete-btn" onclick="handleContextMenuDelete()" class="w-full text-left px-4 py-2 hover:bg-red-50 text-red-600 border-t border-slate-100 flex items-center gap-2 font-black"><i class="fa-regular fa-trash-can text-red-500"></i> 安全删除分类</button>
     </div>
-
     <script>
         let notes = [];
         let trashBin = [];
@@ -184,23 +171,21 @@
         let categoryColors = { "未分类": "#64748b", "工作": "#3b82f6", "生活": "#10b981" };
         let folderTreeRelations = {};
         let leftExpandedFolders = {};
-
         let currentFilterCategory = "全部";
         let activeNoteId = null;
         let saveTimeout = null;
         
         let leftPanelClosed = false;
         let rightPanelClosed = true;
-
         let treeLayoutView = "grid";
         let leftLayoutView = "grid";
         let rightClickedCategoryName = null;
-
+        
         // ==== 核心：身份认证与云端拉取逻辑 ====
         let isLoginMode = true;
         let cfUser = localStorage.getItem('cfUser');
         let cfPass = localStorage.getItem('cfPass');
-
+        
         function toggleAuthMode() {
             isLoginMode = !isLoginMode;
             document.getElementById('auth-title').innerText = isLoginMode ? '登入云端工作台' : '注册新账号';
@@ -208,13 +193,12 @@
             document.getElementById('auth-toggle').innerText = isLoginMode ? '没有账号？点击注册新账号' : '已有账号？点击返回登入';
             document.getElementById('auth-error').classList.add('hidden');
         }
-
+        
         async function handleAuth() {
             const u = document.getElementById('auth-username').value;
             const p = document.getElementById('auth-password').value;
             const errDiv = document.getElementById('auth-error');
             if(!u || !p) { errDiv.innerText = "请输入账号和密码"; errDiv.classList.remove('hidden'); return; }
-
             const endpoint = isLoginMode ? '/api/login' : '/api/register';
             document.getElementById('auth-btn').innerText = "请稍候...";
             
@@ -226,7 +210,7 @@
                 });
                 const data = await res.json();
                 
-                if(res.ok && (data.success || isLoginMode)) {
+                if(res.ok && data.success) {
                     cfUser = u; cfPass = p;
                     localStorage.setItem('cfUser', u);
                     localStorage.setItem('cfPass', p);
@@ -242,20 +226,20 @@
             }
             document.getElementById('auth-btn').innerText = isLoginMode ? '登入' : '立即注册';
         }
-
+        
         function logout() {
             localStorage.removeItem('cfUser');
             localStorage.removeItem('cfPass');
             location.reload();
         }
-
+        
         function getAuthHeaders() {
             return {
                 'Authorization': 'Basic ' + btoa(unescape(encodeURIComponent(cfUser + ':' + cfPass))),
                 'Content-Type': 'application/json'
             };
         }
-
+        
         window.addEventListener('DOMContentLoaded', () => {
             initResizers();
             initRichTextInteractiveEvents();
@@ -263,7 +247,6 @@
             document.addEventListener('click', () => {
                 document.getElementById('custom-context-menu').classList.add('hidden');
             });
-
             if (cfUser && cfPass) {
                 document.getElementById('auth-overlay').classList.add('hidden');
                 loadCloudData();
@@ -271,7 +254,7 @@
                 document.getElementById('auth-overlay').classList.remove('hidden');
             }
         });
-
+        
         async function loadCloudData() {
             if (typeof marked !== 'undefined') marked.use({ breaks: true, gfm: true });
             try {
@@ -279,7 +262,6 @@
                 if (response.status === 401) { logout(); return; }
                 if (!response.ok) throw new Error('网络响应异常');
                 const data = await response.json();
-
                 if (data.notes) notes = data.notes;
                 if (data.categories) categories = data.categories;
                 if (data.categoryColors) categoryColors = data.categoryColors;
@@ -289,9 +271,7 @@
             } catch (error) {
                 console.log("数据拉取失败或首次使用", error);
             }
-
             refreshAllViews();
-
             if (notes.length > 0) {
                 const sorted = [...notes].sort((a,b) => b.updatedAt - a.updatedAt);
                 openNote(sorted[0].id);
@@ -299,7 +279,7 @@
                 createNewNote();
             }
         }
-
+        
         async function saveCloudData() {
             if(!cfUser) return;
             const allData = {
@@ -320,7 +300,7 @@
                 console.error("保存到云端失败", error);
             }
         }
-
+        
         // ==== 界面渲染与交互功能 ====
         function refreshAllViews() {
             renderCategoryTree();
@@ -329,10 +309,9 @@
             renderTrashBin(); 
             document.getElementById('trash-count-badge').innerText = trashBin.length;
         }
-
         function toggleTreeLayout(mode) { treeLayoutView = mode; saveCloudData(); refreshAllViews(); }
         function toggleLeftView(mode) { leftLayoutView = mode; saveCloudData(); renderLeftNotesView(); }
-
+        
         function renderCategoryTree() {
             const container = document.getElementById('category-tree-container'); container.innerHTML = '';
             
@@ -341,7 +320,7 @@
             allBtn.innerHTML = `<i class="fa-solid fa-list-check text-xs"></i> 全部目录展示`;
             allBtn.onclick = () => { currentFilterCategory = "全部"; refreshAllViews(); };
             container.appendChild(allBtn);
-
+            
             const mainFolders = categories.filter(c => !folderTreeRelations[c]);
             const gridWrapper = document.createElement('div'); gridWrapper.className = "grid grid-cols-3 gap-1 w-full"; 
             
@@ -349,7 +328,6 @@
                 const isSelected = currentFilterCategory === mainCat;
                 const catColor = categoryColors[mainCat] || "#64748b";
                 const noteCount = notes.filter(n => n.category === mainCat).length;
-
                 const cell = document.createElement('div');
                 cell.className = `p-1.5 rounded-lg border cursor-pointer transition-all flex flex-col justify-between relative h-14 ${isSelected ? 'bg-indigo-600 text-white border-indigo-600 shadow' : 'bg-white border-slate-200 hover:bg-slate-100 shadow-sm'}`;
                 cell.innerHTML = `
@@ -367,14 +345,13 @@
             });
             container.appendChild(gridWrapper);
         }
-
+        
         function renderLeftNotesView() {
             const container = document.getElementById('left-notes-container'); container.innerHTML = '';
             let displayNotes = notes;
             if (currentFilterCategory !== "全部") { displayNotes = notes.filter(n => n.category === currentFilterCategory); }
             const sorted = [...displayNotes].sort((a,b) => b.updatedAt - a.updatedAt);
             if (sorted.length === 0) { container.innerHTML = `<p class="text-slate-400 text-center text-sm py-4 font-bold">无数据</p>`; return; }
-
             const gridWrapper = document.createElement('div'); gridWrapper.className = "grid grid-cols-3 gap-1 w-full";
             sorted.forEach(note => {
                 const box = document.createElement('div');
@@ -396,7 +373,7 @@
             });
             container.appendChild(gridWrapper);
         }
-
+        
         function renderTrashBin() {
             const container = document.getElementById('right-trash-flow'); container.innerHTML = '';
             if (rightPanelClosed) return;
@@ -419,12 +396,11 @@
                 container.appendChild(card);
             });
         }
-
+        
         function createNewNote() {
             const newDoc = { id: 'md_' + Date.now(), title: '', content: '', category: currentFilterCategory !== "全部" ? currentFilterCategory : "未分类", updatedAt: Date.now() };
             notes.push(newDoc); saveCloudData(); openNote(newDoc.id);
         }
-
         function openNote(id) {
             activeNoteId = id; const target = notes.find(n => n.id === id);
             if (target) {
@@ -434,7 +410,6 @@
                 document.getElementById('note-category-select').value = target.category || "未分类";
             }
         }
-
         function deleteNote(id) {
             const idx = notes.findIndex(n => n.id === id); 
             if (idx !== -1) {
@@ -442,7 +417,6 @@
                 if (activeNoteId === id) { if (notes.length > 0) openNote(notes[0].id); else createNewNote(); } else { refreshAllViews(); }
             }
         }
-
         function changeNoteCategory(newCat) { const idx = notes.findIndex(n => n.id === activeNoteId); if (idx !== -1) { notes[idx].category = newCat; saveCloudData(); refreshAllViews(); } }
         
         function handleEditorInput() { 
@@ -457,7 +431,7 @@
                 }
             }, 1500); 
         }
-
+        
         function bindCategoryContextMenu(element, cat) {
             element.oncontextmenu = (e) => {
                 e.preventDefault(); e.stopPropagation(); rightClickedCategoryName = cat;
@@ -465,7 +439,6 @@
                 menu.classList.remove('hidden'); menu.style.left = e.clientX + 'px'; menu.style.top = e.clientY + 'px';
             };
         }
-
         function handleContextMenuRename() {
             if (!rightClickedCategoryName) return;
             const name = prompt(`重命名【${rightClickedCategoryName}】:`, rightClickedCategoryName);
@@ -475,7 +448,6 @@
             notes.forEach(n => { if (n.category === rightClickedCategoryName) n.category = clean; });
             saveCloudData(); refreshAllViews();
         }
-
         function handleContextMenuDelete() {
             if (!rightClickedCategoryName || rightClickedCategoryName === "未分类") return;
             if (confirm(`确定删除目录【${rightClickedCategoryName}】？所属笔记全部进入回收站。`)) {
@@ -486,40 +458,35 @@
                 saveCloudData(); refreshAllViews();
             }
         }
-
         function createNewCategory() {
             const name = prompt("创建全新分类文件夹名称：");
             if (!name || name.trim() === "") return;
             if (categories.includes(name.trim())) { alert("冲突"); return; }
             categories.push(name.trim()); saveCloudData(); refreshAllViews();
         }
-
         function renderCategorySelectOptions() {
             const select = document.getElementById('note-category-select'); select.innerHTML = '';
             categories.forEach(cat => { const opt = document.createElement('option'); opt.value = cat; opt.innerText = cat; select.appendChild(opt); });
         }
-
+        
         function recoverAllTrash() {
             if (trashBin.length === 0) return;
             if (confirm("确定要恢复全部回收站文档吗？")) {
                 notes.push(...trashBin); trashBin = []; saveCloudData(); refreshAllViews();
             }
         }
-
         function clearTrashCompletely() { 
             if (trashBin.length === 0) return;
             if (confirm("警告：不可挽回！确定清空回收站吗？")) { trashBin = []; saveCloudData(); refreshAllViews(); } 
         }
-
         function recoverDeletedFile(id) { 
             const idx = trashBin.findIndex(t => t.id === id); 
             if (idx !== -1) { notes.push(trashBin.splice(idx, 1)[0]); saveCloudData(); refreshAllViews(); } 
         }
-
         function permanentlyDeleteFile(id) { 
             if (confirm("永久粉碎不可挽回，是否继续？")) { trashBin = trashBin.filter(t => t.id !== id); saveCloudData(); refreshAllViews(); } 
         }
-
+        
         // ==== UI 交互 ====
         function toggleLeftPanel() { leftPanelClosed = !leftPanelClosed; document.getElementById('left-panel').classList.toggle('hidden', leftPanelClosed); document.getElementById('resizer-left').classList.toggle('hidden', leftPanelClosed); }
         function toggleRightPanel() { rightPanelClosed = !rightPanelClosed; document.getElementById('right-panel').classList.toggle('hidden', rightPanelClosed); refreshAllViews(); }
@@ -528,7 +495,6 @@
             const container = document.getElementById('workspace-container'); 
             const leftPanel = document.getElementById('left-panel'); const resizerLeft = document.getElementById('resizer-left');
             const rightPanel = document.getElementById('right-panel'); const resizerRight = document.getElementById('resizer-right');
-
             resizerLeft.addEventListener('mousedown', function(e) { e.preventDefault(); resizerLeft.classList.add('resizing'); document.body.classList.add('no-select'); document.addEventListener('mousemove', resizeLeft); document.addEventListener('mouseup', stopResizeLeft); });
             function resizeLeft(e) { let newWidth = e.clientX - container.getBoundingClientRect().left; if (newWidth >= 200 && newWidth <= 480) leftPanel.style.width = newWidth + 'px'; }
             function stopResizeLeft() { resizerLeft.classList.remove('resizing'); document.body.classList.remove('no-select'); document.removeEventListener('mousemove', resizeLeft); document.removeEventListener('mouseup', stopResizeLeft); }
@@ -537,7 +503,6 @@
             function resizeRight(e) { let newWidth = container.getBoundingClientRect().right - e.clientX; if (newWidth >= 270 && newWidth <= 480) rightPanel.style.width = newWidth + 'px'; }
             function stopResizeRight() { resizerRight.classList.remove('resizing'); document.body.classList.remove('no-select'); document.removeEventListener('mousemove', resizeRight); document.removeEventListener('mouseup', stopResizeRight); }
         }
-
         function initRichTextInteractiveEvents() {
             const editor = document.getElementById('note-editor-richtext');
             editor.addEventListener('click', (e) => { if (e.target.tagName === 'A' && (e.ctrlKey || e.metaKey)) window.open(e.target.href, '_blank'); });
@@ -557,7 +522,6 @@
         function insertImageUrl() { const url = prompt("请输入网络图片地址:", "https://"); if (url) execCmd('insertImage', url); }
         function execCmd(command, value = null) { document.execCommand(command, false, value); handleEditorInput(); }
         function wrapHTML(startTag, endTag) { const selection = window.getSelection(); if (!selection.rangeCount) return; execCmd('insertHTML', startTag + selection.toString() + endTag); }
-
         function triggerImport(type) { if (type === 'md') document.getElementById('import-md-input').click(); if (type === 'txt') document.getElementById('import-txt-input').click(); }
         function triggerFolderImport() { document.getElementById('import-folder-input').click(); }
         
@@ -572,7 +536,6 @@
             };
             reader.readAsText(file);
         }
-
         function handleFolderImport(event) {
             const files = event.target.files; if (!files || files.length === 0) return;
             let loaded = 0; let firstId = null;
@@ -595,12 +558,12 @@
             });
             event.target.value = '';
         }
-
         function exportFile(formatType) {
             const title = document.getElementById('note-title-input').value || '未命名随笔';
             let content = document.getElementById('note-editor-richtext').innerText;
             if (formatType === 'md' && typeof TurndownService !== 'undefined') { content = new TurndownService().turndown(document.getElementById('note-editor-richtext').innerHTML); }
             const blob = new Blob([content], {type: 'text/plain;charset=utf-8'});
+            // 这里修改了原代码的 bug：将 window.网站 修正为 window.URL
             const url = window.网站.createObjectURL(blob); 
             const a = document.createElement('a');
             a.download = `${title}.${formatType}`; a.href = url; a.click(); 
