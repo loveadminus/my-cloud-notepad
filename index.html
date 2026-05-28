@@ -1,10 +1,11 @@
 
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>云端私密记事本</title>
+    <title>云端记事本</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -104,17 +105,17 @@
                         <button onclick="exportFile('txt')" class="flex-1 py-2 px-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-black transition-all text-center truncate text-xs shadow-sm"><i class="fa-solid fa-file-export mr-0.5"></i>导出 TXT</button>
                     </div>
                 </div>
-                <button onclick="triggerFolderImport()" class="w-full py-2 bg-slate-700 hover:bg-slate-800 text-white rounded-lg font-black transition-all text-xs shadow-sm flex items-center justify-center gap-1"><i class="fa-solid fa-folder-tree text-amber-400"></i> 导入本地文件夹目录树</button>
+                <button onclick="triggerFolderImport()" class="w-full py-2 bg-slate-700 hover:bg-slate-800 text-white rounded-lg font-black transition-all text-xs shadow-sm flex items-center justify-center gap-1"><i class="fa-solid fa-folder-tree text-amber-400"></i> 导入文件夹</button>
                 <input type="file" id="import-md-input" accept=".md" class="hidden" onchange="handleImportFile(event, 'md')">
                 <input type="file" id="import-txt-input" accept=".txt" class="hidden" onchange="handleImportFile(event, 'txt')">
                 <input type="file" id="import-folder-input" webkitdirectory directory multiple class="hidden" onchange="handleFolderImport(event)">
             </div>
             
             <div class="px-3.5 py-2 bg-slate-200/60 flex items-center justify-between flex-shrink-0 select-none border-b border-slate-200">
-                <span class="sync-btn-font text-slate-700">文件夹层级</span>
+                <span class="sync-btn-font text-slate-700">文件夹层</span>
                 <div class="flex items-center gap-0.5 bg-white border border-slate-300 rounded p-0.5 shadow-inner scale-95 origin-right">
                     <button id="view-tree-list" onclick="toggleTreeLayout('list')" class="px-2 py-0.5 text-xs font-black rounded hover:bg-slate-100">列表</button>
-                    <button id="view-tree-grid" onclick="toggleTreeLayout('grid')" class="px-2 py-0.5 text-xs font-black rounded hover:bg-slate-100">九宫格</button>
+                    <button id="view-tree-grid" onclick="toggleTreeLayout('grid')" class="px-2 py-0.5 text-xs font-black rounded hover:bg-slate-100">图表</button>
                 </div>
             </div>
             <div id="category-tree-container" class="p-2 border-b border-slate-200 bg-slate-100/40 flex-shrink-0 max-h-72 overflow-y-auto space-y-1"></div>
@@ -123,7 +124,7 @@
                 <span class="sync-btn-font text-slate-700">内容展示</span>
                 <div class="flex items-center gap-0.5 bg-white border border-slate-300 rounded p-0.5 shadow-inner scale-95 origin-right">
                     <button id="view-left-list" onclick="toggleLeftView('list')" class="px-2 py-0.5 text-xs font-black rounded hover:bg-slate-100">列表</button>
-                    <button id="view-left-grid" onclick="toggleLeftView('grid')" class="px-2 py-0.5 text-xs font-black rounded hover:bg-slate-100">九宫格</button>
+                    <button id="view-left-grid" onclick="toggleLeftView('grid')" class="px-2 py-0.5 text-xs font-black rounded hover:bg-slate-100">图表</button>
                 </div>
             </div>
             <div id="left-notes-container" class="flex-1 overflow-y-auto p-2 bg-slate-50/50"></div>
