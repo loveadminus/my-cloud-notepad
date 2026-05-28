@@ -102,19 +102,21 @@
                 <input type="file" id="import-txt-input" accept=".txt" class="hidden" onchange="handleImportFile(event, 'txt')">
                 <input type="file" id="import-folder-input" webkitdirectory directory multiple class="hidden" onchange="handleFolderImport(event)">
             </div>
+            
             <div class="px-3.5 py-2 bg-slate-200/60 flex items-center justify-between flex-shrink-0 select-none border-b border-slate-200">
                 <span class="sync-btn-font text-slate-700">文件夹目录</span>
                 <div class="flex items-center gap-0.5 bg-white border border-slate-300 rounded p-0.5 shadow-inner scale-95 origin-right">
-                    <button id="view-tree-list" onclick="toggleTreeLayout('list')" class="px-2 py-0.5 text-xs font-black rounded">列表</button>
-                    <button id="view-tree-grid" onclick="toggleTreeLayout('grid')" class="px-2 py-0.5 text-xs font-black rounded">九宫格</button>
+                    <button id="view-tree-list" onclick="toggleTreeLayout('list')" class="px-2 py-0.5 text-xs font-black rounded hover:bg-slate-100">列表</button>
+                    <button id="view-tree-grid" onclick="toggleTreeLayout('grid')" class="px-2 py-0.5 text-xs font-black rounded hover:bg-slate-100">九宫格</button>
                 </div>
             </div>
             <div id="category-tree-container" class="p-2 border-b border-slate-200 bg-slate-100/40 flex-shrink-0 max-h-64 overflow-y-auto"></div>
+            
             <div class="px-3.5 py-2 bg-slate-200/60 flex items-center justify-between flex-shrink-0 select-none border-b border-slate-200">
                 <span class="sync-btn-font text-slate-700">内容展示</span>
                 <div class="flex items-center gap-0.5 bg-white border border-slate-300 rounded p-0.5 shadow-inner scale-95 origin-right">
-                    <button id="view-left-list" onclick="toggleLeftView('list')" class="px-2 py-0.5 text-xs font-black rounded">列表</button>
-                    <button id="view-left-grid" onclick="toggleLeftView('grid')" class="px-2 py-0.5 text-xs font-black rounded">九宫格</button>
+                    <button id="view-left-list" onclick="toggleLeftView('list')" class="px-2 py-0.5 text-xs font-black rounded hover:bg-slate-100">列表</button>
+                    <button id="view-left-grid" onclick="toggleLeftView('grid')" class="px-2 py-0.5 text-xs font-black rounded hover:bg-slate-100">九宫格</button>
                 </div>
             </div>
             <div id="left-notes-container" class="flex-1 overflow-y-auto p-2 bg-slate-50/50"></div>
@@ -153,7 +155,15 @@
                     <div class="h-5 w-[1px] bg-slate-300 mx-1"></div>
                     
                     <button onmousedown="event.preventDefault();" onclick="execCmd('bold')" class="px-3 py-1 text-sm font-bold text-slate-700 hover:bg-slate-100 rounded-md border border-slate-200" title="加粗"><i class="fa-solid fa-bold"></i></button>
-                    <button onmousedown="event.preventDefault();" onclick="execCmd('foreColor', '#000000')" class="px-3 py-1 text-sm font-bold text-white hover:bg-slate-900 rounded-md border border-slate-800 bg-slate-800 transition-colors shadow-sm" title="一键变黑"><i class="fa-solid fa-font"></i> 黑</button>
+                    
+                    <button onmousedown="event.preventDefault();" onclick="execCmd('foreColor', '#ef4444')" class="px-2 py-1 text-xs font-bold text-white hover:opacity-80 rounded-md shadow-sm" style="background-color: #ef4444;" title="红">红</button>
+                    <button onmousedown="event.preventDefault();" onclick="execCmd('foreColor', '#eab308')" class="px-2 py-1 text-xs font-bold text-white hover:opacity-80 rounded-md shadow-sm" style="background-color: #eab308;" title="黄">黄</button>
+                    <button onmousedown="event.preventDefault();" onclick="execCmd('foreColor', '#3b82f6')" class="px-2 py-1 text-xs font-bold text-white hover:opacity-80 rounded-md shadow-sm" style="background-color: #3b82f6;" title="蓝">蓝</button>
+                    <button onmousedown="event.preventDefault();" onclick="execCmd('foreColor', '#22c55e')" class="px-2 py-1 text-xs font-bold text-white hover:opacity-80 rounded-md shadow-sm" style="background-color: #22c55e;" title="绿">绿</button>
+                    <button onmousedown="event.preventDefault();" onclick="execCmd('foreColor', '#000000')" class="px-2 py-1 text-xs font-bold text-white hover:opacity-80 rounded-md shadow-sm" style="background-color: #0f172a;" title="黑">黑</button>
+
+                    <div class="h-5 w-[1px] bg-slate-300 mx-1"></div>
+
                     <button onmousedown="event.preventDefault();" onclick="wrapHTML('<code>', '</code>')" class="px-3 py-1 text-sm font-mono text-slate-700 hover:bg-slate-100 rounded-md border border-slate-200"><i class="fa-solid fa-code"></i></button>
                     <button onmousedown="event.preventDefault();" onclick="execCmd('removeFormat')" class="px-3 py-1 text-sm font-bold text-slate-600 hover:bg-slate-200 rounded-md border border-slate-200 bg-slate-50" title="清除格式"><i class="fa-solid fa-eraser"></i></button>
                     <div class="h-5 w-[1px] bg-slate-300 mx-1"></div>
@@ -336,6 +346,12 @@
         }
         
         function refreshAllViews() {
+            // 更新按钮激活状态样式
+            document.getElementById('view-tree-list').style.backgroundColor = treeLayoutView === 'list' ? '#cbd5e1' : 'transparent';
+            document.getElementById('view-tree-grid').style.backgroundColor = treeLayoutView === 'grid' ? '#cbd5e1' : 'transparent';
+            document.getElementById('view-left-list').style.backgroundColor = leftLayoutView === 'list' ? '#cbd5e1' : 'transparent';
+            document.getElementById('view-left-grid').style.backgroundColor = leftLayoutView === 'grid' ? '#cbd5e1' : 'transparent';
+
             renderCategoryTree();
             renderCategorySelectOptions();
             renderLeftNotesView();
@@ -344,7 +360,7 @@
         }
         
         function toggleTreeLayout(mode) { treeLayoutView = mode; saveCloudData(); refreshAllViews(); }
-        function toggleLeftView(mode) { leftLayoutView = mode; saveCloudData(); renderLeftNotesView(); }
+        function toggleLeftView(mode) { leftLayoutView = mode; saveCloudData(); refreshAllViews(); }
         
         function renderCategoryTree() {
             const container = document.getElementById('category-tree-container'); container.innerHTML = '';
@@ -356,7 +372,9 @@
             container.appendChild(allBtn);
             
             const mainFolders = categories.filter(c => !folderTreeRelations[c]);
-            const gridWrapper = document.createElement('div'); gridWrapper.className = "grid grid-cols-3 gap-1 w-full"; 
+            const gridWrapper = document.createElement('div'); 
+            // 依据视图模式切换网格类名
+            gridWrapper.className = treeLayoutView === 'list' ? "grid grid-cols-1 gap-1 w-full" : "grid grid-cols-3 gap-1 w-full";
             
             mainFolders.forEach(mainCat => {
                 const isSelected = currentFilterCategory === mainCat;
@@ -386,7 +404,11 @@
             if (currentFilterCategory !== "全部") { displayNotes = notes.filter(n => n.category === currentFilterCategory); }
             const sorted = [...displayNotes].sort((a,b) => b.updatedAt - a.updatedAt);
             if (sorted.length === 0) { container.innerHTML = `<p class="text-slate-400 text-center text-sm py-4 font-bold">无数据</p>`; return; }
-            const gridWrapper = document.createElement('div'); gridWrapper.className = "grid grid-cols-3 gap-1 w-full";
+            
+            const gridWrapper = document.createElement('div'); 
+            // 依据视图模式切换网格类名
+            gridWrapper.className = leftLayoutView === 'list' ? "grid grid-cols-1 gap-1 w-full" : "grid grid-cols-3 gap-1 w-full";
+            
             sorted.forEach(note => {
                 const box = document.createElement('div');
                 box.className = `w-full h-16 p-1.5 rounded-lg border cursor-pointer flex flex-col justify-between transition-all text-xs bg-white border-slate-200 hover:bg-slate-100 shadow-sm break-all relative group ${note.id === activeNoteId ? 'bg-blue-50 border-blue-400 ring-1 ring-blue-100 shadow' : ''}`;
@@ -536,9 +558,45 @@
             function resizeRight(e) { let newWidth = container.getBoundingClientRect().right - e.clientX; if (newWidth >= 270 && newWidth <= 480) rightPanel.style.width = newWidth + 'px'; }
             function stopResizeRight() { resizerRight.classList.remove('resizing'); document.body.classList.remove('no-select'); document.removeEventListener('mousemove', resizeRight); document.removeEventListener('mouseup', stopResizeRight); }
         }
+
+        // 初始化富文本事件及图片拖拽缩放逻辑
         function initRichTextInteractiveEvents() {
             const editor = document.getElementById('note-editor-richtext');
             editor.addEventListener('click', (e) => { if (e.target.tagName === 'A' && (e.ctrlKey || e.metaKey)) window.open(e.target.href, '_blank'); });
+            
+            // 核心：图片原生拖拉改变大小逻辑
+            let activeImage = null;
+            let startY = 0;
+            let startHeight = 0;
+
+            editor.addEventListener('mousedown', (e) => {
+                if (e.target.tagName === 'IMG') {
+                    e.preventDefault(); // 阻断默认的原生拖拽移动行为
+                    activeImage = e.target;
+                    startY = e.clientY;
+                    startHeight = activeImage.clientHeight || activeImage.offsetHeight;
+                    document.body.style.cursor = 'ns-resize'; // 鼠标变成上下拖拽样式
+                    document.addEventListener('mousemove', resizeImg);
+                    document.addEventListener('mouseup', stopResizeImg);
+                }
+            });
+
+            function resizeImg(e) {
+                if (activeImage) {
+                    const dy = e.clientY - startY;
+                    activeImage.style.height = (startHeight + dy) + 'px';
+                    activeImage.style.width = 'auto'; // 锁定比例
+                }
+            }
+
+            function stopResizeImg() {
+                activeImage = null;
+                document.body.style.cursor = 'default';
+                document.removeEventListener('mousemove', resizeImg);
+                document.removeEventListener('mouseup', stopResizeImg);
+                handleEditorInput(); // 调整完后触发云端保存
+            }
+
             editor.addEventListener('paste', (e) => {
                 const items = (e.clipboardData || window.clipboardData).items;
                 for (let i = 0; i < items.length; i++) {
