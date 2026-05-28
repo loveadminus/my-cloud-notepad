@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -16,7 +15,8 @@
         .md-preview h1 { font-size: 2.6rem; font-weight: 800; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.3em; margin-top: 1.6rem; margin-bottom: 1rem; color: #0f172a; }
         .md-preview h2 { font-size: 2.1rem; font-weight: 700; border-bottom: 1px solid #edf2f7; padding-bottom: 0.3em; margin-top: 1.4rem; margin-bottom: 0.8rem; color: #1e293b; }
         .md-preview h3 { font-size: 1.8rem; font-weight: 600; margin-top: 1.2rem; margin-bottom: 0.6rem; color: #334155; }
-        .md-preview p, .md-preview div { margin-bottom: 0.6rem; line-height: 1.2; color: #334155; font-size: 15px; }
+        /* 默认字号修改为 18px (约四号字体)，并增大行高 */
+        .md-preview p, .md-preview div { margin-bottom: 0.8rem; line-height: 1.6; color: #1e293b; font-size: 18px; }
         .md-preview code { background-color: #fee2e2; padding: 0.2em 0.5em; border-radius: 6px; font-size: 95%; font-family: monospace; color: #be185d; }
         .md-preview pre { background-color: #1e293b; color: #f8fafc; padding: 1.5rem; border-radius: 10px; overflow-x: auto; margin-bottom: 1.5rem; }
         .md-preview pre code { background-color: transparent; color: inherit; padding: 0; font-size: 17px; }
@@ -45,6 +45,7 @@
     </style>
 </head>
 <body class="bg-slate-900 font-sans h-screen flex flex-col overflow-hidden text-slate-800">
+    
     <div id="auth-overlay" class="fixed inset-0 bg-slate-900 z-[100] flex items-center justify-center transition-opacity">
         <div class="bg-white p-8 rounded-2xl shadow-2xl w-96 flex flex-col gap-4">
             <h2 class="text-2xl font-black mb-2 text-center text-slate-800" id="auth-title">登入云端工作台</h2>
@@ -55,6 +56,7 @@
             <div class="text-center text-sm font-bold text-slate-500 cursor-pointer hover:text-blue-600 transition-colors mt-2" onclick="toggleAuthMode()" id="auth-toggle">没有账号？点击注册新账号</div>
         </div>
     </div>
+
     <header class="bg-slate-800 text-slate-200 py-1.5 px-6 flex items-center justify-between flex-shrink-0 select-none border-b border-slate-700 shadow-md relative">
         <div class="flex items-center gap-3 z-10">
             <button onclick="toggleLeftPanel()" class="bg-blue-700 hover:bg-blue-800 text-white font-black px-3 py-1.5 rounded-xl text-sm transition-all shadow-md flex items-center gap-2 border border-blue-600 mr-2">
@@ -78,6 +80,7 @@
             </button>
         </div>
     </header>
+
     <div id="workspace-container" class="flex flex-1 overflow-hidden w-full bg-slate-200">
         <aside id="left-panel" class="bg-slate-50 flex flex-col flex-shrink-0 overflow-hidden border-r border-slate-200 panel-large-text transition-all" style="width: 275px; min-width: 200px; max-width: 480px;">
             <div class="p-2 border-b border-slate-200 bg-slate-100/80 flex flex-col gap-1.5 flex-shrink-0">
@@ -117,58 +120,77 @@
             </div>
             <div id="left-notes-container" class="flex-1 overflow-y-auto p-2 bg-slate-50/50"></div>
         </aside>
+        
         <div id="resizer-left" class="resizer"></div>
+        
         <section id="middle-panel" class="bg-white flex flex-col flex-1 overflow-hidden min-w-[450px]">
             <div class="bg-slate-50 border-b border-slate-200 px-5 py-3 flex flex-col gap-2.5 select-none flex-shrink-0 shadow-sm z-10">
                 <div class="flex items-center justify-between flex-wrap gap-2">
                     <div class="flex items-center gap-1.5 bg-emerald-100/50 text-emerald-700 border border-emerald-200 px-4 py-2 rounded-xl shadow-sm font-black text-sm">
-                        <i class="fa-solid fa-pen-nib"></i> 实时编辑模式
+                        <i class="fa-solid fa-pen-nib"></i> 所见即所得编辑模式
                     </div>
                     <div class="flex items-center gap-1.5 bg-white border border-slate-300 px-4 py-2 rounded-xl shadow-sm">
                         <span class="text-sm font-black text-slate-400"><i class="fa-solid fa-folder"></i> 归属文件夹:</span>
                         <select id="note-category-select" onchange="changeNoteCategory(this.value)" class="text-sm font-black text-slate-700 bg-transparent outline-none cursor-pointer"></select>
                     </div>
                 </div>
+                
                 <div id="editor-format-bar" class="flex items-center gap-1.5 flex-wrap bg-white border border-slate-200 p-2 rounded-xl shadow-inner">
+                    <select onchange="if(this.value){execCmd('fontSize', this.value); this.selectedIndex=0;}" class="px-2 py-1 text-sm font-bold text-slate-700 hover:bg-slate-100 rounded-md border border-slate-200 outline-none cursor-pointer bg-slate-50">
+                        <option value="">字号</option>
+                        <option value="1">极小</option>
+                        <option value="2">小号</option>
+                        <option value="3">正常</option>
+                        <option value="4">四号(大)</option>
+                        <option value="5">特大</option>
+                        <option value="6">超大</option>
+                        <option value="7">极巨</option>
+                    </select>
+                    <div class="h-5 w-[1px] bg-slate-300 mx-1"></div>
+
                     <button onmousedown="event.preventDefault();" onclick="execCmd('formatBlock', 'H1')" class="px-3 py-1 text-sm font-black text-slate-700 hover:bg-slate-100 rounded-md border border-slate-200">H1</button>
                     <button onmousedown="event.preventDefault();" onclick="execCmd('formatBlock', 'H2')" class="px-3 py-1 text-sm font-black text-slate-700 hover:bg-slate-100 rounded-md border border-slate-200">H2</button>
                     <button onmousedown="event.preventDefault();" onclick="execCmd('formatBlock', 'H3')" class="px-3 py-1 text-sm font-black text-slate-700 hover:bg-slate-100 rounded-md border border-slate-200">H3</button>
                     <div class="h-5 w-[1px] bg-slate-300 mx-1"></div>
-                    <button onmousedown="event.preventDefault();" onclick="execCmd('bold')" class="px-3 py-1 text-sm font-bold text-slate-700 hover:bg-slate-100 rounded-md border border-slate-200"><i class="fa-solid fa-bold"></i></button>
+                    
+                    <button onmousedown="event.preventDefault();" onclick="execCmd('bold')" class="px-3 py-1 text-sm font-bold text-slate-700 hover:bg-slate-100 rounded-md border border-slate-200" title="加粗"><i class="fa-solid fa-bold"></i></button>
+                    <button onmousedown="event.preventDefault();" onclick="execCmd('foreColor', '#000000')" class="px-3 py-1 text-sm font-bold text-white hover:bg-slate-900 rounded-md border border-slate-800 bg-slate-800 transition-colors shadow-sm" title="一键变黑"><i class="fa-solid fa-font"></i> 黑</button>
                     <button onmousedown="event.preventDefault();" onclick="wrapHTML('<code>', '</code>')" class="px-3 py-1 text-sm font-mono text-slate-700 hover:bg-slate-100 rounded-md border border-slate-200"><i class="fa-solid fa-code"></i></button>
-                    <button onmousedown="event.preventDefault();" onclick="execCmd('removeFormat')" class="px-3 py-1 text-sm font-bold text-slate-600 hover:bg-slate-200 rounded-md border border-slate-200 bg-slate-50"><i class="fa-solid fa-eraser"></i></button>
+                    <button onmousedown="event.preventDefault();" onclick="execCmd('removeFormat')" class="px-3 py-1 text-sm font-bold text-slate-600 hover:bg-slate-200 rounded-md border border-slate-200 bg-slate-50" title="清除格式"><i class="fa-solid fa-eraser"></i></button>
                     <div class="h-5 w-[1px] bg-slate-300 mx-1"></div>
+                    
                     <button onmousedown="event.preventDefault(); insertHyperlink()" class="px-3 py-1 text-sm font-bold text-blue-600 hover:bg-blue-50 rounded-md border border-blue-200 bg-blue-50/50"><i class="fa-solid fa-link"></i> 链</button>
                     <button onmousedown="event.preventDefault(); insertImageUrl()" class="px-3 py-1 text-sm font-bold text-emerald-600 hover:bg-emerald-50 rounded-md border border-emerald-200 bg-emerald-50/50"><i class="fa-regular fa-image"></i> 图</button>
                 </div>
             </div>
+            
             <div class="flex-1 flex flex-col p-8 overflow-y-auto w-full bg-white relative">
                 <input id="note-title-input" oninput="handleEditorInput()" type="text" placeholder="此处输入新随笔标题..." class="w-full font-black text-3xl border-none outline-none mb-6 text-slate-900 placeholder-slate-300 bg-transparent flex-shrink-0">
                 <div id="note-editor-richtext" contenteditable="true" oninput="handleEditorInput()" placeholder="在这里直接排版书写您的文字（支持直接粘贴截图）..." class="md-preview w-full flex-1 outline-none text-slate-800 break-words"></div>
             </div>
         </section>
+        
         <div id="resizer-right" class="resizer hidden"></div>
-        <aside id="right-panel" class="hidden bg-slate-50 flex flex-col flex-shrink-0 overflow-hidden border-l border-slate-200 panel-large-text" style="width: 250px; min-width: 200px; max-width: 340px;">
+        
+        <aside id="right-panel" class="hidden bg-slate-50 flex flex-col flex-shrink-0 overflow-hidden border-l border-slate-200 panel-large-text" style="width: 250px; min-width: 200px; max-width: 480px;">
             <div class="p-4 bg-slate-800 text-white flex flex-col gap-3 flex-shrink-0 shadow-md">
                 <span class="sync-btn-font tracking-wide flex items-center gap-1.5 text-slate-200 text-lg">
                     <i class="fa-solid fa-dumpster-fire text-red-500"></i> 回收站 (<span id="trash-count-badge">0</span>)
                 </span>
                 <div class="flex items-center gap-2">
-                    <button onclick="recoverAllTrash()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-black py-2 rounded-xl text-xs transition-all shadow border border-emerald-500 flex items-center justify-center gap-1">
-                        <i class="fa-solid fa-trash-arrow-up"></i> 一键恢复
-                    </button>
-                    <button onclick="clearTrashCompletely()" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-black py-2 rounded-xl text-xs transition-all shadow border border-red-500 flex items-center justify-center gap-1">
-                        <i class="fa-solid fa-fire"></i> 一键清空
-                    </button>
+                    <button onclick="recoverAllTrash()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-black py-2 rounded-xl text-xs transition-all shadow border border-emerald-500 flex items-center justify-center gap-1"><i class="fa-solid fa-trash-arrow-up"></i> 一键恢复</button>
+                    <button onclick="clearTrashCompletely()" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-black py-2 rounded-xl text-xs transition-all shadow border border-red-500 flex items-center justify-center gap-1"><i class="fa-solid fa-fire"></i> 一键清空</button>
                 </div>
             </div>
             <div id="right-trash-flow" class="flex-1 overflow-y-auto p-2 space-y-2 bg-slate-100/50"></div>
         </aside>
     </div>
+    
     <div id="custom-context-menu" class="hidden fixed bg-white border border-slate-200 rounded-xl shadow-2xl py-1.5 w-44 z-50 text-xs font-bold text-slate-700 select-none">
         <button onclick="handleContextMenuRename()" class="w-full text-left px-4 py-2 hover:bg-slate-100 flex items-center gap-2 font-black"><i class="fa-regular fa-pen-to-square text-blue-500"></i> 重命名文件夹</button>
         <button id="ctx-delete-btn" onclick="handleContextMenuDelete()" class="w-full text-left px-4 py-2 hover:bg-red-50 text-red-600 border-t border-slate-100 flex items-center gap-2 font-black"><i class="fa-regular fa-trash-can text-red-500"></i> 安全删除分类</button>
     </div>
+
     <script>
         let notes = [];
         let trashBin = [];
@@ -314,6 +336,7 @@
             renderTrashBin(); 
             document.getElementById('trash-count-badge').innerText = trashBin.length;
         }
+        
         function toggleTreeLayout(mode) { treeLayoutView = mode; saveCloudData(); refreshAllViews(); }
         function toggleLeftView(mode) { leftLayoutView = mode; saveCloudData(); renderLeftNotesView(); }
         
@@ -419,161 +442,4 @@
             const idx = notes.findIndex(n => n.id === id); 
             if (idx !== -1) {
                 trashBin.push(notes.splice(idx, 1)[0]); saveCloudData();
-                if (activeNoteId === id) { if (notes.length > 0) openNote(notes[0].id); else createNewNote(); } else { refreshAllViews(); }
-            }
-        }
-        function changeNoteCategory(newCat) { const idx = notes.findIndex(n => n.id === activeNoteId); if (idx !== -1) { notes[idx].category = newCat; saveCloudData(); refreshAllViews(); } }
-        
-        function handleEditorInput() { 
-            if (!activeNoteId) return; if (saveTimeout) clearTimeout(saveTimeout);
-            saveTimeout = setTimeout(() => {
-                const idx = notes.findIndex(n => n.id === activeNoteId);
-                if (idx !== -1) {
-                    notes[idx].title = document.getElementById('note-title-input').value;
-                    notes[idx].content = document.getElementById('note-editor-richtext').innerHTML;
-                    notes[idx].updatedAt = Date.now(); 
-                    saveCloudData(); renderLeftNotesView(); 
-                }
-            }, 1500); 
-        }
-        
-        function bindCategoryContextMenu(element, cat) {
-            element.oncontextmenu = (e) => {
-                e.preventDefault(); e.stopPropagation(); rightClickedCategoryName = cat;
-                const menu = document.getElementById('custom-context-menu');
-                menu.classList.remove('hidden'); menu.style.left = e.clientX + 'px'; menu.style.top = e.clientY + 'px';
-            };
-        }
-        function handleContextMenuRename() {
-            if (!rightClickedCategoryName) return;
-            const name = prompt(`重命名【${rightClickedCategoryName}】:`, rightClickedCategoryName);
-            if (!name || name.trim() === "") return; const clean = name.trim();
-            if (categories.includes(clean)) { alert("冲突"); return; }
-            const idx = categories.indexOf(rightClickedCategoryName); if (idx !== -1) categories[idx] = clean;
-            notes.forEach(n => { if (n.category === rightClickedCategoryName) n.category = clean; });
-            saveCloudData(); refreshAllViews();
-        }
-        function handleContextMenuDelete() {
-            if (!rightClickedCategoryName || rightClickedCategoryName === "未分类") return;
-            if (confirm(`确定删除目录【${rightClickedCategoryName}】？所属笔记全部进入回收站。`)) {
-                const toDelete = notes.filter(n => n.category === rightClickedCategoryName);
-                trashBin.push(...toDelete); notes = notes.filter(n => n.category !== rightClickedCategoryName);
-                categories = categories.filter(c => c !== rightClickedCategoryName);
-                if (currentFilterCategory === rightClickedCategoryName) currentFilterCategory = "全部";
-                saveCloudData(); refreshAllViews();
-            }
-        }
-        function createNewCategory() {
-            const name = prompt("创建全新分类文件夹名称：");
-            if (!name || name.trim() === "") return;
-            if (categories.includes(name.trim())) { alert("冲突"); return; }
-            categories.push(name.trim()); saveCloudData(); refreshAllViews();
-        }
-        function renderCategorySelectOptions() {
-            const select = document.getElementById('note-category-select'); select.innerHTML = '';
-            categories.forEach(cat => { const opt = document.createElement('option'); opt.value = cat; opt.innerText = cat; select.appendChild(opt); });
-        }
-        
-        function recoverAllTrash() {
-            if (trashBin.length === 0) return;
-            if (confirm("确定要恢复全部回收站文档吗？")) {
-                notes.push(...trashBin); trashBin = []; saveCloudData(); refreshAllViews();
-            }
-        }
-        function clearTrashCompletely() { 
-            if (trashBin.length === 0) return;
-            if (confirm("警告：不可挽回！确定清空回收站吗？")) { trashBin = []; saveCloudData(); refreshAllViews(); } 
-        }
-        function recoverDeletedFile(id) { 
-            const idx = trashBin.findIndex(t => t.id === id); 
-            if (idx !== -1) { notes.push(trashBin.splice(idx, 1)[0]); saveCloudData(); refreshAllViews(); } 
-        }
-        function permanentlyDeleteFile(id) { 
-            if (confirm("永久粉碎不可挽回，是否继续？")) { trashBin = trashBin.filter(t => t.id !== id); saveCloudData(); refreshAllViews(); } 
-        }
-        
-        // ==== UI 交互 ====
-        function toggleLeftPanel() { leftPanelClosed = !leftPanelClosed; document.getElementById('left-panel').classList.toggle('hidden', leftPanelClosed); document.getElementById('resizer-left').classList.toggle('hidden', leftPanelClosed); }
-        function toggleRightPanel() { rightPanelClosed = !rightPanelClosed; document.getElementById('right-panel').classList.toggle('hidden', rightPanelClosed); refreshAllViews(); }
-        
-        function initResizers() {
-            const container = document.getElementById('workspace-container'); 
-            const leftPanel = document.getElementById('left-panel'); const resizerLeft = document.getElementById('resizer-left');
-            const rightPanel = document.getElementById('right-panel'); const resizerRight = document.getElementById('resizer-right');
-            resizerLeft.addEventListener('mousedown', function(e) { e.preventDefault(); resizerLeft.classList.add('resizing'); document.body.classList.add('no-select'); document.addEventListener('mousemove', resizeLeft); document.addEventListener('mouseup', stopResizeLeft); });
-            function resizeLeft(e) { let newWidth = e.clientX - container.getBoundingClientRect().left; if (newWidth >= 200 && newWidth <= 480) leftPanel.style.width = newWidth + 'px'; }
-            function stopResizeLeft() { resizerLeft.classList.remove('resizing'); document.body.classList.remove('no-select'); document.removeEventListener('mousemove', resizeLeft); document.removeEventListener('mouseup', stopResizeLeft); }
-            
-            resizerRight.addEventListener('mousedown', function(e) { e.preventDefault(); resizerRight.classList.add('resizing'); document.body.classList.add('no-select'); document.addEventListener('mousemove', resizeRight); document.addEventListener('mouseup', stopResizeRight); });
-            function resizeRight(e) { let newWidth = container.getBoundingClientRect().right - e.clientX; if (newWidth >= 270 && newWidth <= 480) rightPanel.style.width = newWidth + 'px'; }
-            function stopResizeRight() { resizerRight.classList.remove('resizing'); document.body.classList.remove('no-select'); document.removeEventListener('mousemove', resizeRight); document.removeEventListener('mouseup', stopResizeRight); }
-        }
-        function initRichTextInteractiveEvents() {
-            const editor = document.getElementById('note-editor-richtext');
-            editor.addEventListener('click', (e) => { if (e.target.tagName === 'A' && (e.ctrlKey || e.metaKey)) window.open(e.target.href, '_blank'); });
-            editor.addEventListener('paste', (e) => {
-                const items = (e.clipboardData || window.clipboardData).items;
-                for (let i = 0; i < items.length; i++) {
-                    if (items[i].type.indexOf("image") !== -1) {
-                        e.preventDefault(); const reader = new FileReader();
-                        reader.onload = (event) => execCmd('insertImage', event.target.result);
-                        reader.readAsDataURL(items[i].getAsFile());
-                    }
-                }
-            });
-        }
-        
-        function insertHyperlink() { const url = prompt("请输入超级链接地址:", "https://"); if (url) execCmd('createLink', url); }
-        function insertImageUrl() { const url = prompt("请输入网络图片地址:", "https://"); if (url) execCmd('insertImage', url); }
-        function execCmd(command, value = null) { document.execCommand(command, false, value); handleEditorInput(); }
-        function wrapHTML(startTag, endTag) { const selection = window.getSelection(); if (!selection.rangeCount) return; execCmd('insertHTML', startTag + selection.toString() + endTag); }
-        function triggerImport(type) { if (type === 'md') document.getElementById('import-md-input').click(); if (type === 'txt') document.getElementById('import-txt-input').click(); }
-        function triggerFolderImport() { document.getElementById('import-folder-input').click(); }
-        
-        function handleImportFile(event, type) {
-            const file = event.target.files[0]; if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                let parsed = e.target.result;
-                if(type === 'md' && typeof marked !== 'undefined') parsed = marked.parse(parsed);
-                const doc = { id: 'md_' + Date.now(), title: file.name.replace(/\.[^/.]+$/, ""), content: parsed, category: currentFilterCategory !== "全部" ? currentFilterCategory : "未分类", updatedAt: Date.now() };
-                notes.push(doc); saveCloudData(); openNote(doc.id); event.target.value = '';
-            };
-            reader.readAsText(file);
-        }
-        function handleFolderImport(event) {
-            const files = event.target.files; if (!files || files.length === 0) return;
-            let loaded = 0; let firstId = null;
-            Array.from(files).filter(f => f.name.endsWith('.md') || f.name.endsWith('.txt')).forEach(file => {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    loaded++; let cat = "未分类";
-                    if (file.webkitRelativePath) { const parts = file.webkitRelativePath.split('/'); if(parts.length >= 2) cat = parts[parts.length - 2]; }
-                    if (!categories.includes(cat)) categories.push(cat);
-                    
-                    let parsed = e.target.result;
-                    if(file.name.endsWith('.md') && typeof marked !== 'undefined') parsed = marked.parse(parsed);
-                    const newDoc = { id: 'tree_' + Date.now() + '_' + loaded, title: file.name.replace(/\.[^/.]+$/, ""), content: parsed, category: cat, updatedAt: Date.now() };
-                    notes.push(newDoc); if (!firstId) firstId = newDoc.id;
-                    if (loaded === Array.from(files).filter(f => f.name.endsWith('.md') || f.name.endsWith('.txt')).length) {
-                        saveCloudData(); currentFilterCategory = cat; if (firstId) openNote(firstId); else refreshAllViews(); alert("导入成功！");
-                    }
-                };
-                reader.readAsText(file);
-            });
-            event.target.value = '';
-        }
-        function exportFile(formatType) {
-            const title = document.getElementById('note-title-input').value || '未命名随笔';
-            let content = document.getElementById('note-editor-richtext').innerText;
-            if (formatType === 'md' && typeof TurndownService !== 'undefined') { content = new TurndownService().turndown(document.getElementById('note-editor-richtext').innerHTML); }
-            const blob = new Blob([content], {type: 'text/plain;charset=utf-8'});
-            // 这里修改了原代码的 bug：将 window.网站 修正为 window.URL
-            const url = window.网站.createObjectURL(blob); 
-            const a = document.createElement('a');
-            a.download = `${title}.${formatType}`; a.href = url; a.click(); 
-            window.网站.revokeObjectURL(url);
-        }
-    </script>
-</body>
-</html>
+                if (activeNoteId === id) {
