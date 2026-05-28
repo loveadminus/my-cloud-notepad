@@ -46,7 +46,8 @@
         /* 目录树与内容展示样式 */
         .tree-node-wrapper:hover { background-color: #f1f5f9; }
         .active-tree-node { background-color: #3b82f6 !important; color: white !important; }
-        #left-notes-container div.active-note-item:hover { background-color: transparent !important; }
+        /* 修复内容展示区域选中项悬停变灰问题 */
+        #left-notes-container div.active-note-item:hover { background-color: #3b82f6 !important; }
     </style>
 </head>
 <body class="bg-slate-900 font-sans h-screen flex flex-col overflow-hidden text-slate-800">
