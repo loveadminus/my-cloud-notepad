@@ -1,5 +1,5 @@
-async function verifyAuth(请求, env) {
-    const authHeader = 请求.headers.get('Authorization');
+async function verifyAuth(req, env) {
+    const authHeader = req.headers.get('Authorization');
     if (!authHeader || !authHeader.startsWith('Basic ')) return null;
     
     const b64 = authHeader.substring(6);
@@ -9,20 +9,17 @@ async function verifyAuth(请求, env) {
     if (!username || !password) return null;
     
     const storedUser = await env.NOTE_KV.get(`user:${username}`, { type: "json" });
-    if (storedUser && storedUser.password === password) {
-        return username;
-    }
+    if (storedUser && storedUser.password === password) return username;
     return null;
 }
 
 export async function onRequestGet(context) {
     try {
-        const 请求 = context.请求;
+        const req = context.请求;
         const env = context.env;
-        
-        if (!env || !env.NOTE_KV) throw new Error("后端未能读取到 NOTE_KV 存储空间");
+        if (!req || !env || !env.NOTE_KV) throw new Error("环境异常，缺少 request 或 KV");
 
-        const username = await verifyAuth(请求, env);
+        const username = await verifyAuth(req, env);
         if (!username) return new Response(JSON.stringify({ message: "未授权或登录失效" }), { status: 401 });
 
         let data = await env.NOTE_KV.get(`data:${username}`);
@@ -36,15 +33,15 @@ export async function onRequestGet(context) {
 
 export async function onRequestPost(context) {
     try {
-        const 请求 = context.请求;
+        const req = context.请求;
         const env = context.env;
-        
-        if (!env || !env.NOTE_KV) throw new Error("后端未能读取到 NOTE_KV 存储空间");
+        if (!req || !env || !env.NOTE_KV) throw new Error("环境异常，缺少 request 或 KV");
 
-        const username = await verifyAuth(请求, env);
+        const username = await verifyAuth(req, env);
         if (!username) return new Response(JSON.stringify({ message: "未授权或登录失效" }), { status: 401 });
 
-        const data = await 请求.text();
+        // 同步这里也使用 text 绕过潜在 bug
+        const data = await req.text();
         await env.NOTE_KV.put(`data:${username}`, data);
 
         return new Response(JSON.stringify({ success: true }), { status: 200, headers: { "Content-Type": "application/json" } });
