@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>云端私密记事本 </title>
+    <title>云端私密记事本 Pro (全功能完整版)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -16,10 +15,14 @@
         .md-preview h1 { font-size: 2.6rem; font-weight: 800; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.3em; margin-top: 1.6rem; margin-bottom: 1rem; color: #0f172a; }
         .md-preview h2 { font-size: 2.1rem; font-weight: 700; border-bottom: 1px solid #edf2f7; padding-bottom: 0.3em; margin-top: 1.4rem; margin-bottom: 0.8rem; color: #1e293b; }
         .md-preview h3 { font-size: 1.8rem; font-weight: 600; margin-top: 1.2rem; margin-bottom: 0.6rem; color: #334155; }
-        .md-preview p, .md-preview div { margin-bottom: 0.3rem; line-height: 1.3; color: #1e293b; font-size: 18px; }
+        .md-preview p, .md-preview div { margin-bottom: 0.3rem; line-height: 1.35; color: #1e293b; font-size: 18px; }
         .md-preview code { background-color: #fee2e2; padding: 0.2em 0.5em; border-radius: 6px; font-size: 95%; font-family: monospace; color: #be185d; }
         .md-preview pre { background-color: #1e293b; color: #f8fafc; padding: 1.5rem; border-radius: 10px; overflow-x: auto; margin-bottom: 1.5rem; }
         .md-preview pre code { background-color: transparent; color: inherit; padding: 0; font-size: 17px; }
+        
+        /* 修复内容展示区域选中项悬停变灰问题 */
+        #left-notes-container div.active-note-item:hover { background-color: transparent !important; }
+
         .md-preview a { color: #2563eb; text-decoration: underline; font-weight: bold; cursor: pointer; transition: all 0.2; }
         .md-preview a:hover { color: #1e40af; text-decoration-style: dashed; }
         .md-preview img {
@@ -42,8 +45,6 @@
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         .dragging-node { opacity: 0.4; border: 2px dashed #3b82f6 !important; background-color: #eff6ff !important; }
-        
-        /* 目录树美化样式 */
         .tree-node-wrapper:hover { background-color: #f1f5f9; }
         .active-tree-node { background-color: #3b82f6 !important; color: white !important; }
     </style>
@@ -133,7 +134,7 @@
             <div class="bg-slate-50 border-b border-slate-200 px-5 py-3 flex flex-col gap-2.5 select-none flex-shrink-0 shadow-sm z-10">
                 <div class="flex items-center justify-between flex-wrap gap-2">
                     <div class="flex items-center gap-1.5 bg-emerald-100/50 text-emerald-700 border border-emerald-200 px-4 py-2 rounded-xl shadow-sm font-black text-sm">
-                        <i class="fa-solid fa-pen-nib"></i> 实时编辑模式
+                        <i class="fa-solid fa-pen-nib"></i> 所见即所得编辑模式
                     </div>
                     <div class="flex items-center gap-1.5 bg-white border border-slate-300 px-4 py-2 rounded-xl shadow-sm">
                         <span class="text-sm font-black text-slate-400"><i class="fa-solid fa-folder"></i> 归属文件夹:</span>
@@ -209,7 +210,6 @@
         let notes = [];
         let trashBin = [];
         
-        // 重构：分类升级为对象结构，带唯一的 id 和 parentId 实现多级树
         let categories = [
             { id: "未分类", name: "未分类", parentId: null },
             { id: "工作", name: "工作", parentId: null },
@@ -217,16 +217,16 @@
         ];
         let categoryColors = { "未分类": "#64748b", "工作": "#3b82f6", "生活": "#10b981" };
         let folderTreeRelations = {}; 
-        let leftExpandedFolders = {}; // 控制文件夹树节点的展开收起状态
-        let currentFilterCategory = "全部"; // 记录当前筛选的分类 ID
+        let leftExpandedFolders = {}; 
+        let currentFilterCategory = "全部"; 
         let activeNoteId = null;
         let saveTimeout = null;
         
         let leftPanelClosed = false;
         let rightPanelClosed = true;
-        let treeLayoutView = "list"; // 列表或九宫格模式
+        let treeLayoutView = "grid"; 
         let leftLayoutView = "grid";
-        let rightClickedCategoryId = null; // 右键选中的分类 ID
+        let rightClickedCategoryId = null; 
         
         let isLoginMode = true;
         let cfUser = localStorage.getItem('cfUser');
@@ -307,7 +307,6 @@
                 const data = await response.json();
                 if (data.notes) notes = data.notes;
                 if (data.categories) {
-                    // 数据兼容：如果拉取到的是老版字符串数组，自动升级为树状结构
                     if (data.categories.length > 0 && typeof data.categories[0] === 'string') {
                         categories = data.categories.map(c => ({ id: c, name: c, parentId: null }));
                     } else {
@@ -385,6 +384,7 @@
             const container = document.getElementById('category-tree-container'); 
             container.innerHTML = '';
             
+            // 统一定义高亮选中状态（蓝底白字）与默认状态
             const activeStyle = 'bg-blue-500 text-white border-blue-600 shadow';
             const defaultStyle = 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100 shadow-sm';
 
@@ -405,25 +405,24 @@
                     const isExpanded = leftExpandedFolders[cat.id] !== false; 
                     const hasChildren = categories.some(c => c.parentId === cat.id);
                     
+                    // 统计数量时，包含它所有的子孙文件夹笔记
                     const allCatIds = getAllCategoryIds(cat.id);
                     const noteCount = notes.filter(n => allCatIds.includes(n.category)).length;
                     
                     const cell = document.createElement('div');
                     const cellClass = isSelected ? activeStyle : defaultStyle;
                     
-                    // 【关键改动 1】判断是主文件夹还是子文件夹，赋予不同的颜色
-                    const folderIconColor = cat.parentId === null ? 'text-amber-500' : 'text-red-500';
-                    
-                    let iconHtml = `<i class="fa-solid fa-folder ${folderIconColor} text-xs shrink-0"></i>`;
+                    let iconHtml = `<i class="fa-solid fa-folder text-amber-500 text-xs shrink-0"></i>`;
                     if (hasChildren && treeLayoutView === 'list') {
                         iconHtml = isExpanded 
-                            ? `<i class="fa-solid fa-caret-down ${isSelected ? 'text-blue-100' : 'text-slate-400'} text-[10px] w-3 shrink-0"></i><i class="fa-solid fa-folder-open ${folderIconColor} text-xs shrink-0"></i>`
-                            : `<i class="fa-solid fa-caret-right ${isSelected ? 'text-blue-100' : 'text-slate-400'} text-[10px] w-3 shrink-0"></i><i class="fa-solid fa-folder ${folderIconColor} text-xs shrink-0"></i>`;
+                            ? `<i class="fa-solid fa-caret-down ${isSelected ? 'text-blue-100' : 'text-slate-400'} text-[10px] w-3 shrink-0"></i><i class="fa-solid fa-folder-open text-amber-500 text-xs shrink-0"></i>`
+                            : `<i class="fa-solid fa-caret-right ${isSelected ? 'text-blue-100' : 'text-slate-400'} text-[10px] w-3 shrink-0"></i><i class="fa-solid fa-folder text-amber-500 text-xs shrink-0"></i>`;
                     } else if (treeLayoutView === 'list') {
-                        iconHtml = `<span class="w-3 inline-block shrink-0"></span><i class="fa-solid fa-folder ${folderIconColor} text-xs shrink-0"></i>`;
+                        iconHtml = `<span class="w-3 inline-block shrink-0"></span><i class="fa-solid fa-folder ${isSelected ? 'text-blue-200' : 'text-slate-400'} text-xs shrink-0"></i>`;
                     }
 
                     if (treeLayoutView === 'grid') {
+                        // 九宫格模式不缩进，上下两行排版
                         cell.className = `p-1.5 rounded-lg border cursor-pointer transition-all flex flex-col justify-between relative h-14 ${cellClass}`;
                         cell.innerHTML = `
                             <div class="truncate w-full pr-1">
@@ -435,6 +434,7 @@
                             </div>
                         `;
                     } else {
+                        // 列表排版保持不变
                         const paddingLeft = `${level * 12 + 6}px`;
                         cell.className = `p-1.5 rounded-lg border cursor-pointer transition-all flex items-center justify-between relative h-12 ${cellClass}`;
                         cell.style.paddingLeft = paddingLeft;
@@ -476,6 +476,7 @@
             const container = document.getElementById('left-notes-container'); container.innerHTML = '';
             let displayNotes = notes;
             
+            // 展示内容时，直接把当前分类以及它所有子孙分类的笔记全部掏出来
             if (currentFilterCategory !== "全部") { 
                 const targetIds = getAllCategoryIds(currentFilterCategory);
                 displayNotes = notes.filter(n => targetIds.includes(n.category)); 
@@ -492,14 +493,11 @@
                 box.className = `w-full h-16 p-1.5 rounded-lg border cursor-pointer flex flex-col justify-between transition-all text-xs bg-white border-slate-200 hover:bg-slate-100 shadow-sm break-all relative group ${note.id === activeNoteId ? 'bg-blue-500 border-blue-600 text-white shadow' : ''}`;
                 box.onclick = (e) => { if (!e.target.closest('.del-btn')) openNote(note.id); };
                 
-                const catObj = categories.find(c => c.id === note.category) || {name: '未分类', parentId: null};
+                const catObj = categories.find(c => c.id === note.category) || {name: '未分类'};
+                const catColor = categoryColors[note.category] || "#64748b";
                 const plainText = note.content ? note.content.replace(/<[^>]+>/g, '').substring(0, 15) : '...';
-                const isSelected = note.id === activeNoteId;
                 
-                // 【关键改动 2】内容展示栏的笔记底部标签，也带上对应的彩色文件夹图标
-                const folderIconColor = catObj.parentId === null ? 'text-amber-500' : 'text-red-500';
-                // 未选中时标签为灰底黑字，选中时标签融合为蓝底白字
-                const badgeStyle = isSelected ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700 border border-slate-200';
+                const isSelected = note.id === activeNoteId;
                 
                 box.innerHTML = `
                     <button class="del-btn opacity-0 group-hover:opacity-100 absolute right-1 top-1 p-0.5 ${isSelected ? 'text-blue-100 hover:text-white' : 'text-slate-400 hover:text-red-600'} transition-all z-10" onclick="event.stopPropagation(); deleteNote('${note.id}')"><i class="fa-solid fa-trash-can text-[10px]"></i></button>
@@ -507,17 +505,12 @@
                         <div class="font-extrabold text-[11px] ${isSelected ? 'text-white' : 'text-slate-950'} line-clamp-1 leading-tight mb-0.5" title="${note.title || '无标题'}">${note.title || '无标题'}</div>
                         <p class="text-[9px] ${isSelected ? 'text-blue-100' : 'text-slate-400'} line-clamp-1 leading-none mt-0.5">${plainText}</p>
                     </div>
-                    <div class="flex items-center gap-1 text-[9px] px-1 py-0.5 rounded ${badgeStyle} font-black truncate max-w-full inline-flex mt-0.5 align-bottom self-start">
-                        <i class="fa-solid fa-folder ${isSelected ? 'text-white' : folderIconColor}"></i>
-                        <span class="truncate">${catObj.name}</span>
-                    </div>
+                    <span class="text-[8px] px-1 py-0.5 rounded text-white font-black truncate max-w-full inline-block mt-0.5 align-bottom self-start" style="background-color:${catColor}; line-height: 1;">${catObj.name}</span>
                 `;
                 gridWrapper.appendChild(box);
             });
             container.appendChild(gridWrapper);
         }
-
-        // ------------------ 替换部分结束 ------------------
         
         function renderTrashBin() {
             const container = document.getElementById('right-trash-flow'); container.innerHTML = '';
@@ -600,7 +593,6 @@
             const catObj = categories.find(c => c.id === rightClickedCategoryId);
             if(!catObj) return;
             if (confirm(`确定删除分类目录【${catObj.name}】？其内部子目录及所属笔记都将全部进入回收站。`)) {
-                // 递归查找所有的子孙分类节点
                 let idsToDelete = [rightClickedCategoryId];
                 function findSubIds(pId) {
                     categories.forEach(c => {
@@ -612,29 +604,24 @@
                 }
                 findSubIds(rightClickedCategoryId);
 
-                // 移除笔记并丢进垃圾箱
                 const toDeleteNotes = notes.filter(n => idsToDelete.includes(n.category));
                 trashBin.push(...toDeleteNotes);
                 notes = notes.filter(n => !idsToDelete.includes(n.category));
 
-                // 移除分类
                 categories = categories.filter(c => !idsToDelete.includes(c.id));
                 if (idsToDelete.includes(currentFilterCategory)) currentFilterCategory = "全部";
                 saveCloudData(); refreshAllViews();
             }
         }
         
-        // 支持创建子文件夹
         function createNewCategory() {
             const name = prompt("创建全新分类文件夹名称：");
             if (!name || name.trim() === "") return;
             
-            // 默认把当前左侧选中的树文件夹作为父级文件夹 (如果选了全部，就是根部目录 null)
             let parentId = null;
             if (currentFilterCategory !== "全部") {
                 parentId = currentFilterCategory;
             } else {
-                // 如果没选具体的，询问是否作为某个文件夹的子文件夹
                 const wantParent = confirm("需要将此新文件夹作为当前高亮目录下级子文件夹吗？")
                 if(wantParent && activeNoteId) {
                     const currentNote = notes.find(n => n.id === activeNoteId);
@@ -647,7 +634,6 @@
             saveCloudData(); refreshAllViews();
         }
         
-        // 渲染下拉框（缩进呈现完美树形层级感觉）
         function renderCategorySelectOptions() {
             const select = document.getElementById('note-category-select'); select.innerHTML = '';
             
@@ -658,7 +644,7 @@
                     opt.value = cat.id;
                     opt.innerHTML = '—'.repeat(depth) + ' ' + cat.name;
                     select.appendChild(opt);
-                    appendOption(cat.id, depth + 1); // 递归向下找
+                    appendOption(cat.id, depth + 1); 
                 });
             }
             appendOption(null, 0);
@@ -766,7 +752,6 @@
             reader.readAsText(file);
         }
 
-        // 史诗级加强：无限级文件夹本地目录树完整还原解析
         function handleFolderImport(event) {
             const files = event.target.files; if (!files || files.length === 0) return;
             let loaded = 0; let firstId = null;
@@ -780,20 +765,17 @@
                     loaded++; 
                     let currentParentId = null;
 
-                    // 解析路径：比如 "我的文档/工作/随笔/测试.md" -> 逐级构建子文件夹
                     if (file.webkitRelativePath) {
                         const parts = file.webkitRelativePath.split('/');
-                        // 最后一项 parts[parts.length-1] 是文件名，前面全是文件夹层级
                         for (let i = 0; i < parts.length - 1; i++) {
                             const dirName = parts[i];
-                            // 查找当前层级下是否存在这个同名文件夹
                             let found = categories.find(c => c.name === dirName && c.parentId === currentParentId);
                             if (!found) {
                                 const newCatId = 'cat_' + Date.now() + '_' + Math.floor(Math.random() * 10000);
                                 found = { id: newCatId, name: dirName, parentId: currentParentId };
                                 categories.push(found);
                             }
-                            currentParentId = found.id; // 向下迭代父级 ID
+                            currentParentId = found.id; 
                         }
                     }
 
