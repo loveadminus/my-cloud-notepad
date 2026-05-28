@@ -366,58 +366,87 @@
         function toggleTreeLayout(mode) { treeLayoutView = mode; saveCloudData(); refreshAllViews(); }
         function toggleLeftView(mode) { leftLayoutView = mode; saveCloudData(); refreshAllViews(); }
 
-        // ==== 核心重构：多层级文件夹树递归渲染 ====
+// 新增辅助函数：递归获取指定分类及其所有子孙分类的 ID 集合
+        function getAllCategoryIds(rootId) {
+            let ids = [rootId];
+            function findChildren(pId) {
+                categories.filter(c => c.parentId === pId).forEach(c => {
+                    ids.push(c.id);
+                    findChildren(c.id); // 继续向下挖
+                });
+            }
+            findChildren(rootId);
+            return ids;
+        }
+
+        // 覆盖替换原有的 renderCategoryTree 函数
         function renderCategoryTree() {
             const container = document.getElementById('category-tree-container'); 
             container.innerHTML = '';
             
-            // "全部展示" 固定的主控按钮
+            // 统一定义高亮选中状态（蓝底白字）与默认状态
+            const activeStyle = 'bg-blue-500 text-white border-blue-600 shadow';
+            const defaultStyle = 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100 shadow-sm';
+
             const allBtn = document.createElement('div');
-            allBtn.className = `px-3 py-1.5 rounded-lg border flex items-center gap-1.5 mb-2 cursor-pointer transition-all text-sm font-black ${currentFilterCategory === '全部' ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'}`;
+            allBtn.className = `px-3 py-1.5 rounded-lg border flex items-center gap-1.5 mb-2 cursor-pointer transition-all text-sm font-black ${currentFilterCategory === '全部' ? activeStyle : defaultStyle}`;
             allBtn.innerHTML = `<i class="fa-solid fa-list-check text-xs"></i> 全部内容目录`;
             allBtn.onclick = () => { currentFilterCategory = "全部"; refreshAllViews(); };
             container.appendChild(allBtn);
 
-            // 树形网格布局容器
             const treeRootWrapper = document.createElement('div');
             treeRootWrapper.className = treeLayoutView === 'grid' ? "grid grid-cols-3 gap-1 w-full" : "space-y-1 w-full";
 
-            // 递归渲染节点函数
             function buildTreeNodes(parentId, level) {
                 const currentLevelNodes = categories.filter(c => c.parentId === parentId);
                 
                 currentLevelNodes.forEach(cat => {
                     const isSelected = currentFilterCategory === cat.id;
-                    const isExpanded = leftExpandedFolders[cat.id] !== false; // 默认展开
+                    const isExpanded = leftExpandedFolders[cat.id] !== false; 
                     const hasChildren = categories.some(c => c.parentId === cat.id);
-                    const noteCount = notes.filter(n => n.category === cat.id).length;
+                    
+                    // 统计数量时，包含它所有的子孙文件夹笔记
+                    const allCatIds = getAllCategoryIds(cat.id);
+                    const noteCount = notes.filter(n => allCatIds.includes(n.category)).length;
                     
                     const cell = document.createElement('div');
-                    // 九宫格模式不缩进，列表模式按层级进行缩进
-                    const paddingLeft = treeLayoutView === 'list' ? `${level * 12 + 6}px` : '6px';
+                    const cellClass = isSelected ? activeStyle : defaultStyle;
                     
-                    cell.className = `p-1.5 rounded-lg border cursor-pointer transition-all flex items-center justify-between relative h-12 tree-node-wrapper ${isSelected ? 'active-tree-node shadow' : 'bg-white border-slate-200 shadow-sm'}`;
-                    cell.style.paddingLeft = paddingLeft;
-                    
-                    // 构建文件夹的小图标 (带展开状态折叠状态)
                     let iconHtml = `<i class="fa-solid fa-folder text-amber-500 text-xs shrink-0"></i>`;
                     if (hasChildren && treeLayoutView === 'list') {
                         iconHtml = isExpanded 
-                            ? `<i class="fa-solid fa-caret-down text-slate-400 text-[10px] w-3 shrink-0"></i><i class="fa-solid fa-folder-open text-amber-500 text-xs shrink-0"></i>`
-                            : `<i class="fa-solid fa-caret-right text-slate-400 text-[10px] w-3 shrink-0"></i><i class="fa-solid fa-folder text-amber-500 text-xs shrink-0"></i>`;
+                            ? `<i class="fa-solid fa-caret-down ${isSelected ? 'text-blue-100' : 'text-slate-400'} text-[10px] w-3 shrink-0"></i><i class="fa-solid fa-folder-open text-amber-500 text-xs shrink-0"></i>`
+                            : `<i class="fa-solid fa-caret-right ${isSelected ? 'text-blue-100' : 'text-slate-400'} text-[10px] w-3 shrink-0"></i><i class="fa-solid fa-folder text-amber-500 text-xs shrink-0"></i>`;
                     } else if (treeLayoutView === 'list') {
-                        iconHtml = `<span class="w-3 inline-block shrink-0"></span><i class="fa-solid fa-folder text-slate-400 text-xs shrink-0"></i>`;
+                        iconHtml = `<span class="w-3 inline-block shrink-0"></span><i class="fa-solid fa-folder ${isSelected ? 'text-blue-200' : 'text-slate-400'} text-xs shrink-0"></i>`;
                     }
 
-                    cell.innerHTML = `
-                        <div class="flex items-center gap-1.5 truncate flex-1 pr-1">
-                            ${iconHtml}
-                            <span class="font-extrabold text-[12px] truncate">${cat.name}</span>
-                        </div>
-                        <span class="text-[10px] font-bold opacity-60 shrink-0">(${noteCount}篇)</span>
-                    `;
+                    if (treeLayoutView === 'grid') {
+                        // 九宫格恢复为上下两行排版
+                        cell.className = `p-1.5 rounded-lg border cursor-pointer transition-all flex flex-col justify-between relative h-14 ${cellClass}`;
+                        cell.innerHTML = `
+                            <div class="truncate w-full pr-1">
+                                <div class="flex items-center gap-1.5 truncate">
+                                    ${iconHtml}
+                                    <span class="font-extrabold text-[12px] truncate">${cat.name}</span>
+                                </div>
+                                <span class="text-[10px] block mt-0.5 font-bold ${isSelected ? 'opacity-100 text-blue-100' : 'opacity-60'}">(${noteCount}篇)</span>
+                            </div>
+                        `;
+                    } else {
+                        // 列表排版保持不变
+                        const paddingLeft = `${level * 12 + 6}px`;
+                        cell.className = `p-1.5 rounded-lg border cursor-pointer transition-all flex items-center justify-between relative h-12 ${cellClass}`;
+                        cell.style.paddingLeft = paddingLeft;
+                        cell.innerHTML = `
+                            <div class="flex items-center gap-1.5 truncate flex-1 pr-1">
+                                ${iconHtml}
+                                <span class="font-extrabold text-[12px] truncate">${cat.name}</span>
+                            </div>
+                            <span class="text-[10px] font-bold ${isSelected ? 'opacity-100 text-blue-100' : 'opacity-60'} shrink-0">(${noteCount}篇)</span>
+                        `;
+                    }
 
-                    // 点击事件：点击图标区域如果是折叠则只做折叠切换，点击文字走分类筛选
                     cell.onclick = (e) => {
                         if (e.target.closest('.fa-caret-down') || e.target.closest('.fa-caret-right')) {
                             leftExpandedFolders[cat.id] = !isExpanded;
@@ -432,22 +461,27 @@
                     bindCategoryContextMenu(cell, cat.id);
                     treeRootWrapper.appendChild(cell);
 
-                    // 递归渲染子文件夹 (仅限列表布局下，并且处于打开状态)
                     if (hasChildren && isExpanded && treeLayoutView === 'list') {
                         buildTreeNodes(cat.id, level + 1);
                     }
                 });
             }
 
-            // 开始从根节点开始渲染树
             buildTreeNodes(null, 0);
             container.appendChild(treeRootWrapper);
         }
         
+        // 覆盖替换原有的 renderLeftNotesView 函数
         function renderLeftNotesView() {
             const container = document.getElementById('left-notes-container'); container.innerHTML = '';
             let displayNotes = notes;
-            if (currentFilterCategory !== "全部") { displayNotes = notes.filter(n => n.category === currentFilterCategory); }
+            
+            // 展示内容时，直接把当前分类以及它所有子孙分类的笔记全部掏出来
+            if (currentFilterCategory !== "全部") { 
+                const targetIds = getAllCategoryIds(currentFilterCategory);
+                displayNotes = notes.filter(n => targetIds.includes(n.category)); 
+            }
+            
             const sorted = [...displayNotes].sort((a,b) => b.updatedAt - a.updatedAt);
             if (sorted.length === 0) { container.innerHTML = `<p class="text-slate-400 text-center text-sm py-4 font-bold">无数据</p>`; return; }
             
@@ -456,18 +490,20 @@
             
             sorted.forEach(note => {
                 const box = document.createElement('div');
-                box.className = `w-full h-16 p-1.5 rounded-lg border cursor-pointer flex flex-col justify-between transition-all text-xs bg-white border-slate-200 hover:bg-slate-100 shadow-sm break-all relative group ${note.id === activeNoteId ? 'bg-blue-50 border-blue-400 ring-1 ring-blue-100 shadow' : ''}`;
+                box.className = `w-full h-16 p-1.5 rounded-lg border cursor-pointer flex flex-col justify-between transition-all text-xs bg-white border-slate-200 hover:bg-slate-100 shadow-sm break-all relative group ${note.id === activeNoteId ? 'bg-blue-500 border-blue-600 text-white shadow' : ''}`;
                 box.onclick = (e) => { if (!e.target.closest('.del-btn')) openNote(note.id); };
                 
                 const catObj = categories.find(c => c.id === note.category) || {name: '未分类'};
                 const catColor = categoryColors[note.category] || "#64748b";
                 const plainText = note.content ? note.content.replace(/<[^>]+>/g, '').substring(0, 15) : '...';
                 
+                const isSelected = note.id === activeNoteId;
+                
                 box.innerHTML = `
-                    <button class="del-btn opacity-0 group-hover:opacity-100 absolute right-1 top-1 p-0.5 text-slate-400 hover:text-red-600 transition-all z-10" onclick="event.stopPropagation(); deleteNote('${note.id}')"><i class="fa-solid fa-trash-can text-[10px]"></i></button>
+                    <button class="del-btn opacity-0 group-hover:opacity-100 absolute right-1 top-1 p-0.5 ${isSelected ? 'text-blue-100 hover:text-white' : 'text-slate-400 hover:text-red-600'} transition-all z-10" onclick="event.stopPropagation(); deleteNote('${note.id}')"><i class="fa-solid fa-trash-can text-[10px]"></i></button>
                     <div class="w-full overflow-hidden flex flex-col flex-1 pr-2">
-                        <div class="font-extrabold text-[11px] text-slate-950 line-clamp-1 leading-tight mb-0.5" title="${note.title || '无标题'}">${note.title || '无标题'}</div>
-                        <p class="text-[9px] text-slate-400 line-clamp-1 leading-none mt-0.5">${plainText}</p>
+                        <div class="font-extrabold text-[11px] ${isSelected ? 'text-white' : 'text-slate-950'} line-clamp-1 leading-tight mb-0.5" title="${note.title || '无标题'}">${note.title || '无标题'}</div>
+                        <p class="text-[9px] ${isSelected ? 'text-blue-100' : 'text-slate-400'} line-clamp-1 leading-none mt-0.5">${plainText}</p>
                     </div>
                     <span class="text-[8px] px-1 py-0.5 rounded text-white font-black truncate max-w-full inline-block mt-0.5 align-bottom self-start" style="background-color:${catColor}; line-height: 1;">${catObj.name}</span>
                 `;
