@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -454,7 +453,10 @@
                     const cell = document.createElement('div');
                     const cellClass = isSelected ? activeStyle : defaultStyle;
                     
-                    const folderIconColor = cat.parentId === null ? 'text-amber-500' : 'text-red-500';
+                    let folderIconColor = 'text-amber-500'; // 默认1级主文件夹：黄色 (Amber)
+                    if (level === 1) folderIconColor = 'text-blue-500'; // 2级文件夹：蓝色 (Blue)
+                    else if (level === 2) folderIconColor = 'text-emerald-500'; // 3级文件夹：绿色 (Emerald)
+                    else if (level >= 3) folderIconColor = 'text-purple-500'; // 4级及以上文件夹：紫色 (Purple)
                     
                     let iconHtml = `<i class="fa-solid fa-folder ${folderIconColor} text-[13px] shrink-0"></i>`;
                     if (hasChildren) {
