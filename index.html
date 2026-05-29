@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>云端记事本</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com"cell.className = `p-1.5 rounded-lg border cursor-pointer></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://unpkg.com/turndown/dist/turndown.js"></script>
@@ -465,7 +465,7 @@
                     }
 
                     if (treeLayoutView === 'grid') {
-                        cell.className = `p-1.5 rounded-lg border cursor-pointer transition-all flex flex-col justify-between relative h-10 ${cellClass}`;
+                        cell.className = `p-1.5 rounded-lg border cursor-pointer transition-all flex flex-col justify-between relative h-9 ${cellClass}`;
                         cell.innerHTML = `
                             <div class="truncate w-full pr-1">
                                 <div class="flex items-center gap-1.5 truncate">
@@ -533,7 +533,7 @@
                 const box = document.createElement('div');
                 const isSelected = note.id === activeNoteId;
                 
-                box.className = `w-full h-12 p-1.2 rounded-lg border cursor-pointer flex flex-col justify-between transition-all text-xs break-all relative group ${isSelected ? 'bg-blue-500 border-blue-600 text-white shadow active-note-item' : 'bg-white border-emerald-400 hover:bg-emerald-50 shadow-sm'}`;
+                box.className = `w-full h-10 p-1 rounded-lg border cursor-pointer flex flex-col justify-between transition-all text-xs break-all relative group ${isSelected ? 'bg-blue-500 border-blue-600 text-white shadow active-note-item' : 'bg-white border-emerald-400 hover:bg-emerald-50 shadow-sm'}`;
                 box.onclick = (e) => { if (!e.target.closest('.del-btn')) openNote(note.id); };
                 
                 const plainText = note.content ? note.content.replace(/<[^>]+>/g, '').substring(0, 15) : '...';
