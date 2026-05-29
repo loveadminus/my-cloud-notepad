@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -428,7 +429,7 @@
             const allBtn = document.createElement('div');
             // 注意：移除了原有的 mb-2，因为它现在在一个独立的容器里了
             allBtn.className = `px-3 py-1.5 rounded-lg border flex items-center gap-1.5 cursor-pointer transition-all text-sm font-black ${currentFilterCategory === '全部' ? activeStyle : defaultStyle}`;
-            allBtn.innerHTML = `<i class="fa-solid fa-list-check text-[14px]"></i> 全文档目录`;
+            allBtn.innerHTML = `<i class="fa-solid fa-list-check text-[12px]"></i> 全文档目录`;
             allBtn.onclick = () => { currentFilterCategory = "全部"; refreshAllViews(); };
             
             // 【修改】：将全文档按钮加入到上方的独立容器
@@ -455,13 +456,13 @@
                     
                     const folderIconColor = cat.parentId === null ? 'text-amber-500' : 'text-red-500';
                     
-                    let iconHtml = `<i class="fa-solid fa-folder ${folderIconColor} text-[14px] shrink-0"></i>`;
+                    let iconHtml = `<i class="fa-solid fa-folder ${folderIconColor} text-[13px] shrink-0"></i>`;
                     if (hasChildren) {
                         iconHtml = isExpanded 
-                            ? `<i class="fa-solid fa-caret-down ${isSelected ? 'text-blue-100' : 'text-slate-400'} text-[12px] w-3 shrink-0"></i><i class="fa-solid fa-folder-open ${folderIconColor} text-[14px] shrink-0"></i>`
-                            : `<i class="fa-solid fa-caret-right ${isSelected ? 'text-blue-100' : 'text-slate-400'} text-[12px] w-3 shrink-0"></i><i class="fa-solid fa-folder ${folderIconColor} text-[14px] shrink-0"></i>`;
+                            ? `<i class="fa-solid fa-caret-down ${isSelected ? 'text-blue-100' : 'text-slate-400'} text-[12px] w-3 shrink-0"></i><i class="fa-solid fa-folder-open ${folderIconColor} text-[13px] shrink-0"></i>`
+                            : `<i class="fa-solid fa-caret-right ${isSelected ? 'text-blue-100' : 'text-slate-400'} text-[12px] w-3 shrink-0"></i><i class="fa-solid fa-folder ${folderIconColor} text-[13px] shrink-0"></i>`;
                     } else {
-                        iconHtml = `<span class="w-3 inline-block shrink-0"></span><i class="fa-solid fa-folder ${folderIconColor} text-[14px] shrink-0"></i>`;
+                        iconHtml = `<span class="w-3 inline-block shrink-0"></span><i class="fa-solid fa-folder ${folderIconColor} text-[13px] shrink-0"></i>`;
                     }
 
                     if (treeLayoutView === 'grid') {
