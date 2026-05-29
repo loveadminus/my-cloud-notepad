@@ -465,7 +465,7 @@
                     }
 
                     if (treeLayoutView === 'grid') {
-                        cell.className = `p-1.5 rounded-lg border cursor-pointer transition-all flex flex-col justify-between relative h-14 ${cellClass}`;
+                        cell.className = `p-1.5 rounded-lg border cursor-pointer transition-all flex flex-col justify-between relative h-10 ${cellClass}`;
                         cell.innerHTML = `
                             <div class="truncate w-full pr-1">
                                 <div class="flex items-center gap-1.5 truncate">
@@ -533,7 +533,7 @@
                 const box = document.createElement('div');
                 const isSelected = note.id === activeNoteId;
                 
-                box.className = `w-full h-16 p-1.5 rounded-lg border cursor-pointer flex flex-col justify-between transition-all text-xs break-all relative group ${isSelected ? 'bg-blue-500 border-blue-600 text-white shadow active-note-item' : 'bg-white border-slate-200 hover:bg-slate-100 shadow-sm'}`;
+                box.className = `w-full h-12 p-1.2 rounded-lg border cursor-pointer flex flex-col justify-between transition-all text-xs break-all relative group ${isSelected ? 'bg-blue-500 border-blue-600 text-white shadow active-note-item' : 'bg-white border-emerald-400 hover:bg-emerald-50 shadow-sm'}`;
                 box.onclick = (e) => { if (!e.target.closest('.del-btn')) openNote(note.id); };
                 
                 const plainText = note.content ? note.content.replace(/<[^>]+>/g, '').substring(0, 15) : '...';
