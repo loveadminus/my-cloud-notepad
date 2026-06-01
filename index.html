@@ -325,6 +325,15 @@
             if (window.innerWidth < 768) { toggleLeftPanel(); } // 手机端默认收起侧边栏
             initResizers();
             initRichTextInteractiveEvents();
+
+            // 监听标题栏的回车键，按下直接跳到正文
+            document.getElementById('note-title-input').addEventListener('keydown', function(e) {
+                     if (e.key === 'Enter') {
+                         e.preventDefault(); // 阻止默认的回车行为
+                         document.getElementById('note-editor-richtext').focus(); // 让正文编辑器获取光标
+                     }
+            });  
+
             document.addEventListener('click', () => { document.getElementById('custom-context-menu').classList.add('hidden'); });
             if (cfUser && cfPass) {
                 document.getElementById('auth-overlay').classList.add('hidden');
