@@ -570,7 +570,7 @@
                     <button class="del-btn opacity-0 group-hover:opacity-100 absolute right-1 top-1 p-0.5 ${isSelected ? 'text-white hover:text-blue-200' : 'text-slate-400 hover:text-red-600'} transition-all z-10" onclick="event.stopPropagation(); deleteNote('${note.id}')"><i class="fa-solid fa-trash-can text-[11px]"></i></button>
                     <div class="w-full overflow-hidden flex flex-col flex-1 pr-2">
                         <div class="font-extrabold text-[10px] ${isSelected ? 'text-white' : 'text-slate-950'} line-clamp-1 leading-tight mb-0.5" title="${note.title || '无标题'}">${note.title || '无标题'}</div>
-                        <p class="text-[10px] ${isSelected ? 'text-blue-100' : 'text-slate-400'} line-clamp-1 leading-relaxed mt-0.5">${plainText}</p>
+                        <p class="text-[10px] ${isSelected ? 'text-blue-100' : 'text-slate-400'} line-clamp-1 leading-relaxed mt-1">${plainText}</p>
                     </div>
                 `;
                 gridWrapper.appendChild(box);
