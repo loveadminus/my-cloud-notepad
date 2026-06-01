@@ -542,42 +542,54 @@
         }
         
         function renderLeftNotesView() {
-            const container = document.getElementById('left-notes-container'); container.innerHTML = '';
-            let displayNotes = notes;
-            
-            if (currentFilterCategory !== "全部") { 
-                const targetIds = getAllCategoryIds(currentFilterCategory);
-                displayNotes = notes.filter(n => targetIds.includes(n.category)); 
-            }
-            
-            const sorted = [...displayNotes].sort((a,b) => b.updatedAt - a.updatedAt);
-            if (sorted.length === 0) { container.innerHTML = `<p class="text-slate-400 text-center text-sm py-4 font-bold">无数据</p>`; return; }
-            
-            const gridWrapper = document.createElement('div'); 
-            gridWrapper.className = leftLayoutView === 'list' ? "grid grid-cols-1 gap-1 w-full" : "grid grid-cols-3 gap-1 w-full";
-            
-            sorted.forEach(note => {
-                const box = document.createElement('div');
-                const isSelected = note.id === activeNoteId;
-                
-                // 💡 优化点 1：把高度从 h-14 稍微拉高到 h-16，给大字体充裕空间，绝不挡字
-                box.className = `w-full h-16 p-2 rounded-lg border cursor-pointer flex flex-col justify-between transition-all text-xs break-all relative group ${isSelected ? 'bg-blue-500 border-blue-600 text-white shadow active-note-item' : 'bg-white border-emerald-400 hover:bg-emerald-50 shadow-sm'}`;
-                box.onclick = (e) => { if (!e.target.closest('.del-btn')) openNote(note.id); };
-                
-                const plainText = note.content ? note.content.replace(/<[^>]+>/g, '').substring(0, 15) : '...';
-                
-                box.innerHTML = `
-                    <button class="del-btn opacity-0 group-hover:opacity-100 absolute right-1 top-1 p-0.5 ${isSelected ? 'text-white hover:text-blue-200' : 'text-slate-600 hover:text-red-600'} transition-all z-10" onclick="event.stopPropagation(); deleteNote('${note.id}')"><i class="fa-solid fa-trash-can text-[13px]"></i></button>
-                    <div class="w-full overflow-hidden flex flex-col flex-1 pr-2 justify-center">
-                        <div class="font-black text-[13.5px] ${isSelected ? 'text-white' : 'text-slate-900'} line-clamp-1 leading-snug mb-0.5" title="${note.title || '无标题'}">${note.title || '无标题'}</div>
-                        <p class="text-[11px] ${isSelected ? 'text-blue-100' : 'text-slate-500'} line-clamp-1 leading-relaxed">${plainText}</p>
-                    </div>
-                `;
-                gridWrapper.appendChild(box);
-            });
-            container.appendChild(gridWrapper);
+               const container = document.getElementById('left-notes-container'); container.innerHTML = '';
+               let displayNotes = notes;
+    
+               if (currentFilterCategory !== "全部") { 
+                   const targetIds = getAllCategoryIds(currentFilterCategory);
+                   displayNotes = notes.filter(n => targetIds.includes(n.category)); 
+               }
+    
+               const sorted = [...displayNotes].sort((a,b) => b.updatedAt - a.updatedAt);
+               if (sorted.length === 0) { container.innerHTML = `<p class="text-slate-400 text-center text-sm py-4 font-bold">无数据</p>`; return; }
+    
+               const gridWrapper = document.createElement('div'); 
+               gridWrapper.className = leftLayoutView === 'list' ? "grid grid-cols-1 gap-1 w-full" : "grid grid-cols-3 gap-1 w-full";
+    
+               sorted.forEach(note => {
+                     const box = document.createElement('div');
+                     const isSelected = note.id === activeNoteId;
+                     box.onclick = (e) => { if (!e.target.closest('.del-btn')) openNote(note.id); };
+        
+                     const plainText = note.content ? note.content.replace(/<[^>]+>/g, '').substring(0, 15) : '...';
+        
+                    // 💡 核心修复：将“列表模式”与“图表模式”的卡片样式彻底拆开，单独调大图表字体
+                    if (leftLayoutView === 'list') {
+                        // ================= 1. 列表模式 (单列展示) =================
+                        box.className = `w-full h-16 p-2 rounded-lg border cursor-pointer flex flex-col justify-between transition-all text-xs break-all relative group ${isSelected ? 'bg-blue-500 border-blue-600 text-white shadow active-note-item' : 'bg-white border-emerald-400 hover:bg-emerald-50 shadow-sm'}`;
+                        box.innerHTML = `
+                              <button class="del-btn opacity-0 group-hover:opacity-100 absolute right-1 top-1 p-0.5 ${isSelected ? 'text-white hover:text-blue-200' : 'text-slate-600 hover:text-red-600'} transition-all z-10" onclick="event.stopPropagation(); deleteNote('${note.id}')"><i class="fa-solid fa-trash-can text-[13px]"></i></button>
+                              <div class="w-full overflow-hidden flex flex-col flex-1 pr-2 justify-center">
+                                    <div class="font-black text-[13.5px] ${isSelected ? 'text-white' : 'text-slate-900'} line-clamp-1 leading-snug mb-0.5" title="${note.title || '无标题'}">${note.title || '无标题'}</div>
+                                    <p class="text-[11px] ${isSelected ? 'text-blue-100' : 'text-slate-500'} line-clamp-1 leading-relaxed">${plainText}</p>
+                              </div>
+                        `;
+                    } else {
+                         // ================= 2. 图表模式 (三列九宫格展示) =================
+                         // 💡 调整：高度从 h-14/16 提升到 h-20，多出的高度用来容纳更大的字体
+                         box.className = `w-full h-20 p-2 rounded-lg border cursor-pointer flex flex-col justify-between transition-all text-xs break-all relative group ${isSelected ? 'bg-blue-500 border-blue-600 text-white shadow active-note-item' : 'bg-white border-emerald-400 hover:bg-emerald-50 shadow-sm'}`;
+                         box.innerHTML = `
+                              <button class="del-btn opacity-0 group-hover:opacity-100 absolute right-1 top-1 p-0.5 ${isSelected ? 'text-white hover:text-blue-200' : 'text-slate-600 hover:text-red-600'} transition-all z-10" onclick="event.stopPropagation(); deleteNote('${note.id}')"><i class="fa-solid fa-trash-can text-[11px]"></i></button>
+                              <div class="w-full overflow-hidden flex flex-col flex-1 justify-center">
+                                    <div class="font-black text-[13px] ${isSelected ? 'text-white' : 'text-slate-950'} line-clamp-1 leading-tight mb-1" title="${note.title || '无标题'}">${note.title || '无标题'}</div>
+                                    <p class="text-[11px] ${isSelected ? 'text-blue-100' : 'text-slate-500'} line-clamp-2 leading-tight">${plainText}</p>
+                              </div>
+                        `;
+                    }        
+                    gridWrapper.appendChild(box);
+                });
+                container.appendChild(gridWrapper);
         }
-
         function renderTrashBin() {
             const container = document.getElementById('right-trash-flow'); container.innerHTML = '';
             if (rightPanelClosed) return;
