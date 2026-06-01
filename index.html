@@ -537,7 +537,7 @@
                 const box = document.createElement('div');
                 const isSelected = note.id === activeNoteId;
                 
-                box.className = `w-full h-10 p-1 rounded-lg border cursor-pointer flex flex-col justify-between transition-all text-xs break-all relative group ${isSelected ? 'bg-blue-500 border-blue-600 text-white shadow active-note-item' : 'bg-white border-emerald-400 hover:bg-emerald-50 shadow-sm'}`;
+                box.className = `w-full h-16 p-1 rounded-lg border cursor-pointer flex flex-col justify-between transition-all text-xs break-all relative group ${isSelected ? 'bg-blue-500 border-blue-600 text-white shadow active-note-item' : 'bg-white border-emerald-400 hover:bg-emerald-50 shadow-sm'}`;
                 box.onclick = (e) => { if (!e.target.closest('.del-btn')) openNote(note.id); };
                 
                 const plainText = note.content ? note.content.replace(/<[^>]+>/g, '').substring(0, 15) : '...';
@@ -545,8 +545,8 @@
                 box.innerHTML = `
                     <button class="del-btn opacity-0 group-hover:opacity-100 absolute right-1 top-1 p-0.5 ${isSelected ? 'text-white hover:text-blue-200' : 'text-slate-400 hover:text-red-600'} transition-all z-10" onclick="event.stopPropagation(); deleteNote('${note.id}')"><i class="fa-solid fa-trash-can text-[11px]"></i></button>
                     <div class="w-full overflow-hidden flex flex-col flex-1 pr-2">
-                        <div class="font-extrabold text-[12px] ${isSelected ? 'text-white' : 'text-slate-950'} line-clamp-1 leading-tight mb-0.5" title="${note.title || '无标题'}">${note.title || '无标题'}</div>
-                        <p class="text-[10px] ${isSelected ? 'text-blue-100' : 'text-slate-400'} line-clamp-2 leading-relaxed mt-0.5">${plainText}</p>
+                        <div class="font-extrabold text-[10px] ${isSelected ? 'text-white' : 'text-slate-950'} line-clamp-1 leading-tight mb-0.5" title="${note.title || '无标题'}">${note.title || '无标题'}</div>
+                        <p class="text-[10px] ${isSelected ? 'text-blue-100' : 'text-slate-400'} line-clamp-1 leading-relaxed mt-0.5">${plainText}</p>
                     </div>
                 `;
                 gridWrapper.appendChild(box);
