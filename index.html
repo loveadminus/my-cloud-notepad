@@ -98,17 +98,31 @@
                     <button id="btn-new-note" onclick="createNewNote()" class="flex-1 py-1 px-1 flex items-center justify-center gap-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-black transition-all shadow-sm text-xs"><i class="fa-solid fa-file-plus"></i> 新建笔记</button>
                     <button onclick="createNewCategory()" class="flex-1 py-1 px-1 flex items-center justify-center gap-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-black transition-all shadow-sm text-xs"><i class="fa-solid fa-folder-plus"></i> 新建分类</button>
                 </div>
-                <div class="flex flex-col gap-0.5 bg-white/70 p-1 rounded-lg border border-slate-200/60">
-                    <div class="flex items-center gap-1.5">
-                        <button onclick="triggerImport('md')" class="flex-1 py-1 px-1 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-black transition-all text-center truncate text-xs shadow-sm"><i class="fa-solid fa-file-import mr-0.5"></i>导入 MD</button>
-                        <button onclick="exportFile('md')" class="flex-1 py-1 px-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-black transition-all text-center truncate text-xs shadow-sm"><i class="fa-solid fa-download mr-0.5"></i>导出 MD</button>
-                    </div>
-                    <div class="flex items-center gap-1.5">
-                        <button onclick="triggerImport('txt')" class="flex-1 py-1 px-1 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-black transition-all text-center truncate text-xs shadow-sm"><i class="fa-solid fa-file-import mr-0.5"></i>导入 TXT</button>
-                        <button onclick="exportFile('txt')" class="flex-1 py-1 px-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-black transition-all text-center truncate text-xs shadow-sm"><i class="fa-solid fa-file-export mr-0.5"></i>导出 TXT</button>
-                    </div>
-                </div>
-                <button onclick="triggerFolderImport()" class="w-full py-1 bg-slate-700 hover:bg-slate-800 text-white rounded-lg font-black transition-all text-xs shadow-sm flex items-center justify-center gap-1"><i class="fa-solid fa-folder-tree text-amber-400"></i> 导入文件夹</button>
+                
+                <div class="bg-white border border-slate-200 rounded-lg p-1.5 mb-2 shadow-sm flex-shrink-0">
+    
+                      <button onclick="toggleImportExport()" class="w-full flex items-center justify-between text-slate-700 font-extrabold text-[13px] px-2 py-1.5 hover:bg-slate-50 hover:text-blue-600 transition-colors rounded cursor-pointer">
+                             <span class="flex items-center gap-1.5"><i class="fa-solid fa-box-archive text-blue-500"></i> 导入与导出</span>
+                             <i id="import-export-arrow" class="fa-solid fa-chevron-down transition-transform duration-200 text-slate-400 text-xs"></i>
+                      </button>
+    
+                      <div id="import-export-content" class="hidden flex flex-col gap-1.5 border-t border-slate-100 pt-1.5 mt-1.5">
+        
+                           <div class="flex flex-col gap-0.5 bg-white/70 p-1 rounded-lg border border-slate-200/60">
+                                 <div class="flex items-center gap-1.5">
+                                       <button onclick="triggerImport('md')" class="flex-1 py-1 px-1 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-black transition-all text-center truncate text-xs shadow-sm"><i class="fa-solid fa-file-import"></i> 导入 MD</button>
+                                       <button onclick="exportFile('md')" class="flex-1 py-1 px-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-black transition-all text-center truncate text-xs shadow-sm"><i class="fa-solid fa-file-export"></i> 导出 MD</button>
+                                 </div>
+                                 <div class="flex items-center gap-1.5">
+                                       <button onclick="triggerImport('txt')" class="flex-1 py-1 px-1 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-black transition-all text-center truncate text-xs shadow-sm"><i class="fa-solid fa-file-import"></i> 导入 TXT</button>
+                                       <button onclick="exportFile('txt')" class="flex-1 py-1 px-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-black transition-all text-center truncate text-xs shadow-sm"><i class="fa-solid fa-file-export"></i> 导出 TXT</button>
+                                 </div>
+                                 <button onclick="triggerFolderImport()" class="w-full py-1 bg-slate-700 hover:bg-slate-800 text-white rounded-lg font-black transition-all text-xs shadow-sm flex items-center justify-center gap-1"><i class="fa-solid fa-folder-tree text-amber-400"></i> 导入文件夹</button>
+                           </div>
+
+                     </div>
+               </div>
+
                 <input type="file" id="import-md-input" accept=".md" class="hidden" onchange="handleImportFile(event, 'md')">
                 <input type="file" id="import-txt-input" accept=".txt" class="hidden" onchange="handleImportFile(event, 'txt')">
                 <input type="file" id="import-folder-input" webkitdirectory directory multiple class="hidden" onchange="handleFolderImport(event)">
@@ -902,6 +916,21 @@
               // 清空 input 的值，确保下次选同一张图也能触发
               event.target.value = '';
         }
+
+        // 控制导入导出面板的展开和收起
+       function toggleImportExport() {
+              const content = document.getElementById('import-export-content');
+              const arrow = document.getElementById('import-export-arrow');
+    
+              if (content.classList.contains('hidden')) {
+                  content.classList.remove('hidden'); // 展开
+                  arrow.classList.add('rotate-180');  // 箭头指向上
+              } else {
+                   content.classList.add('hidden');    // 收起
+                   arrow.classList.remove('rotate-180'); // 箭头指向下
+              }
+        }
+
     </script>
 </body>
 </html>
