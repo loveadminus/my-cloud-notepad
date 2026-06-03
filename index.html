@@ -5,12 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>云端记事本</title>
     
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 💡 核心修复 1：必须先把配置项写在前面，Tailwind 引擎才能正确开启暗黑模式 -->
     <script>
-        tailwind.config = {
-            darkMode: 'class', 
+        tailwind = {
+            config: {
+                darkMode: 'class', 
+            }
         }
     </script>
+    <script src="https://cdn.tailwindcss.com"></script>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="manifest" href="manifest.json">
@@ -23,7 +26,6 @@
         .panel-large-text { font-size: 16px !important; font-weight: 800 !important; }
         .sync-btn-font { font-size: 14px !important; font-weight: 900 !important; }
         
-        /* 💡 修复暗黑模式失效：移除了所有固定 color 属性，交由 Tailwind 动态控制 */
         .md-preview h1 { font-size: 2.6rem; font-weight: 800; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.3em; margin-top: 1.6rem; margin-bottom: 1rem; }
         .md-preview h2 { font-size: 2.1rem; font-weight: 700; border-bottom: 1px solid #edf2f7; padding-bottom: 0.3em; margin-top: 1.4rem; margin-bottom: 0.8rem; }
         .md-preview h3 { font-size: 1.8rem; font-weight: 600; margin-top: 1.2rem; margin-bottom: 0.6rem; }
@@ -59,7 +61,7 @@
         #left-notes-container div.active-note-item:hover { background-color: #3b82f6 !important; }
     </style>
 </head>
-<body class="bg-slate-900 font-sans h-screen flex flex-col overflow-hidden text-slate-800 dark:bg-slate-950 dark:text-slate-200 transition-colors">
+<body class="bg-slate-900 font-sans h-screen flex flex-col overflow-hidden text-slate-800 dark:bg-slate-950 dark:text-slate-200 transition-colors duration-300">
     
     <div id="auth-overlay" class="fixed inset-0 bg-slate-900 z-[100] flex items-center justify-center transition-opacity">
         <div class="bg-white p-8 rounded-2xl shadow-2xl w-96 flex flex-col gap-4">
@@ -115,7 +117,7 @@
         </div>
     </header>
 
-    <div id="workspace-container" class="flex flex-1 overflow-hidden w-full bg-slate-200 dark:bg-slate-900 transition-colors">
+    <div id="workspace-container" class="flex flex-1 overflow-hidden w-full bg-slate-200 dark:bg-slate-900 transition-colors duration-300">
         
         <aside id="left-panel" class="bg-slate-50 dark:bg-slate-800 dark:border-slate-700 flex flex-col flex-shrink-0 overflow-hidden border-r border-slate-200 panel-large-text transition-all absolute md:relative z-50 h-full shadow-2xl md:shadow-none" style="width: 220px; min-width: 160px; max-width: 480px;">
             <div class="p-1.5 border-b border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 flex flex-col gap-1 flex-shrink-0">
@@ -155,8 +157,8 @@
             <div class="px-3.5 py-2 bg-slate-200/60 dark:bg-slate-900/60 flex items-center justify-between flex-shrink-0 select-none border-b border-slate-200 dark:border-slate-700">
                 <span class="sync-btn-font text-slate-700 dark:text-slate-300" data-i18n="label-folder">文件夹</span>
                 <div class="flex items-center gap-0.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded p-0.5 shadow-inner scale-95 origin-right">
-                    <button id="view-tree-list" onclick="toggleTreeLayout('list')" class="px-2 py-0.5 text-xs font-black rounded hover:bg-slate-100 dark:hover:bg-slate-700 dark:text-slate-200">列表</button>
-                    <button id="view-tree-grid" onclick="toggleTreeLayout('grid')" class="px-2 py-0.5 text-xs font-black rounded hover:bg-slate-100 dark:hover:bg-slate-700 dark:text-slate-200">图表</button>
+                    <button id="view-tree-list" onclick="toggleTreeLayout('list')" class="px-2 py-0.5 text-xs font-black rounded hover:bg-slate-100 dark:hover:bg-slate-700 dark:text-slate-200" data-i18n="btn-list">列表</button>
+                    <button id="view-tree-grid" onclick="toggleTreeLayout('grid')" class="px-2 py-0.5 text-xs font-black rounded hover:bg-slate-100 dark:hover:bg-slate-700 dark:text-slate-200" data-i18n="btn-grid">图表</button>
                 </div>
             </div>
             <div id="category-tree-container" class="p-2 border-b border-slate-200 dark:border-slate-700 bg-slate-100/40 dark:bg-slate-800/40 flex-shrink-0 max-h-72 overflow-y-auto space-y-1"></div>
@@ -164,8 +166,8 @@
             <div class="px-3.5 py-2 bg-slate-200/60 dark:bg-slate-900/60 flex items-center justify-between flex-shrink-0 select-none border-b border-slate-200 dark:border-slate-700">
                 <span class="sync-btn-font text-slate-700 dark:text-slate-300" data-i18n="label-content">内容展示</span>
                 <div class="flex items-center gap-0.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded p-0.5 shadow-inner scale-95 origin-right">
-                    <button id="view-left-list" onclick="toggleLeftView('list')" class="px-2 py-0.5 text-xs font-black rounded hover:bg-slate-100 dark:hover:bg-slate-700 dark:text-slate-200" style="background-color: #3b82f6;">列表</button>
-                    <button id="view-left-grid" onclick="toggleLeftView('grid')" class="px-2 py-0.5 text-xs font-black rounded hover:bg-slate-100 dark:hover:bg-slate-700 dark:text-slate-200" style="background-color: transparent;">图表</button>
+                    <button id="view-left-list" onclick="toggleLeftView('list')" class="px-2 py-0.5 text-xs font-black rounded hover:bg-slate-100 dark:hover:bg-slate-700 dark:text-slate-200" style="background-color: #3b82f6;" data-i18n="btn-list">列表</button>
+                    <button id="view-left-grid" onclick="toggleLeftView('grid')" class="px-2 py-0.5 text-xs font-black rounded hover:bg-slate-100 dark:hover:bg-slate-700 dark:text-slate-200" style="background-color: transparent;" data-i18n="btn-grid">图表</button>
                 </div>
             </div>
             <div id="left-notes-container" class="flex-1 overflow-y-auto p-2 bg-slate-50/50 dark:bg-slate-800/50"></div>
@@ -173,7 +175,7 @@
         
         <div id="resizer-left" class="resizer hidden md:block dark:bg-slate-700"></div>
         
-        <section id="middle-panel" class="bg-white dark:bg-slate-950 flex flex-col flex-1 overflow-hidden min-w-0 md:min-w-[450px] transition-colors">
+        <section id="middle-panel" class="bg-white dark:bg-slate-950 flex flex-col flex-1 overflow-hidden min-w-0 md:min-w-[450px] transition-colors duration-300">
             <div class="bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 py-2 flex flex-col gap-2 select-none flex-shrink-0 shadow-sm z-10">
                 <div class="flex items-center justify-between flex-wrap gap-2">
                     <div class="flex items-center gap-1 bg-emerald-100/50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 px-2.5 py-1 rounded-lg shadow-sm font-black text-xs">
@@ -187,14 +189,14 @@
                 
                 <div id="editor-format-bar" class="flex items-center gap-1 flex-wrap bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-1.5 rounded-lg shadow-inner">
                     <select onchange="if(this.value){execCmd('fontSize', this.value); this.selectedIndex=0;}" class="px-1.5 py-0.5 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded border border-slate-200 dark:border-slate-600 outline-none cursor-pointer bg-slate-50 dark:bg-slate-700">
-                        <option value="">字号</option>
-                        <option value="1">极小</option>
-                        <option value="2">小号</option>
-                        <option value="3">正常</option>
-                        <option value="4">四号(大)</option>
-                        <option value="5">特大</option>
-                        <option value="6">超大</option>
-                        <option value="7">极巨</option>
+                        <option value="" data-i18n="fmt-size">字号</option>
+                        <option value="1" data-i18n="sz-1">极小</option>
+                        <option value="2" data-i18n="sz-2">小号</option>
+                        <option value="3" data-i18n="sz-3">正常</option>
+                        <option value="4" data-i18n="sz-4">大号</option>
+                        <option value="5" data-i18n="sz-5">特大</option>
+                        <option value="6" data-i18n="sz-6">超大</option>
+                        <option value="7" data-i18n="sz-7">极巨</option>
                     </select>
                     <div class="h-4 w-[1px] bg-slate-300 dark:bg-slate-600 mx-0.5"></div>
 
@@ -203,28 +205,28 @@
                     <button onmousedown="event.preventDefault();" onclick="execCmd('formatBlock', 'H3')" class="px-2 py-0.5 text-xs font-black text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded border border-slate-200 dark:border-slate-600">H3</button>
                     <div class="h-4 w-[1px] bg-slate-300 dark:bg-slate-600 mx-0.5"></div>
     
-                    <button onmousedown="event.preventDefault();" onclick="execCmd('bold')" class="px-2 py-0.5 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded border border-slate-200 dark:border-slate-600" title="加粗"><i class="fa-solid fa-bold"></i></button>
+                    <button onmousedown="event.preventDefault();" onclick="execCmd('bold')" class="px-2 py-0.5 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded border border-slate-200 dark:border-slate-600"><i class="fa-solid fa-bold"></i></button>
     
-                    <button onmousedown="event.preventDefault();" onclick="execCmd('foreColor', '#ef4444')" class="px-1.5 py-0.5 text-[11px] font-bold text-white hover:opacity-80 rounded shadow-sm" style="background-color: #ef4444;" title="红">红</button>
-                    <button onmousedown="event.preventDefault();" onclick="execCmd('foreColor', '#eab308')" class="px-1.5 py-0.5 text-[11px] font-bold text-white hover:opacity-80 rounded shadow-sm" style="background-color: #eab308;" title="黄">黄</button>
-                    <button onmousedown="event.preventDefault();" onclick="execCmd('foreColor', '#3b82f6')" class="px-1.5 py-0.5 text-[11px] font-bold text-white hover:opacity-80 rounded shadow-sm" style="background-color: #3b82f6;" title="蓝">蓝</button>
-                    <button onmousedown="event.preventDefault();" onclick="execCmd('foreColor', '#22c55e')" class="px-1.5 py-0.5 text-[11px] font-bold text-white hover:opacity-80 rounded shadow-sm" style="background-color: #22c55e;" title="绿">绿</button>
-                    <button onmousedown="event.preventDefault();" onclick="execCmd('foreColor', '#000000')" class="px-1.5 py-0.5 text-[11px] font-bold text-white hover:opacity-80 rounded shadow-sm" style="background-color: #0f172a;" title="黑">黑</button>
+                    <button onmousedown="event.preventDefault();" onclick="execCmd('foreColor', '#ef4444')" class="px-1.5 py-0.5 text-[11px] font-bold text-white hover:opacity-80 rounded shadow-sm" style="background-color: #ef4444;" data-i18n="color-red">红</button>
+                    <button onmousedown="event.preventDefault();" onclick="execCmd('foreColor', '#eab308')" class="px-1.5 py-0.5 text-[11px] font-bold text-white hover:opacity-80 rounded shadow-sm" style="background-color: #eab308;" data-i18n="color-yellow">黄</button>
+                    <button onmousedown="event.preventDefault();" onclick="execCmd('foreColor', '#3b82f6')" class="px-1.5 py-0.5 text-[11px] font-bold text-white hover:opacity-80 rounded shadow-sm" style="background-color: #3b82f6;" data-i18n="color-blue">蓝</button>
+                    <button onmousedown="event.preventDefault();" onclick="execCmd('foreColor', '#22c55e')" class="px-1.5 py-0.5 text-[11px] font-bold text-white hover:opacity-80 rounded shadow-sm" style="background-color: #22c55e;" data-i18n="color-green">绿</button>
+                    <button onmousedown="event.preventDefault();" onclick="execCmd('foreColor', '#000000')" class="px-1.5 py-0.5 text-[11px] font-bold text-white hover:opacity-80 rounded shadow-sm" style="background-color: #0f172a;" data-i18n="color-black">黑</button>
 
                     <div class="h-4 w-[1px] bg-slate-300 dark:bg-slate-600 mx-0.5"></div>
 
                     <button onmousedown="event.preventDefault();" onclick="wrapHTML('<code>', '</code>')" class="px-2 py-0.5 text-xs font-mono text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded border border-slate-200 dark:border-slate-600"><i class="fa-solid fa-code"></i></button>
-                    <button onmousedown="event.preventDefault();" onclick="execCmd('removeFormat')" class="px-2 py-0.5 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600 rounded border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700" title="清除格式"><i class="fa-solid fa-eraser"></i></button>
+                    <button onmousedown="event.preventDefault();" onclick="execCmd('removeFormat')" class="px-2 py-0.5 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600 rounded border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700"><i class="fa-solid fa-eraser"></i></button>
                     <div class="h-4 w-[1px] bg-slate-300 dark:bg-slate-600 mx-0.5"></div>
     
-                    <button onmousedown="event.preventDefault(); document.getElementById('local-img-input').click()" class="px-2 py-0.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-slate-700 rounded border border-emerald-200 dark:border-emerald-800 bg-emerald-50/50 dark:bg-slate-700"><i class="fa-regular fa-image"></i> 图</button>
+                    <button onmousedown="event.preventDefault(); document.getElementById('local-img-input').click()" class="px-2 py-0.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-slate-700 rounded border border-emerald-200 dark:border-emerald-800 bg-emerald-50/50 dark:bg-slate-700"><i class="fa-regular fa-image"></i> <span data-i18n="fmt-img">图</span></button>
                 </div>
                 <input type="file" id="local-img-input" accept="image/*" class="hidden" onchange="handleLocalImageUpload(event)">
             </div>
             
             <div class="flex-1 flex flex-col p-5 overflow-y-auto w-full bg-white dark:bg-slate-950 relative">
                 <input id="note-title-input" oninput="handleEditorInput()" type="text" placeholder="此处输入新随笔标题..." class="w-full font-black text-2xl border-none outline-none mb-3 text-slate-900 dark:text-slate-100 placeholder-slate-300 dark:placeholder-slate-600 bg-transparent flex-shrink-0">
-                <div id="note-editor-richtext" contenteditable="true" oninput="handleEditorInput()" placeholder="在这里直接排版书写您的文字（支持直接粘贴截图）..." class="md-preview w-full flex-1 outline-none text-slate-800 dark:text-slate-200 break-words"></div>
+                <div id="note-editor-richtext" contenteditable="true" oninput="handleEditorInput()" placeholder="在这里直接排版书写..." class="md-preview w-full flex-1 outline-none text-slate-800 dark:text-slate-200 break-words"></div>
             </div>
         </section>
         
@@ -236,8 +238,8 @@
                     <i class="fa-solid fa-dumpster-fire text-red-500"></i> <span data-i18n="trash-title">回收站</span> (<span id="trash-count-badge">0</span>)
                 </span>
                 <div class="flex items-center gap-2">
-                    <button onclick="recoverAllTrash()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-black py-2 rounded-xl text-xs transition-all shadow border border-emerald-500 flex items-center justify-center gap-1"><i class="fa-solid fa-trash-arrow-up"></i> 恢复</button>
-                    <button onclick="clearTrashCompletely()" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-black py-2 rounded-xl text-xs transition-all shadow border border-red-500 flex items-center justify-center gap-1"><i class="fa-solid fa-fire"></i> 清空</button>
+                    <button onclick="recoverAllTrash()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-black py-2 rounded-xl text-xs transition-all shadow border border-emerald-500 flex items-center justify-center gap-1"><i class="fa-solid fa-trash-arrow-up"></i> <span data-i18n="btn-recover">恢复</span></button>
+                    <button onclick="clearTrashCompletely()" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-black py-2 rounded-xl text-xs transition-all shadow border border-red-500 flex items-center justify-center gap-1"><i class="fa-solid fa-fire"></i> <span data-i18n="btn-empty">清空</span></button>
                 </div>
             </div>
             <div id="right-trash-flow" class="flex-1 overflow-y-auto p-2 space-y-2 bg-slate-100/50 dark:bg-slate-800/50"></div>
@@ -245,11 +247,71 @@
     </div>
     
     <div id="custom-context-menu" class="hidden fixed bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xl py-1.5 w-44 z-50 text-xs font-bold text-slate-700 dark:text-slate-200 select-none">
-        <button onclick="handleContextMenuRename()" class="w-full text-left px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2 font-black"><i class="fa-regular fa-pen-to-square text-blue-500"></i> 重命名分类</button>
-        <button id="ctx-delete-btn" onclick="handleContextMenuDelete()" class="w-full text-left px-4 py-2 hover:bg-red-50 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400 border-t border-slate-100 dark:border-slate-700 flex items-center gap-2 font-black"><i class="fa-regular fa-trash-can text-red-500"></i> 安全删除分类</button>
+        <button onclick="handleContextMenuRename()" class="w-full text-left px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2 font-black"><i class="fa-regular fa-pen-to-square text-blue-500"></i> <span data-i18n="ctx-rename">重命名分类</span></button>
+        <button id="ctx-delete-btn" onclick="handleContextMenuDelete()" class="w-full text-left px-4 py-2 hover:bg-red-50 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400 border-t border-slate-100 dark:border-slate-700 flex items-center gap-2 font-black"><i class="fa-regular fa-trash-can text-red-500"></i> <span data-i18n="ctx-delete">安全删除分类</span></button>
     </div>
 
     <script>
+        // ==========================================
+        // 字典与翻译辅助引擎 (必须放最前面)
+        // ==========================================
+        const dict = {
+            zh: {
+                'nav-logout': '退出', 'nav-delete': '注销', 'nav-history': '历史',
+                'theme-light': '浅色', 'theme-dark': '深色', 'theme-sys': '系统',
+                'nav-sidebar': '侧栏', 'app-title': '云端笔记',
+                'btn-new-note': '新建笔记', 'btn-new-folder': '新建分类',
+                'btn-import-export': '导入与导出', 'label-folder': '文件夹',
+                'label-content': '内容展示', 'label-editor': '编辑栏',
+                'label-category': '归属地:', 'trash-title': '回收站',
+                'btn-list': '列表', 'btn-grid': '图表',
+                'all-docs': '全文档展示', 'no-data': '无数据', 'trash-empty': '回收站空空如也',
+                'untitled': '无标题', 'original-folder': '原位置:',
+                'fmt-size': '字号', 'sz-1': '极小', 'sz-2': '小号', 'sz-3': '正常', 'sz-4': '大号', 'sz-5': '特大', 'sz-6': '超大', 'sz-7': '极巨',
+                'color-red': '红', 'color-yellow': '黄', 'color-blue': '蓝', 'color-green': '绿', 'color-black': '黑',
+                'fmt-img': '图', 'btn-recover': '恢复', 'btn-empty': '清空', 'ctx-rename': '重命名分类', 'ctx-delete': '安全删除分类'
+            },
+            en: {
+                'nav-logout': 'Logout', 'nav-delete': 'Delete', 'nav-history': 'History',
+                'theme-light': 'Light', 'theme-dark': 'Dark', 'theme-sys': 'Auto',
+                'nav-sidebar': 'Sidebar', 'app-title': 'Cloud Note',
+                'btn-new-note': 'New Note', 'btn-new-folder': 'New Folder',
+                'btn-import-export': 'Import/Export', 'label-folder': 'Folders',
+                'label-content': 'Content', 'label-editor': 'Editor',
+                'label-category': 'Category:', 'trash-title': 'Trash',
+                'btn-list': 'List', 'btn-grid': 'Grid',
+                'all-docs': 'All Documents', 'no-data': 'No Data', 'trash-empty': 'Trash is empty',
+                'untitled': 'Untitled', 'original-folder': 'From:',
+                'fmt-size': 'Size', 'sz-1': 'Tiny', 'sz-2': 'Small', 'sz-3': 'Normal', 'sz-4': 'Large', 'sz-5': 'X-Large', 'sz-6': 'XXL', 'sz-7': 'Huge',
+                'color-red': 'R', 'color-yellow': 'Y', 'color-blue': 'B', 'color-green': 'G', 'color-black': 'Bk',
+                'fmt-img': 'Img', 'btn-recover': 'Restore', 'btn-empty': 'Empty', 'ctx-rename': 'Rename', 'ctx-delete': 'Delete safely'
+            }
+        };
+
+        let currentLang = localStorage.getItem('app-lang') || 'zh';
+
+        // 动态翻译助手
+        function t(key) { return dict[currentLang][key] || key; }
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'zh' ? 'en' : 'zh';
+            localStorage.setItem('app-lang', currentLang);
+            updateLanguageUI();
+            refreshAllViews(); // 强制重新渲染左侧列表，确保 JS 文字也变为英文
+        }
+
+        function updateLanguageUI() {
+            document.getElementById('lang-text').innerText = currentLang === 'zh' ? 'CN' : 'EN';
+            const currentDict = dict[currentLang];
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (currentDict[key]) el.innerText = currentDict[key];
+            });
+        }
+
+        // ==========================================
+        // 核心应用逻辑
+        // ==========================================
         let notes = [];
         let trashBin = [];
         let categories = [
@@ -318,10 +380,7 @@
         async function deleteAccount() {
             if(!cfUser) return;
             const isConfirmed = confirm(`🚨 危险操作警告 🚨\n\n此操作将彻底销毁您的账号【${cfUser}】以及云端所有的笔记数据！\n\n点击“确定”立即注销，点击“取消”放弃。`);
-            
-            if (!isConfirmed) {
-                return;
-            }
+            if (!isConfirmed) return;
 
             try {
                 const res = await fetch('/api/delete-account', {
@@ -329,7 +388,6 @@
                     headers: getAuthHeaders()
                 });
                 const data = await res.json();
-                
                 if(res.ok && data.success) {
                     alert("销毁成功：您的账号及所有云端数据已从服务器彻底清除！");
                     localStorage.removeItem('cfUser');
@@ -376,6 +434,7 @@
                 document.getElementById('auth-overlay').classList.remove('hidden');
             }
 
+            // 初始化主题和语言
             applyTheme(localStorage.getItem('app-theme') || 'system');
             updateLanguageUI();
         });
@@ -471,12 +530,12 @@
             if(allDocsContainer) allDocsContainer.innerHTML = '';
 
             const activeStyle = 'bg-blue-500 text-white border-blue-600 shadow';
-            // 💡 修复暗黑模式失效：JS 生成的按钮样式补全了暗黑 class
             const defaultStyle = 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 shadow-sm';
 
             const allBtn = document.createElement('div');
             allBtn.className = `px-3 py-1 rounded-lg border flex items-center gap-1 cursor-pointer transition-all text-xs font-black ${currentFilterCategory === '全部' ? activeStyle : defaultStyle}`;
-            allBtn.innerHTML = `<i class="fa-solid fa-list-check text-[12px]"></i> 全文档展示`;
+            // 💡 使用 t() 动态翻译内部内容
+            allBtn.innerHTML = `<i class="fa-solid fa-list-check text-[12px]"></i> ${t('all-docs')}`;
             allBtn.onclick = () => { currentFilterCategory = "全部"; refreshAllViews(); };
             
             if(allDocsContainer) {
@@ -522,7 +581,7 @@
                                     ${iconHtml}
                                     <span class="font-extrabold text-[12px] truncate">${cat.name}</span>
                                 </div>
-                                <span class="text-[10px] block mt-0.5 font-bold ${isSelected ? 'opacity-100 text-blue-100' : 'opacity-60'}">(${noteCount}篇)</span>
+                                <span class="text-[10px] block mt-0.5 font-bold ${isSelected ? 'opacity-100 text-blue-100' : 'opacity-60'}">(${noteCount})</span>
                             </div>
                         `;
                     } else {
@@ -534,7 +593,7 @@
                                 ${iconHtml}
                                 <span class="font-extrabold text-[12px] truncate">${cat.name}</span>
                             </div>
-                            <span class="text-[10px] font-bold ${isSelected ? 'opacity-100 text-blue-100' : 'opacity-60'} shrink-0">(${noteCount}篇)</span>
+                            <span class="text-[10px] font-bold ${isSelected ? 'opacity-100 text-blue-100' : 'opacity-60'} shrink-0">(${noteCount})</span>
                         `;
                     }
 
@@ -574,7 +633,7 @@
             }
     
             const sorted = [...displayNotes].sort((a,b) => b.updatedAt - a.updatedAt);
-            if (sorted.length === 0) { container.innerHTML = `<p class="text-slate-400 text-center text-sm py-4 font-bold">无数据</p>`; return; }
+            if (sorted.length === 0) { container.innerHTML = `<p class="text-slate-400 text-center text-sm py-4 font-bold">${t('no-data')}</p>`; return; }
     
             const gridWrapper = document.createElement('div'); 
             gridWrapper.className = leftLayoutView === 'list' ? "grid grid-cols-1 gap-1 w-full" : "grid grid-cols-3 gap-1 w-full";
@@ -585,8 +644,8 @@
                 box.onclick = (e) => { if (!e.target.closest('.del-btn')) openNote(note.id); };
         
                 const plainText = note.content ? note.content.replace(/<[^>]+>/g, '').substring(0, 15) : '...';
+                const displayTitle = note.title || t('untitled'); // 动态翻译“无标题”
         
-                // 💡 修复暗黑模式失效：列表卡片适配暗黑样式
                 const defaultBoxStyle = 'bg-white dark:bg-slate-800 border-emerald-400 dark:border-emerald-600 hover:bg-emerald-50 dark:hover:bg-slate-700 shadow-sm';
                 const activeBoxStyle = 'bg-blue-500 border-blue-600 text-white shadow active-note-item';
 
@@ -595,7 +654,7 @@
                     box.innerHTML = `
                         <button class="del-btn opacity-0 group-hover:opacity-100 absolute right-1 top-1 p-0.5 ${isSelected ? 'text-white hover:text-blue-200' : 'text-slate-600 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400'} transition-all z-10" onclick="event.stopPropagation(); deleteNote('${note.id}')"><i class="fa-solid fa-trash-can text-[13px]"></i></button>
                         <div class="w-full overflow-hidden flex flex-col flex-1 pr-2 justify-center">
-                            <div class="font-black text-[16px] ${isSelected ? 'text-white' : 'text-slate-900 dark:text-slate-100'} line-clamp-1 leading-snug mb-0.5" title="${note.title || '无标题'}">${note.title || '无标题'}</div>
+                            <div class="font-black text-[16px] ${isSelected ? 'text-white' : 'text-slate-900 dark:text-slate-100'} line-clamp-1 leading-snug mb-0.5" title="${displayTitle}">${displayTitle}</div>
                             <p class="text-[14px] ${isSelected ? 'text-blue-100' : 'text-slate-500 dark:text-slate-400'} line-clamp-1 leading-relaxed">${plainText}</p>
                         </div>
                     `;
@@ -604,7 +663,7 @@
                     box.innerHTML = `
                         <button class="del-btn opacity-0 group-hover:opacity-100 absolute right-1 top-1 p-0.5 ${isSelected ? 'text-white hover:text-blue-200' : 'text-slate-600 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400'} transition-all z-10" onclick="event.stopPropagation(); deleteNote('${note.id}')"><i class="fa-solid fa-trash-can text-[11px]"></i></button>
                         <div class="w-full overflow-hidden flex flex-col flex-1 justify-center">
-                            <div class="font-black text-[13px] ${isSelected ? 'text-white' : 'text-slate-950 dark:text-slate-50'} line-clamp-1 leading-tight mb-1" title="${note.title || '无标题'}">${note.title || '无标题'}</div>
+                            <div class="font-black text-[13px] ${isSelected ? 'text-white' : 'text-slate-950 dark:text-slate-50'} line-clamp-1 leading-tight mb-1" title="${displayTitle}">${displayTitle}</div>
                             <p class="text-[11px] ${isSelected ? 'text-blue-100' : 'text-slate-500 dark:text-slate-400'} line-clamp-2 leading-tight">${plainText}</p>
                         </div>
                     `;
@@ -618,17 +677,17 @@
             const container = document.getElementById('right-trash-flow'); container.innerHTML = '';
             if (rightPanelClosed) return;
             if (trashBin.length === 0) { 
-                container.innerHTML = `<p class="text-center py-8 text-slate-400 text-sm font-bold flex flex-col items-center gap-2"><i class="fa-solid fa-wind text-2xl"></i> 回收站空空如也</p>`; 
+                container.innerHTML = `<p class="text-center py-8 text-slate-400 text-sm font-bold flex flex-col items-center gap-2"><i class="fa-solid fa-wind text-2xl"></i> ${t('trash-empty')}</p>`; 
                 return; 
             }
             trashBin.forEach((note) => {
-                // 💡 修复暗黑模式失效：回收站卡片适配暗黑样式
                 const card = document.createElement('div'); card.className = "bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-3 rounded-xl relative group text-xs shadow-sm hover:shadow transition-all mb-2";
                 const catObj = categories.find(c => c.id === note.category) || {name: '未分类'};
+                const displayTitle = note.title || t('untitled');
                 card.innerHTML = `
                     <div class="pr-16 truncate">
-                        <div class="font-bold text-slate-900 dark:text-slate-100 truncate mb-1 text-sm">${note.title || '无标题记录'}</div>
-                        <span class="text-[11px] text-slate-500 dark:text-slate-400 font-medium block flex items-center gap-1"><i class="fa-solid fa-folder-open text-slate-400"></i> 原位置: ${catObj.name}</span>
+                        <div class="font-bold text-slate-900 dark:text-slate-100 truncate mb-1 text-sm">${displayTitle}</div>
+                        <span class="text-[11px] text-slate-500 dark:text-slate-400 font-medium block flex items-center gap-1"><i class="fa-solid fa-folder-open text-slate-400"></i> ${t('original-folder')} ${catObj.name}</span>
                     </div>
                     <div class="absolute right-2 top-2 flex gap-1.5 opacity-60 group-hover:opacity-100 transition-opacity">
                         <button onclick="recoverDeletedFile('${note.id}')" title="恢复" class="p-1.5 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 rounded-lg text-emerald-600 dark:text-emerald-400 font-bold"><i class="fa-solid fa-rotate-left"></i></button>
@@ -1036,51 +1095,7 @@
         });
 
         // ==========================================
-        // 2. 多语言切换逻辑 (i18n)
-        // ==========================================
-        const dict = {
-            zh: {
-                'nav-logout': '退出', 'nav-delete': '注销', 'nav-history': '历史',
-                'theme-light': '浅色', 'theme-dark': '深色', 'theme-sys': '系统',
-                'nav-sidebar': '侧栏', 'app-title': '云端笔记',
-                'btn-new-note': '新建笔记', 'btn-new-folder': '新建分类',
-                'btn-import-export': '导入与导出', 'label-folder': '文件夹',
-                'label-content': '内容展示', 'label-editor': '编辑栏',
-                'label-category': '归属地:', 'trash-title': '回收站'
-            },
-            en: {
-                'nav-logout': 'Logout', 'nav-delete': 'Delete', 'nav-history': 'History',
-                'theme-light': 'Light', 'theme-dark': 'Dark', 'theme-sys': 'Auto',
-                'nav-sidebar': 'Sidebar', 'app-title': 'Cloud Note',
-                'btn-new-note': 'New Note', 'btn-new-folder': 'New Folder',
-                'btn-import-export': 'Import/Export', 'label-folder': 'Folders',
-                'label-content': 'Content', 'label-editor': 'Editor',
-                'label-category': 'Category:', 'trash-title': 'Trash'
-            }
-        };
-
-        let currentLang = localStorage.getItem('app-lang') || 'zh';
-
-        function toggleLanguage() {
-            currentLang = currentLang === 'zh' ? 'en' : 'zh';
-            localStorage.setItem('app-lang', currentLang);
-            updateLanguageUI();
-        }
-
-        function updateLanguageUI() {
-            document.getElementById('lang-text').innerText = currentLang === 'zh' ? 'CN' : 'EN';
-            const currentDict = dict[currentLang];
-            
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                if (currentDict[key]) {
-                    el.innerText = currentDict[key];
-                }
-            });
-        }
-        
-        // ==========================================
-        // 3. PWA Service Worker 注册
+        // PWA Service Worker 注册
         // ==========================================
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
