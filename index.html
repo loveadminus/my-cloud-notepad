@@ -57,13 +57,6 @@
         .active-tree-node { background-color: #3b82f6 !important; color: white !important; }
         #left-notes-container div.active-note-item:hover { background-color: #3b82f6 !important; }
 
-        /* 💡 终极修复：针对 PWA 沉浸模式下的完美动态避让 */
-        @media (display-mode: window-controls-overlay) {
-            #app-header {
-                /* 当系统的向下箭头、最小化等按钮覆盖在网页上时，右侧强制空出 210px 避让 */
-                padding-right: 210px !important; 
-            }
-        }
     </style>
 </head>
 <body class="bg-slate-900 font-sans h-screen flex flex-col overflow-hidden text-slate-800 dark:bg-slate-950 dark:text-slate-200 transition-colors duration-300">
@@ -79,7 +72,7 @@
         </div>
     </div>
 
-    <header id="app-header" class="bg-slate-800 text-slate-200 py-1 pl-6 pr-6 flex items-center justify-between flex-shrink-0 select-none border-b border-slate-700 shadow-md relative z-[60]" style="-webkit-app-region: drag;">
+    <header id="app-header" class="bg-slate-800 text-slate-200 py-1 pl-6 flex items-center justify-between flex-shrink-0 select-none border-b border-slate-700 shadow-md relative z-[60]" style="-webkit-app-region: drag;">
         
         <div class="flex items-center gap-3 z-10 flex-shrink-0" style="-webkit-app-region: no-drag;">
             <button onclick="toggleLeftPanel()" class="bg-blue-700 hover:bg-blue-800 text-white font-black px-3 py-1 rounded-xl text-sm transition-all shadow-md flex items-center gap-2 border border-blue-600 mr-2 whitespace-nowrap flex-shrink-0">
@@ -87,14 +80,16 @@
             </button>
         </div>
         
-        <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden md:flex items-center gap-2 pointer-events-none w-max">
-            <i class="fa-solid fa-pen-to-square text-yellow-400 text-1xl"></i>
-            <span class="font-black tracking-wider text-xl lg:text-lg bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-300" data-i18n="app-title">
-                云端笔记
-            </span>
+        <div class="flex-1 flex justify-center items-center pointer-events-none pr-8">
+            <div class="hidden md:flex items-center gap-2 w-max">
+                <i class="fa-solid fa-pen-to-square text-yellow-400 text-1xl"></i>
+                <span class="font-black tracking-wider text-xl lg:text-lg bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-300" data-i18n="app-title">
+                    云端笔记
+                </span>
+            </div>
         </div>
             
-        <div class="flex items-center gap-4 text-slate-400 text-base z-10 flex-shrink-0 ml-auto" style="-webkit-app-region: no-drag;">
+        <div class="flex items-center gap-4 text-slate-400 text-base z-10 flex-shrink-0 pr-[280px]" style="-webkit-app-region: no-drag;">
             
             <div class="relative flex-shrink-0 z-[70]">
                 <button onclick="toggleSettingsMenu(event)" class="text-slate-300 hover:text-white transition-all hover:rotate-90 duration-300 flex items-center p-1" title="系统设置">
