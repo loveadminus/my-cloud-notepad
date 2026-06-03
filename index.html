@@ -71,7 +71,7 @@
         </div>
     </div>
 
-    <header class="bg-slate-800 text-slate-200 py-1 pl-6 pr-[140px] flex items-center justify-between flex-shrink-0 select-none border-b border-slate-700 shadow-md relative z-[60]" style="-webkit-app-region: drag;">
+    <header class="bg-slate-800 text-slate-200 py-1 pl-6 pr-6 flex items-center justify-between flex-shrink-0 select-none border-b border-slate-700 shadow-md relative z-[60]" style="-webkit-app-region: drag;">
         
         <div class="flex items-center gap-3 z-10 flex-shrink-0" style="-webkit-app-region: no-drag;">
             <button onclick="toggleLeftPanel()" class="bg-blue-700 hover:bg-blue-800 text-white font-black px-3 py-1 rounded-xl text-sm transition-all shadow-md flex items-center gap-2 border border-blue-600 mr-2 whitespace-nowrap flex-shrink-0">
@@ -94,7 +94,6 @@
                 </button>
                 
                 <div id="settings-dropdown" class="hidden absolute right-0 top-full mt-3 w-48 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden z-50 flex flex-col py-1">
-                    
                     <button onclick="toggleLanguage(); closeSettingsMenu();" class="w-full text-left px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-3 font-bold transition-colors">
                         <i class="fa-solid fa-language text-lg text-blue-500 w-4 text-center"></i> <span data-i18n="lang-toggle">切换语言 / EN</span>
                     </button>
@@ -229,7 +228,7 @@
                     <div class="h-4 w-[1px] bg-slate-300 dark:bg-slate-600 mx-0.5"></div>
 
                     <button onmousedown="event.preventDefault();" onclick="wrapHTML('<code>', '</code>')" class="px-2 py-0.5 text-xs font-mono text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded border border-slate-200 dark:border-slate-600"><i class="fa-solid fa-code"></i></button>
-                    <button onmousedown="event.preventDefault();" onclick="execCmd('removeFormat')" class="px-2 py-0.5 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600 rounded border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700"><i class="fa-solid fa-eraser"></i></button>
+                    <button onmousedown="event.preventDefault();" onclick="removeFormat()" class="px-2 py-0.5 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600 rounded border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700"><i class="fa-solid fa-eraser"></i></button>
                     <div class="h-4 w-[1px] bg-slate-300 dark:bg-slate-600 mx-0.5"></div>
     
                     <button onmousedown="event.preventDefault(); document.getElementById('local-img-input').click()" class="px-2 py-0.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-slate-700 rounded border border-emerald-200 dark:border-emerald-800 bg-emerald-50/50 dark:bg-slate-700"><i class="fa-regular fa-image"></i> <span data-i18n="fmt-img">图</span></button>
@@ -365,7 +364,7 @@
         });
 
         // ==========================================
-        // 核心数据模型与同步应用逻辑
+        // 核心应用逻辑
         // ==========================================
         let notes = [];
         let trashBin = [];
@@ -860,7 +859,7 @@
                 const layerNodes = categories.filter(c => c.parentId === parentId);
                 layerNodes.forEach(cat => {
                     const opt = document.createElement('option');
-                    opt.value = opt.value = cat.id;
+                    opt.value = cat.id;
                     opt.innerHTML = '—'.repeat(depth) + ' ' + t(cat.name);
                     select.appendChild(opt);
                     appendOption(cat.id, depth + 1); 
