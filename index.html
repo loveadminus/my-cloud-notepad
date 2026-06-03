@@ -56,6 +56,14 @@
         .tree-node-wrapper:hover { background-color: #f1f5f9; }
         .active-tree-node { background-color: #3b82f6 !important; color: white !important; }
         #left-notes-container div.active-note-item:hover { background-color: #3b82f6 !important; }
+
+        /* 💡 终极修复：针对 PWA 沉浸模式下的完美动态避让 */
+        @media (display-mode: window-controls-overlay) {
+            #app-header {
+                /* 当系统的向下箭头、最小化等按钮覆盖在网页上时，右侧强制空出 210px 避让 */
+                padding-right: 210px !important; 
+            }
+        }
     </style>
 </head>
 <body class="bg-slate-900 font-sans h-screen flex flex-col overflow-hidden text-slate-800 dark:bg-slate-950 dark:text-slate-200 transition-colors duration-300">
@@ -71,7 +79,7 @@
         </div>
     </div>
 
-    <header class="bg-slate-800 text-slate-200 py-1 pl-6 pr-6 flex items-center justify-between flex-shrink-0 select-none border-b border-slate-700 shadow-md relative z-[60]" style="-webkit-app-region: drag;">
+    <header id="app-header" class="bg-slate-800 text-slate-200 py-1 pl-6 pr-6 flex items-center justify-between flex-shrink-0 select-none border-b border-slate-700 shadow-md relative z-[60]" style="-webkit-app-region: drag;">
         
         <div class="flex items-center gap-3 z-10 flex-shrink-0" style="-webkit-app-region: no-drag;">
             <button onclick="toggleLeftPanel()" class="bg-blue-700 hover:bg-blue-800 text-white font-black px-3 py-1 rounded-xl text-sm transition-all shadow-md flex items-center gap-2 border border-blue-600 mr-2 whitespace-nowrap flex-shrink-0">
@@ -114,10 +122,10 @@
                     <div class="h-px bg-slate-100 dark:bg-slate-700 w-full my-1"></div>
                     
                     <button onclick="logout()" class="w-full text-left px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-3 font-bold transition-colors">
-                        <i class="fa-solid fa-right-from-bracket text-slate-400 w-4 text-center"></i> <span data-i18n="nav-logout">退出</span>
+                        <i class="fa-solid fa-right-from-bracket text-slate-400 w-4 text-center"></i> <span data-i18n="nav-logout">退出登录</span>
                     </button>
                     <button onclick="deleteAccount()" class="w-full text-left px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 flex items-center gap-3 font-bold transition-colors">
-                        <i class="fa-solid fa-user-xmark w-4 text-center"></i> <span data-i18n="nav-delete">注销</span>
+                        <i class="fa-solid fa-user-xmark w-4 text-center"></i> <span data-i18n="nav-delete">注销账号</span>
                     </button>
                 </div>
             </div>
@@ -364,7 +372,7 @@
         });
 
         // ==========================================
-        // 核心应用逻辑
+        // 核心数据模型与同步应用逻辑
         // ==========================================
         let notes = [];
         let trashBin = [];
@@ -859,7 +867,7 @@
                 const layerNodes = categories.filter(c => c.parentId === parentId);
                 layerNodes.forEach(cat => {
                     const opt = document.createElement('option');
-                    opt.value = cat.id;
+                    opt.value = opt.value = cat.id;
                     opt.innerHTML = '—'.repeat(depth) + ' ' + t(cat.name);
                     select.appendChild(opt);
                     appendOption(cat.id, depth + 1); 
@@ -1102,7 +1110,7 @@
         }
 
         // ==========================================
-        // 3. PWA Service Worker 注册
+        // PWA Service Worker 注册
         // ==========================================
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
