@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -65,32 +66,32 @@
 
     <header class="bg-slate-800 text-slate-200 py-1 pl-6 flex items-center justify-between flex-shrink-0 select-none border-b border-slate-700 shadow-md relative" style="-webkit-app-region: drag; padding-right: env(titlebar-area-width, 0px);">
         
-        <div class="flex items-center gap-3 z-10" style="-webkit-app-region: no-drag;">
-            <button onclick="toggleLeftPanel()" class="bg-blue-700 hover:bg-blue-800 text-white font-black px-3 py-1 rounded-xl text-sm transition-all shadow-md flex items-center gap-2 border border-blue-600 mr-2">
-                <i id="left-panel-toggle-icon" class="fa-solid fa-folder-tree text-xs"></i> <span id="btn-toggle-left-text">开关侧栏</span>
-            </button>
-        </div>
+            <div class="flex items-center gap-3 z-10" style="-webkit-app-region: no-drag;">
+                  <button onclick="toggleLeftPanel()" class="bg-blue-700 hover:bg-blue-800 text-white font-black px-3 py-1 rounded-xl text-sm transition-all shadow-md flex items-center gap-2 border border-blue-600 mr-2">
+                         <i id="left-panel-toggle-icon" class="fa-solid fa-folder-tree text-xs"></i> <span id="btn-toggle-left-text">开关侧栏</span>
+                  </button>
+            </div>
         
-        <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden md:flex items-center gap-2 pointer-events-none w-max">
-            <i class="fa-solid fa-pen-to-square text-yellow-400 text-1xl"></i>
-            <span class="font-black tracking-wider text-xl lg:text-lg bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-300">
-                云端笔记
-            </span>
-        </div>
+            <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden md:flex items-center gap-2 pointer-events-none w-max">
+                  <i class="fa-solid fa-pen-to-square text-yellow-400 text-1xl"></i>
+                  <span class="font-black tracking-wider text-xl lg:text-lg bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-300">
+                         云端笔记
+                  </span>
+            </div>
         
-        <div class="flex items-center gap-5 text-slate-400 text-base z-10" style="-webkit-app-region: no-drag;">
-            <button onclick="logout()" class="text-slate-300 hover:text-white font-bold text-sm mr-2 transition-colors">
-                <i class="fa-solid fa-right-from-bracket"></i> 退出
-            </button>
+            <div class="flex items-center gap-5 text-slate-400 text-base z-10" style="-webkit-app-region: no-drag;">
+                  <button onclick="logout()" class="text-slate-300 hover:text-white font-bold text-sm mr-2 transition-colors">
+                         <i class="fa-solid fa-right-from-bracket"></i> 退出
+                  </button>
 
-            <button onclick="deleteAccount()" class="text-red-400 hover:text-red-500 font-bold text-sm transition-colors" title="彻底销毁账号及所有数据">
-                <i class="fa-solid fa-user-xmark"></i> 注销
-            </button>
+                  <button onclick="deleteAccount()" class="text-red-400 hover:text-red-500 font-bold text-sm transition-colors" title="彻底销毁账号及所有数据">
+                          <i class="fa-solid fa-user-xmark"></i> 注销
+                  </button>
 
-            <button onclick="toggleRightPanel()" class="bg-red-700 hover:bg-red-800 text-white font-black px-3 py-1 rounded-xl text-sm transition-all shadow-md flex items-center justify-center gap-2 border border-red-600">
-                   <i id="right-panel-toggle-icon" class="fa-solid fa-dumpster-fire text-xs"></i> <span id="btn-toggle-right-text">开关历史</span>
-            </button>
-        </div>
+                  <button onclick="toggleRightPanel()" class="bg-red-700 hover:bg-red-800 text-white font-black px-3 py-1 rounded-xl text-sm transition-all shadow-md flex items-center justify-center gap-2 border border-red-600">
+                              <i id="right-panel-toggle-icon" class="fa-solid fa-dumpster-fire text-xs"></i> <span id="btn-toggle-right-text">开关历史</span>
+                  </button>
+            </div>
     </header>
 
     <div id="workspace-container" class="flex flex-1 overflow-hidden w-full bg-slate-200">
@@ -988,7 +989,5 @@
             });
         }
     </script>
-</body>
-</html>
 </body>
 </html>
