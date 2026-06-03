@@ -4,11 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>云端记事本</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class', 
+        }
+    </script>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="manifest" href="manifest.json">
+    
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://unpkg.com/turndown/dist/turndown.js"></script>
+    
     <style>
         body { font-size: 19px; }
         .panel-large-text { font-size: 16px !important; font-weight: 800 !important; }
@@ -46,11 +55,10 @@
         /* 目录树与内容展示样式 */
         .tree-node-wrapper:hover { background-color: #f1f5f9; }
         .active-tree-node { background-color: #3b82f6 !important; color: white !important; }
-        /* 修复内容展示区域选中项悬停变灰问题 */
         #left-notes-container div.active-note-item:hover { background-color: #3b82f6 !important; }
     </style>
 </head>
-<body class="bg-slate-900 font-sans h-screen flex flex-col overflow-hidden text-slate-800">
+<body class="bg-slate-900 font-sans h-screen flex flex-col overflow-hidden text-slate-800 dark:bg-slate-950 dark:text-slate-200 transition-colors">
     
     <div id="auth-overlay" class="fixed inset-0 bg-slate-900 z-[100] flex items-center justify-center transition-opacity">
         <div class="bg-white p-8 rounded-2xl shadow-2xl w-96 flex flex-col gap-4">
@@ -65,39 +73,49 @@
 
     <header class="bg-slate-800 text-slate-200 py-1 pl-6 flex items-center justify-between flex-shrink-0 select-none border-b border-slate-700 shadow-md relative" style="-webkit-app-region: drag; padding-right: env(titlebar-area-width, 0px);">
         
-            <div class="flex items-center gap-3 z-10 flex-shrink-0" style="-webkit-app-region: no-drag;">
-
-                  <button onclick="toggleLeftPanel()" class="bg-blue-700 hover:bg-blue-800 text-white font-black px-3 py-1 rounded-xl text-sm transition-all shadow-md flex items-center gap-2 border border-blue-600 mr-2 whitespace-nowrap flex-shrink-0">
-                         <i id="left-panel-toggle-icon" class="fa-solid fa-folder-tree text-xs"></i> <span id="btn-toggle-left-text">侧栏</span>
-                  </button>
-
-            </div>
+        <div class="flex items-center gap-3 z-10 flex-shrink-0" style="-webkit-app-region: no-drag;">
+            <button onclick="toggleLeftPanel()" class="bg-blue-700 hover:bg-blue-800 text-white font-black px-3 py-1 rounded-xl text-sm transition-all shadow-md flex items-center gap-2 border border-blue-600 mr-2 whitespace-nowrap flex-shrink-0">
+                <i id="left-panel-toggle-icon" class="fa-solid fa-folder-tree text-xs"></i> <span id="btn-toggle-left-text">侧栏</span>
+            </button>
+        </div>
         
-            <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden md:flex items-center gap-2 pointer-events-none w-max">
-                  <i class="fa-solid fa-pen-to-square text-yellow-400 text-1xl"></i>
-                  <span class="font-black tracking-wider text-xl lg:text-lg bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-300">
-                         云端笔记
-                  </span>
+        <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden md:flex items-center gap-2 pointer-events-none w-max">
+            <i class="fa-solid fa-pen-to-square text-yellow-400 text-1xl"></i>
+            <span class="font-black tracking-wider text-xl lg:text-lg bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-300">
+                云端笔记
+            </span>
+        </div>
+            
+        <div class="flex items-center gap-3 text-slate-400 text-base z-10 flex-shrink-0" style="-webkit-app-region: no-drag;">
+            <button onclick="toggleLanguage()" class="text-slate-300 hover:text-white font-bold text-sm transition-colors whitespace-nowrap flex-shrink-0 flex items-center gap-1.5" title="切换语言 / Language">
+                <i class="fa-solid fa-language text-lg"></i> <span id="lang-text">CN</span>
+            </button>
+
+            <div class="relative flex-shrink-0 ml-1 mr-1">
+                <button onclick="toggleThemeMenu(event)" class="text-slate-300 hover:text-white transition-colors flex items-center" title="主题设置">
+                    <i id="current-theme-icon" class="fa-solid fa-circle-half-stroke text-lg"></i>
+                </button>
+                <div id="theme-dropdown" class="hidden absolute right-0 top-full mt-3 w-28 bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden z-50">
+                    <button onclick="setTheme('light')" class="w-full text-left px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2 font-bold"><i class="fa-solid fa-sun w-4"></i> <span data-i18n="theme-light">浅色</span></button>
+                    <button onclick="setTheme('dark')" class="w-full text-left px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2 font-bold"><i class="fa-solid fa-moon w-4"></i> <span data-i18n="theme-dark">深色</span></button>
+                    <button onclick="setTheme('system')" class="w-full text-left px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2 font-bold"><i class="fa-solid fa-desktop w-4"></i> <span data-i18n="theme-sys">系统</span></button>
+                </div>
             </div>
-        
-            <div class="flex items-center gap-3 text-slate-400 text-base z-10 flex-shrink-0" style="-webkit-app-region: no-drag;">
 
-                  <button onclick="logout()" class="text-slate-300 hover:text-white font-bold text-sm transition-colors whitespace-nowrap flex-shrink-0">
-                         <i class="fa-solid fa-right-from-bracket"></i> 退出
-                  </button>
-
-                  <button onclick="deleteAccount()" class="text-red-400 hover:text-red-500 font-bold text-sm transition-colors whitespace-nowrap flex-shrink-0" title="彻底销毁账号及所有数据">
-                              <i class="fa-solid fa-user-xmark"></i> 注销
-                  </button>
-
-                  <button onclick="toggleRightPanel()" class="bg-red-700 hover:bg-red-800 text-white font-black px-3 py-1 rounded-xl text-sm transition-all shadow-md flex items-center justify-center gap-2 border border-red-600 whitespace-nowrap flex-shrink-0">
-                              <i id="right-panel-toggle-icon" class="fa-solid fa-dumpster-fire text-xs"></i> <span id="btn-toggle-right-text">历史</span>
-                  </button>
-
-            </div>
+            <button onclick="logout()" class="text-slate-300 hover:text-white font-bold text-sm transition-colors whitespace-nowrap flex-shrink-0">
+                <i class="fa-solid fa-right-from-bracket"></i> <span data-i18n="nav-logout">退出</span>
+            </button>
+            <button onclick="deleteAccount()" class="text-red-400 hover:text-red-500 font-bold text-sm transition-colors whitespace-nowrap flex-shrink-0">
+                <i class="fa-solid fa-user-xmark"></i> <span data-i18n="nav-delete">注销</span>
+            </button>
+            <button onclick="toggleRightPanel()" class="bg-red-700 hover:bg-red-800 text-white font-black px-3 py-1 rounded-xl text-sm transition-all shadow-md flex items-center justify-center gap-2 border border-red-600 whitespace-nowrap flex-shrink-0">
+                <i id="right-panel-toggle-icon" class="fa-solid fa-dumpster-fire text-xs"></i> <span id="btn-toggle-right-text" data-i18n="nav-history">历史</span>
+            </button>
+        </div>
     </header>
 
     <div id="workspace-container" class="flex flex-1 overflow-hidden w-full bg-slate-200">
+        
         <aside id="left-panel" class="bg-slate-50 flex flex-col flex-shrink-0 overflow-hidden border-r border-slate-200 panel-large-text transition-all absolute md:relative z-50 h-full shadow-2xl md:shadow-none" style="width: 220px; min-width: 160px; max-width: 480px;">
             <div class="p-1.5 border-b border-slate-200 bg-slate-100/80 flex flex-col gap-1 flex-shrink-0">
                 <div class="flex items-center gap-1.5 px-1">
@@ -106,27 +124,24 @@
                 </div>
                 
                 <div class="bg-white border border-slate-200 rounded-lg p-1.5 mb-0 shadow-sm flex-shrink-0">
+                    <button onclick="toggleImportExport()" class="w-full flex items-center justify-between bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs px-3 py-1 rounded-lg transition-all cursor-pointer shadow-sm border border-emerald-600">
+                        <span class="flex items-center gap-1"><i class="fa-solid fa-box-archive text-white"></i> 导入与导出</span>
+                        <i id="import-export-arrow" class="fa-solid fa-chevron-down transition-transform duration-200 text-emerald-100 text-[10px]"></i>
+                    </button>
     
-                      <button onclick="toggleImportExport()" class="w-full flex items-center justify-between bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs px-3 py-1 rounded-lg transition-all cursor-pointer shadow-sm border border-emerald-600">
-                            <span class="flex items-center gap-1"><i class="fa-solid fa-box-archive text-white"></i> 导入与导出</span>
-                            <i id="import-export-arrow" class="fa-solid fa-chevron-down transition-transform duration-200 text-emerald-100 text-[10px]"></i>
-                      </button>
-    
-                      <div id="import-export-content" class="hidden flex flex-col gap-1.5 border-t border-slate-100 pt-1.5 mt-1.5">
-        
-                           <div class="flex flex-col gap-0.5 bg-white/70 p-1 rounded-lg border border-slate-200/60">
-                                 <div class="flex items-center gap-1.5">
-                                       <button onclick="triggerImport('md')" class="flex-1 py-1 px-1 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-black transition-all text-center truncate text-xs shadow-sm"><i class="fa-solid fa-file-import"></i> 导入 MD</button>
-                                       <button onclick="exportFile('md')" class="flex-1 py-1 px-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-black transition-all text-center truncate text-xs shadow-sm"><i class="fa-solid fa-file-export"></i> 导出 MD</button>
-                                 </div>
-                                 <div class="flex items-center gap-1.5">
-                                       <button onclick="triggerImport('txt')" class="flex-1 py-1 px-1 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-black transition-all text-center truncate text-xs shadow-sm"><i class="fa-solid fa-file-import"></i> 导入 TXT</button>
-                                       <button onclick="exportFile('txt')" class="flex-1 py-1 px-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-black transition-all text-center truncate text-xs shadow-sm"><i class="fa-solid fa-file-export"></i> 导出 TXT</button>
-                                 </div>
-                                 <button onclick="triggerFolderImport()" class="w-full py-1 bg-slate-700 hover:bg-slate-800 text-white rounded-lg font-black transition-all text-xs shadow-sm flex items-center justify-center gap-1"><i class="fa-solid fa-folder-tree text-amber-400"></i> 导入文件夹</button>
-                           </div>
-
-                      </div>
+                    <div id="import-export-content" class="hidden flex flex-col gap-1.5 border-t border-slate-100 pt-1.5 mt-1.5">
+                        <div class="flex flex-col gap-0.5 bg-white/70 p-1 rounded-lg border border-slate-200/60">
+                            <div class="flex items-center gap-1.5">
+                                <button onclick="triggerImport('md')" class="flex-1 py-1 px-1 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-black transition-all text-center truncate text-xs shadow-sm"><i class="fa-solid fa-file-import"></i> 导入 MD</button>
+                                <button onclick="exportFile('md')" class="flex-1 py-1 px-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-black transition-all text-center truncate text-xs shadow-sm"><i class="fa-solid fa-file-export"></i> 导出 MD</button>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <button onclick="triggerImport('txt')" class="flex-1 py-1 px-1 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-black transition-all text-center truncate text-xs shadow-sm"><i class="fa-solid fa-file-import"></i> 导入 TXT</button>
+                                <button onclick="exportFile('txt')" class="flex-1 py-1 px-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-black transition-all text-center truncate text-xs shadow-sm"><i class="fa-solid fa-file-export"></i> 导出 TXT</button>
+                            </div>
+                            <button onclick="triggerFolderImport()" class="w-full py-1 bg-slate-700 hover:bg-slate-800 text-white rounded-lg font-black transition-all text-xs shadow-sm flex items-center justify-center gap-1"><i class="fa-solid fa-folder-tree text-amber-400"></i> 导入文件夹</button>
+                        </div>
+                    </div>
                 </div>
 
                 <input type="file" id="import-md-input" accept=".md" class="hidden" onchange="handleImportFile(event, 'md')">
@@ -161,53 +176,53 @@
             <div class="bg-slate-50 border-b border-slate-200 px-4 py-2 flex flex-col gap-2 select-none flex-shrink-0 shadow-sm z-10">
                 <div class="flex items-center justify-between flex-wrap gap-2">
                     <div class="flex items-center gap-1 bg-emerald-100/50 text-emerald-700 border border-emerald-200 px-2.5 py-1 rounded-lg shadow-sm font-black text-xs">
-                          <i class="fa-solid fa-pen-nib"></i> 编辑栏
+                        <i class="fa-solid fa-pen-nib"></i> 编辑栏
                     </div>
                     <div class="flex items-center gap-1 bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-lg shadow-sm">
-                          <span class="text-xs font-black text-blue-600"><i class="fa-solid fa-folder text-blue-500"></i> 归属地:</span>
-                          <select id="note-category-select" onchange="changeNoteCategory(this.value)" class="text-xs font-black text-blue-700 bg-transparent outline-none cursor-pointer"></select>
+                        <span class="text-xs font-black text-blue-600"><i class="fa-solid fa-folder text-blue-500"></i> 归属地:</span>
+                        <select id="note-category-select" onchange="changeNoteCategory(this.value)" class="text-xs font-black text-blue-700 bg-transparent outline-none cursor-pointer"></select>
                     </div>
                 </div>
                 
                 <div id="editor-format-bar" class="flex items-center gap-1 flex-wrap bg-white border border-slate-200 p-1.5 rounded-lg shadow-inner">
-                      <select onchange="if(this.value){execCmd('fontSize', this.value); this.selectedIndex=0;}" class="px-1.5 py-0.5 text-xs font-bold text-slate-700 hover:bg-slate-100 rounded border border-slate-200 outline-none cursor-pointer bg-slate-50">
-                            <option value="">字号</option>
-                            <option value="1">极小</option>
-                            <option value="2">小号</option>
-                            <option value="3">正常</option>
-                            <option value="4">四号(大)</option>
-                            <option value="5">特大</option>
-                            <option value="6">超大</option>
-                            <option value="7">极巨</option>
-                      </select>
-                     <div class="h-4 w-[1px] bg-slate-300 mx-0.5"></div>
+                    <select onchange="if(this.value){execCmd('fontSize', this.value); this.selectedIndex=0;}" class="px-1.5 py-0.5 text-xs font-bold text-slate-700 hover:bg-slate-100 rounded border border-slate-200 outline-none cursor-pointer bg-slate-50">
+                        <option value="">字号</option>
+                        <option value="1">极小</option>
+                        <option value="2">小号</option>
+                        <option value="3">正常</option>
+                        <option value="4">四号(大)</option>
+                        <option value="5">特大</option>
+                        <option value="6">超大</option>
+                        <option value="7">极巨</option>
+                    </select>
+                    <div class="h-4 w-[1px] bg-slate-300 mx-0.5"></div>
 
-                     <button onmousedown="event.preventDefault();" onclick="execCmd('formatBlock', 'H1')" class="px-2 py-0.5 text-xs font-black text-slate-700 hover:bg-slate-100 rounded border border-slate-200">H1</button>
-                     <button onmousedown="event.preventDefault();" onclick="execCmd('formatBlock', 'H2')" class="px-2 py-0.5 text-xs font-black text-slate-700 hover:bg-slate-100 rounded border border-slate-200">H2</button>
-                     <button onmousedown="event.preventDefault();" onclick="execCmd('formatBlock', 'H3')" class="px-2 py-0.5 text-xs font-black text-slate-700 hover:bg-slate-100 rounded border border-slate-200">H3</button>
-                     <div class="h-4 w-[1px] bg-slate-300 mx-0.5"></div>
+                    <button onmousedown="event.preventDefault();" onclick="execCmd('formatBlock', 'H1')" class="px-2 py-0.5 text-xs font-black text-slate-700 hover:bg-slate-100 rounded border border-slate-200">H1</button>
+                    <button onmousedown="event.preventDefault();" onclick="execCmd('formatBlock', 'H2')" class="px-2 py-0.5 text-xs font-black text-slate-700 hover:bg-slate-100 rounded border border-slate-200">H2</button>
+                    <button onmousedown="event.preventDefault();" onclick="execCmd('formatBlock', 'H3')" class="px-2 py-0.5 text-xs font-black text-slate-700 hover:bg-slate-100 rounded border border-slate-200">H3</button>
+                    <div class="h-4 w-[1px] bg-slate-300 mx-0.5"></div>
     
-                     <button onmousedown="event.preventDefault();" onclick="execCmd('bold')" class="px-2 py-0.5 text-xs font-bold text-slate-700 hover:bg-slate-100 rounded border border-slate-200" title="加粗"><i class="fa-solid fa-bold"></i></button>
+                    <button onmousedown="event.preventDefault();" onclick="execCmd('bold')" class="px-2 py-0.5 text-xs font-bold text-slate-700 hover:bg-slate-100 rounded border border-slate-200" title="加粗"><i class="fa-solid fa-bold"></i></button>
     
-                     <button onmousedown="event.preventDefault();" onclick="execCmd('foreColor', '#ef4444')" class="px-1.5 py-0.5 text-[11px] font-bold text-white hover:opacity-80 rounded shadow-sm" style="background-color: #ef4444;" title="红">红</button>
-                     <button onmousedown="event.preventDefault();" onclick="execCmd('foreColor', '#eab308')" class="px-1.5 py-0.5 text-[11px] font-bold text-white hover:opacity-80 rounded shadow-sm" style="background-color: #eab308;" title="黄">黄</button>
-                     <button onmousedown="event.preventDefault();" onclick="execCmd('foreColor', '#3b82f6')" class="px-1.5 py-0.5 text-[11px] font-bold text-white hover:opacity-80 rounded shadow-sm" style="background-color: #3b82f6;" title="蓝">蓝</button>
-                     <button onmousedown="event.preventDefault();" onclick="execCmd('foreColor', '#22c55e')" class="px-1.5 py-0.5 text-[11px] font-bold text-white hover:opacity-80 rounded shadow-sm" style="background-color: #22c55e;" title="绿">绿</button>
-                     <button onmousedown="event.preventDefault();" onclick="execCmd('foreColor', '#000000')" class="px-1.5 py-0.5 text-[11px] font-bold text-white hover:opacity-80 rounded shadow-sm" style="background-color: #0f172a;" title="黑">黑</button>
+                    <button onmousedown="event.preventDefault();" onclick="execCmd('foreColor', '#ef4444')" class="px-1.5 py-0.5 text-[11px] font-bold text-white hover:opacity-80 rounded shadow-sm" style="background-color: #ef4444;" title="红">红</button>
+                    <button onmousedown="event.preventDefault();" onclick="execCmd('foreColor', '#eab308')" class="px-1.5 py-0.5 text-[11px] font-bold text-white hover:opacity-80 rounded shadow-sm" style="background-color: #eab308;" title="黄">黄</button>
+                    <button onmousedown="event.preventDefault();" onclick="execCmd('foreColor', '#3b82f6')" class="px-1.5 py-0.5 text-[11px] font-bold text-white hover:opacity-80 rounded shadow-sm" style="background-color: #3b82f6;" title="蓝">蓝</button>
+                    <button onmousedown="event.preventDefault();" onclick="execCmd('foreColor', '#22c55e')" class="px-1.5 py-0.5 text-[11px] font-bold text-white hover:opacity-80 rounded shadow-sm" style="background-color: #22c55e;" title="绿">绿</button>
+                    <button onmousedown="event.preventDefault();" onclick="execCmd('foreColor', '#000000')" class="px-1.5 py-0.5 text-[11px] font-bold text-white hover:opacity-80 rounded shadow-sm" style="background-color: #0f172a;" title="黑">黑</button>
 
-                       <div class="h-4 w-[1px] bg-slate-300 mx-0.5"></div>
+                    <div class="h-4 w-[1px] bg-slate-300 mx-0.5"></div>
 
-                       <button onmousedown="event.preventDefault();" onclick="wrapHTML('<code>', '</code>')" class="px-2 py-0.5 text-xs font-mono text-slate-700 hover:bg-slate-100 rounded border border-slate-200"><i class="fa-solid fa-code"></i></button>
-                       <button onmousedown="event.preventDefault();" onclick="execCmd('removeFormat')" class="px-2 py-0.5 text-xs font-bold text-slate-600 hover:bg-slate-200 rounded border border-slate-200 bg-slate-50" title="清除格式"><i class="fa-solid fa-eraser"></i></button>
-                       <div class="h-4 w-[1px] bg-slate-300 mx-0.5"></div>
+                    <button onmousedown="event.preventDefault();" onclick="wrapHTML('<code>', '</code>')" class="px-2 py-0.5 text-xs font-mono text-slate-700 hover:bg-slate-100 rounded border border-slate-200"><i class="fa-solid fa-code"></i></button>
+                    <button onmousedown="event.preventDefault();" onclick="execCmd('removeFormat')" class="px-2 py-0.5 text-xs font-bold text-slate-600 hover:bg-slate-200 rounded border border-slate-200 bg-slate-50" title="清除格式"><i class="fa-solid fa-eraser"></i></button>
+                    <div class="h-4 w-[1px] bg-slate-300 mx-0.5"></div>
     
-                       <button onmousedown="event.preventDefault(); document.getElementById('local-img-input').click()" class="px-2 py-0.5 text-xs font-bold text-emerald-600 hover:bg-emerald-50 rounded border border-emerald-200 bg-emerald-50/50"><i class="fa-regular fa-image"></i> 图</button>
+                    <button onmousedown="event.preventDefault(); document.getElementById('local-img-input').click()" class="px-2 py-0.5 text-xs font-bold text-emerald-600 hover:bg-emerald-50 rounded border border-emerald-200 bg-emerald-50/50"><i class="fa-regular fa-image"></i> 图</button>
                 </div>
-                      <input type="file" id="local-img-input" accept="image/*" class="hidden" onchange="handleLocalImageUpload(event)">
+                <input type="file" id="local-img-input" accept="image/*" class="hidden" onchange="handleLocalImageUpload(event)">
             </div>
             
             <div class="flex-1 flex flex-col p-5 overflow-y-auto w-full bg-white relative">
-                  <input id="note-title-input" oninput="handleEditorInput()" type="text" placeholder="此处输入新随笔标题..." class="w-full font-black text-2xl border-none outline-none mb-3 text-slate-900 placeholder-slate-300 bg-transparent flex-shrink-0">
+                <input id="note-title-input" oninput="handleEditorInput()" type="text" placeholder="此处输入新随笔标题..." class="w-full font-black text-2xl border-none outline-none mb-3 text-slate-900 placeholder-slate-300 bg-transparent flex-shrink-0">
                 <div id="note-editor-richtext" contenteditable="true" oninput="handleEditorInput()" placeholder="在这里直接排版书写您的文字（支持直接粘贴截图）..." class="md-preview w-full flex-1 outline-none text-slate-800 break-words"></div>
             </div>
         </section>
@@ -236,7 +251,6 @@
     <script>
         let notes = [];
         let trashBin = [];
-        
         let categories = [
             { id: "未分类", name: "未分类", parentId: null },
             { id: "工作", name: "工作", parentId: null },
@@ -252,7 +266,6 @@
         let leftPanelClosed = false;
         let rightPanelClosed = true;
         let treeLayoutView = "list"; 
-        // 🚨【修改点】：内容展示区布局改为默认 list 模式，并把之前不科学的标题字号对调放大，体验拉满
         let leftLayoutView = "list";
         let rightClickedCategoryId = null; 
         
@@ -348,10 +361,10 @@
             initRichTextInteractiveEvents();
 
             document.getElementById('note-title-input').addEventListener('keydown', function(e) {
-                     if (e.key === 'Enter') {
-                         e.preventDefault(); 
-                         document.getElementById('note-editor-richtext').focus(); 
-                     }
+                if (e.key === 'Enter') {
+                    e.preventDefault(); 
+                    document.getElementById('note-editor-richtext').focus(); 
+                }
             });  
 
             document.addEventListener('click', () => { document.getElementById('custom-context-menu').classList.add('hidden'); });
@@ -361,6 +374,10 @@
             } else {
                 document.getElementById('auth-overlay').classList.remove('hidden');
             }
+
+            // 初始化主题和语言
+            applyTheme(localStorage.getItem('app-theme') || 'system');
+            updateLanguageUI();
         });
         
         async function loadCloudData() {
@@ -421,7 +438,6 @@
             document.getElementById('view-left-list').style.backgroundColor = leftLayoutView === 'list' ? '#3b82f6' : 'transparent';
             document.getElementById('view-left-grid').style.backgroundColor = leftLayoutView === 'grid' ? '#3b82f6' : 'transparent';
             
-            // 💡 同步处理文字显眼度和按钮高亮文字颜色
             document.getElementById('view-left-list').style.color = leftLayoutView === 'list' ? '#ffffff' : '#334155';
             document.getElementById('view-left-grid').style.color = leftLayoutView === 'grid' ? '#ffffff' : '#334155';
 
@@ -548,54 +564,51 @@
         }
         
         function renderLeftNotesView() {
-               const container = document.getElementById('left-notes-container'); container.innerHTML = '';
-               let displayNotes = notes;
+            const container = document.getElementById('left-notes-container'); container.innerHTML = '';
+            let displayNotes = notes;
     
-               if (currentFilterCategory !== "全部") { 
-                   const targetIds = getAllCategoryIds(currentFilterCategory);
-                   displayNotes = notes.filter(n => targetIds.includes(n.category)); 
-               }
+            if (currentFilterCategory !== "全部") { 
+                const targetIds = getAllCategoryIds(currentFilterCategory);
+                displayNotes = notes.filter(n => targetIds.includes(n.category)); 
+            }
     
-               const sorted = [...displayNotes].sort((a,b) => b.updatedAt - a.updatedAt);
-               if (sorted.length === 0) { container.innerHTML = `<p class="text-slate-400 text-center text-sm py-4 font-bold">无数据</p>`; return; }
+            const sorted = [...displayNotes].sort((a,b) => b.updatedAt - a.updatedAt);
+            if (sorted.length === 0) { container.innerHTML = `<p class="text-slate-400 text-center text-sm py-4 font-bold">无数据</p>`; return; }
     
-               const gridWrapper = document.createElement('div'); 
-               gridWrapper.className = leftLayoutView === 'list' ? "grid grid-cols-1 gap-1 w-full" : "grid grid-cols-3 gap-1 w-full";
+            const gridWrapper = document.createElement('div'); 
+            gridWrapper.className = leftLayoutView === 'list' ? "grid grid-cols-1 gap-1 w-full" : "grid grid-cols-3 gap-1 w-full";
     
-               sorted.forEach(note => {
-                     const box = document.createElement('div');
-                     const isSelected = note.id === activeNoteId;
-                     box.onclick = (e) => { if (!e.target.closest('.del-btn')) openNote(note.id); };
+            sorted.forEach(note => {
+                const box = document.createElement('div');
+                const isSelected = note.id === activeNoteId;
+                box.onclick = (e) => { if (!e.target.closest('.del-btn')) openNote(note.id); };
         
-                     const plainText = note.content ? note.content.replace(/<[^>]+>/g, '').substring(0, 15) : '...';
+                const plainText = note.content ? note.content.replace(/<[^>]+>/g, '').substring(0, 15) : '...';
         
-                    // 💡 核心修复：将“列表模式”与“图表模式”的卡片样式彻底拆开，单独调大图表字体
-                    if (leftLayoutView === 'list') {
-                        // ================= 1. 列表模式 (单列展示) =================
-                        box.className = `w-full h-13 p-1.5 rounded-lg border cursor-pointer flex flex-col justify-between transition-all text-xs break-all relative group ${isSelected ? 'bg-blue-500 border-blue-600 text-white shadow active-note-item' : 'bg-white border-emerald-400 hover:bg-emerald-50 shadow-sm'}`;
-                        box.innerHTML = `
-                              <button class="del-btn opacity-0 group-hover:opacity-100 absolute right-1 top-1 p-0.5 ${isSelected ? 'text-white hover:text-blue-200' : 'text-slate-600 hover:text-red-600'} transition-all z-10" onclick="event.stopPropagation(); deleteNote('${note.id}')"><i class="fa-solid fa-trash-can text-[13px]"></i></button>
-                              <div class="w-full overflow-hidden flex flex-col flex-1 pr-2 justify-center">
-                                    <div class="font-black text-[16px] ${isSelected ? 'text-white' : 'text-slate-900'} line-clamp-1 leading-snug mb-0.5" title="${note.title || '无标题'}">${note.title || '无标题'}</div>
-                                    <p class="text-[14px] ${isSelected ? 'text-blue-100' : 'text-slate-500'} line-clamp-1 leading-relaxed">${plainText}</p>
-                              </div>
-                        `;
-                    } else {
-                         // ================= 2. 图表模式 (三列九宫格展示) =================
-                         // 💡 调整：高度从 h-14/16 提升到 h-20，多出的高度用来容纳更大的字体
-                         box.className = `w-full h-20 p-2 rounded-lg border cursor-pointer flex flex-col justify-between transition-all text-xs break-all relative group ${isSelected ? 'bg-blue-500 border-blue-600 text-white shadow active-note-item' : 'bg-white border-emerald-400 hover:bg-emerald-50 shadow-sm'}`;
-                         box.innerHTML = `
-                              <button class="del-btn opacity-0 group-hover:opacity-100 absolute right-1 top-1 p-0.5 ${isSelected ? 'text-white hover:text-blue-200' : 'text-slate-600 hover:text-red-600'} transition-all z-10" onclick="event.stopPropagation(); deleteNote('${note.id}')"><i class="fa-solid fa-trash-can text-[11px]"></i></button>
-                              <div class="w-full overflow-hidden flex flex-col flex-1 justify-center">
-                                    <div class="font-black text-[13px] ${isSelected ? 'text-white' : 'text-slate-950'} line-clamp-1 leading-tight mb-1" title="${note.title || '无标题'}">${note.title || '无标题'}</div>
-                                    <p class="text-[11px] ${isSelected ? 'text-blue-100' : 'text-slate-500'} line-clamp-2 leading-tight">${plainText}</p>
-                              </div>
-                        `;
-                    }        
-                    gridWrapper.appendChild(box);
-                });
-                container.appendChild(gridWrapper);
+                if (leftLayoutView === 'list') {
+                    box.className = `w-full h-13 p-1.5 rounded-lg border cursor-pointer flex flex-col justify-between transition-all text-xs break-all relative group ${isSelected ? 'bg-blue-500 border-blue-600 text-white shadow active-note-item' : 'bg-white border-emerald-400 hover:bg-emerald-50 shadow-sm'}`;
+                    box.innerHTML = `
+                        <button class="del-btn opacity-0 group-hover:opacity-100 absolute right-1 top-1 p-0.5 ${isSelected ? 'text-white hover:text-blue-200' : 'text-slate-600 hover:text-red-600'} transition-all z-10" onclick="event.stopPropagation(); deleteNote('${note.id}')"><i class="fa-solid fa-trash-can text-[13px]"></i></button>
+                        <div class="w-full overflow-hidden flex flex-col flex-1 pr-2 justify-center">
+                            <div class="font-black text-[16px] ${isSelected ? 'text-white' : 'text-slate-900'} line-clamp-1 leading-snug mb-0.5" title="${note.title || '无标题'}">${note.title || '无标题'}</div>
+                            <p class="text-[14px] ${isSelected ? 'text-blue-100' : 'text-slate-500'} line-clamp-1 leading-relaxed">${plainText}</p>
+                        </div>
+                    `;
+                } else {
+                    box.className = `w-full h-20 p-2 rounded-lg border cursor-pointer flex flex-col justify-between transition-all text-xs break-all relative group ${isSelected ? 'bg-blue-500 border-blue-600 text-white shadow active-note-item' : 'bg-white border-emerald-400 hover:bg-emerald-50 shadow-sm'}`;
+                    box.innerHTML = `
+                        <button class="del-btn opacity-0 group-hover:opacity-100 absolute right-1 top-1 p-0.5 ${isSelected ? 'text-white hover:text-blue-200' : 'text-slate-600 hover:text-red-600'} transition-all z-10" onclick="event.stopPropagation(); deleteNote('${note.id}')"><i class="fa-solid fa-trash-can text-[11px]"></i></button>
+                        <div class="w-full overflow-hidden flex flex-col flex-1 justify-center">
+                            <div class="font-black text-[13px] ${isSelected ? 'text-white' : 'text-slate-950'} line-clamp-1 leading-tight mb-1" title="${note.title || '无标题'}">${note.title || '无标题'}</div>
+                            <p class="text-[11px] ${isSelected ? 'text-blue-100' : 'text-slate-500'} line-clamp-2 leading-tight">${plainText}</p>
+                        </div>
+                    `;
+                }        
+                gridWrapper.appendChild(box);
+            });
+            container.appendChild(gridWrapper);
         }
+        
         function renderTrashBin() {
             const container = document.getElementById('right-trash-flow'); container.innerHTML = '';
             if (rightPanelClosed) return;
@@ -625,6 +638,7 @@
             const newDoc = { id: 'md_' + Date.now(), title: '', content: '', category: defaultCat, updatedAt: Date.now() };
             notes.push(newDoc); saveCloudData(); openNote(newDoc.id);
         }
+        
         function openNote(id) {
             activeNoteId = id; const target = notes.find(n => n.id === id);
             if (target) {
@@ -634,6 +648,7 @@
                 document.getElementById('note-category-select').value = target.category || "未分类";
             }
         }
+        
         function deleteNote(id) {
             const idx = notes.findIndex(n => n.id === id); 
             if (idx !== -1) {
@@ -641,6 +656,7 @@
                 if (activeNoteId === id) { if (notes.length > 0) openNote(notes[0].id); else createNewNote(); } else { refreshAllViews(); }
             }
         }
+        
         function changeNoteCategory(newCatId) { const idx = notes.findIndex(n => n.id === activeNoteId); if (idx !== -1) { notes[idx].category = newCatId; saveCloudData(); refreshAllViews(); } }
         
         function handleEditorInput() { 
@@ -663,6 +679,7 @@
                 menu.classList.remove('hidden'); menu.style.left = e.clientX + 'px'; menu.style.top = e.clientY + 'px';
             };
         }
+        
         function handleContextMenuRename() {
             if (!rightClickedCategoryId) return;
             const catObj = categories.find(c => c.id === rightClickedCategoryId);
@@ -672,6 +689,7 @@
             catObj.name = name.trim();
             saveCloudData(); refreshAllViews();
         }
+        
         function handleContextMenuDelete() {
             if (!rightClickedCategoryId || rightClickedCategoryId === "未分类") return;
             const catObj = categories.find(c => c.id === rightClickedCategoryId);
@@ -740,14 +758,17 @@
                 notes.push(...trashBin); trashBin = []; saveCloudData(); refreshAllViews();
             }
         }
+        
         function clearTrashCompletely() { 
             if (trashBin.length === 0) return;
             if (confirm("警告：不可挽回！确定清空回收站吗？")) { trashBin = []; saveCloudData(); refreshAllViews(); } 
         }
+        
         function recoverDeletedFile(id) { 
             const idx = trashBin.findIndex(t => t.id === id); 
             if (idx !== -1) { notes.push(trashBin.splice(idx, 1)[0]); saveCloudData(); refreshAllViews(); } 
         }
+        
         function permanentlyDeleteFile(id) { 
             if (confirm("永久粉碎不可挽回，是否继续？")) { trashBin = trashBin.filter(t => t.id !== id); saveCloudData(); refreshAllViews(); } 
         }
@@ -776,15 +797,12 @@
                let startY = 0;
                let startHeight = 0;
 
-               // 💡 核心新增：统一获取 Y 坐标的辅助函数（自动兼容鼠标和手机手指）
               const getClientY = (e) => {
                      return e.touches ? e.touches[0].clientY : e.clientY;
               };
 
-              // 💡 核心新增：统一的开始缩放处理器
               const startResize = (e) => {
                      if (e.target.tagName === 'IMG') {
-                         // 如果是手机端触摸，阻止长按弹出系统菜单或放大镜
                          if(e.touches) { e.stopPropagation(); } 
                          else { e.preventDefault(); }
             
@@ -792,9 +810,8 @@
                          startY = getClientY(e);
                          startHeight = activeImage.clientHeight || activeImage.offsetHeight;
             
-                         if (!e.touches) document.body.style.cursor = 'ns-resize'; // 仅在电脑端改变鼠标样式
+                         if (!e.touches) document.body.style.cursor = 'ns-resize'; 
             
-                         // 根据当前是触摸还是鼠标，动态绑定对应的移动和结束事件
                          if (e.touches) {
                              document.addEventListener('touchmove', resizeImg, { passive: false });
                              document.addEventListener('touchend', stopResizeImg);
@@ -805,20 +822,18 @@
                     }
               };
 
-              // 同时监听电脑鼠标和手机触摸
               editor.addEventListener('mousedown', startResize);
               editor.addEventListener('touchstart', startResize, { passive: false });
 
               function resizeImg(e) {
                      if (activeImage) {
-                         // 💡 关键：如果是手机端拖动图片，阻止手机网页整体跟着上下滚屏滚动
                          if (e.touches) {
                              if (e.cancelable) e.preventDefault(); 
                          }
             
                          const dy = getClientY(e) - startY;
                          activeImage.style.height = (startHeight + dy) + 'px';
-                         activeImage.style.width = 'auto'; // 保持原比例缩放
+                         activeImage.style.width = 'auto';
                      }
                }
 
@@ -826,7 +841,6 @@
                       activeImage = null;
                       document.body.style.cursor = 'default';
         
-                       // 一口气解绑所有双端事件，彻底释放内存
                        document.removeEventListener('mousemove', resizeImg);
                        document.removeEventListener('mouseup', stopResizeImg);
                        document.removeEventListener('touchmove', resizeImg);
@@ -971,23 +985,99 @@
               }
         }
 
-    </script>
-    
-    <script>
+        // ==========================================
+        // 1. 主题切换逻辑 (Theme)
+        // ==========================================
+        function toggleThemeMenu(e) {
+            e.stopPropagation(); 
+            document.getElementById('theme-dropdown').classList.toggle('hidden');
+        }
+
+        document.addEventListener('click', (e) => {
+            const dropdown = document.getElementById('theme-dropdown');
+            if (dropdown && !dropdown.classList.contains('hidden') && !dropdown.contains(e.target)) {
+                dropdown.classList.add('hidden');
+            }
+        });
+
+        function setTheme(theme) {
+            localStorage.setItem('app-theme', theme); 
+            applyTheme(theme);
+            document.getElementById('theme-dropdown').classList.add('hidden'); 
+        }
+
+        function applyTheme(theme) {
+            const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            const icon = document.getElementById('current-theme-icon');
+            
+            if (isDark) {
+                document.documentElement.classList.add('dark'); 
+                icon.className = "fa-solid fa-moon text-lg text-blue-400"; 
+            } else {
+                document.documentElement.classList.remove('dark');
+                icon.className = "fa-solid fa-sun text-lg text-yellow-400"; 
+            }
+            
+            if (theme === 'system') {
+                icon.className = "fa-solid fa-circle-half-stroke text-lg text-slate-300"; 
+            }
+        }
+
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+            if (localStorage.getItem('app-theme') === 'system' || !localStorage.getItem('app-theme')) {
+                applyTheme('system');
+            }
+        });
+
+        // ==========================================
+        // 2. 多语言切换逻辑 (i18n)
+        // ==========================================
+        const dict = {
+            zh: {
+                'nav-logout': '退出',
+                'nav-delete': '注销',
+                'nav-history': '历史',
+                'theme-light': '浅色',
+                'theme-dark': '深色',
+                'theme-sys': '系统',
+            },
+            en: {
+                'nav-logout': 'Logout',
+                'nav-delete': 'Delete',
+                'nav-history': 'History',
+                'theme-light': 'Light',
+                'theme-dark': 'Dark',
+                'theme-sys': 'Auto',
+            }
+        };
+
+        let currentLang = localStorage.getItem('app-lang') || 'zh';
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'zh' ? 'en' : 'zh';
+            localStorage.setItem('app-lang', currentLang);
+            updateLanguageUI();
+        }
+
+        function updateLanguageUI() {
+            document.getElementById('lang-text').innerText = currentLang === 'zh' ? 'CN' : 'EN';
+            const currentDict = dict[currentLang];
+            
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (currentDict[key]) {
+                    el.innerText = currentDict[key];
+                }
+            });
+        }
+        
+        // ==========================================
+        // 3. PWA Service Worker 注册
+        // ==========================================
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js')
                     .then(reg => console.log('PWA Service Worker 注册成功!', reg))
-                    .catch(err => console.error('PWA 注册失败:', err));
-            });
-        }
-    </script>
-    
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then(reg => console.log('PWA 注册成功!', reg))
                     .catch(err => console.error('PWA 注册失败:', err));
             });
         }
