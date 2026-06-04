@@ -24,10 +24,17 @@
         .panel-large-text { font-size: 16px !important; font-weight: 800 !important; }
         .sync-btn-font { font-size: 14px !important; font-weight: 900 !important; }
         
-        .md-preview h1 { font-size: 2.6rem; font-weight: 800; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.3em; margin-top: 1.6rem; margin-bottom: 1rem; }
-        .md-preview h2 { font-size: 2.1rem; font-weight: 700; border-bottom: 1px solid #edf2f7; padding-bottom: 0.3em; margin-top: 1.4rem; margin-bottom: 0.8rem; }
+        /* 💡 去掉了标题下划线 border-bottom */
+        .md-preview h1 { font-size: 2.6rem; font-weight: 800; padding-bottom: 0.3em; margin-top: 1.6rem; margin-bottom: 1rem; }
+        .md-preview h2 { font-size: 2.1rem; font-weight: 700; padding-bottom: 0.3em; margin-top: 1.4rem; margin-bottom: 0.8rem; }
         .md-preview h3 { font-size: 1.8rem; font-weight: 600; margin-top: 1.2rem; margin-bottom: 0.6rem; }
         .md-preview p, .md-preview div { margin-bottom: 0.3rem; line-height: 1.3; font-size: 18px; }
+        
+        /* 💡 重新唤醒 Tailwind 默认屏蔽的列表样式 */
+        .md-preview ul { list-style-type: disc !important; margin-left: 1.5rem !important; padding-left: 0.5rem; margin-bottom: 0.5rem; }
+        .md-preview ol { list-style-type: decimal !important; margin-left: 1.5rem !important; padding-left: 0.5rem; margin-bottom: 0.5rem; }
+        .md-preview li { display: list-item !important; margin-bottom: 0.25rem; }
+
         .md-preview code { background-color: #fee2e2; padding: 0.2em 0.5em; border-radius: 6px; font-size: 95%; font-family: monospace; color: #be185d; }
         .md-preview pre { background-color: #1e293b; color: #f8fafc; padding: 1.5rem; border-radius: 10px; overflow-x: auto; margin-bottom: 1.5rem; }
         .md-preview pre code { background-color: transparent; color: inherit; padding: 0; font-size: 17px; }
@@ -207,7 +214,7 @@
                 </div>
                 
                 <div id="editor-format-bar" class="flex items-center gap-1 flex-wrap bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-1.5 rounded-lg shadow-inner">
-                    <select onchange="if(this.value){execCmd('fontSize', this.value); this.selectedIndex=0;}" class="px-1.5 py-0.5 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded border border-slate-200 dark:border-slate-600 outline-none cursor-pointer bg-slate-50 dark:bg-slate-700">
+                    <select onchange="if(this.value){execCmd('fontSize', this.value);}" class="px-1.5 py-0.5 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded border border-slate-200 dark:border-slate-600 outline-none cursor-pointer bg-slate-50 dark:bg-slate-700">
                         <option value="" data-i18n="fmt-size">字号</option>
                         <option value="1" data-i18n="sz-1">极小</option>
                         <option value="2" data-i18n="sz-2">小号</option>
@@ -219,9 +226,17 @@
                     </select>
                     <div class="h-4 w-[1px] bg-slate-300 dark:bg-slate-600 mx-0.5"></div>
 
-                    <button onmousedown="event.preventDefault();" onclick="execCmd('formatBlock', 'H1')" class="px-2 py-0.5 text-xs font-black text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded border border-slate-200 dark:border-slate-600">H1</button>
-                    <button onmousedown="event.preventDefault();" onclick="execCmd('formatBlock', 'H2')" class="px-2 py-0.5 text-xs font-black text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded border border-slate-200 dark:border-slate-600">H2</button>
-                    <button onmousedown="event.preventDefault();" onclick="execCmd('formatBlock', 'H3')" class="px-2 py-0.5 text-xs font-black text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded border border-slate-200 dark:border-slate-600">H3</button>
+                    <select onchange="if(this.value){execCmd('formatBlock', this.value);}" class="px-1.5 py-0.5 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded border border-slate-200 dark:border-slate-600 outline-none cursor-pointer bg-slate-50 dark:bg-slate-700">
+                        <option value="" data-i18n="fmt-heading">标题</option>
+                        <option value="H1" data-i18n="h1">一级标题</option>
+                        <option value="H2" data-i18n="h2">二级标题</option>
+                        <option value="H3" data-i18n="h3">三级标题</option>
+                        <option value="P" data-i18n="p">正文</option>
+                    </select>
+                    <div class="h-4 w-[1px] bg-slate-300 dark:bg-slate-600 mx-0.5"></div>
+                    
+                    <button onmousedown="event.preventDefault();" onclick="execCmd('insertUnorderedList')" class="px-2 py-0.5 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded border border-slate-200 dark:border-slate-600" title="无序列表"><i class="fa-solid fa-list-ul"></i></button>
+                    <button onmousedown="event.preventDefault();" onclick="execCmd('insertOrderedList')" class="px-2 py-0.5 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded border border-slate-200 dark:border-slate-600" title="有序列表"><i class="fa-solid fa-list-ol"></i></button>
                     <div class="h-4 w-[1px] bg-slate-300 dark:bg-slate-600 mx-0.5"></div>
     
                     <button onmousedown="event.preventDefault();" onclick="execCmd('bold')" class="px-2 py-0.5 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded border border-slate-200 dark:border-slate-600"><i class="fa-solid fa-bold"></i></button>
@@ -231,11 +246,12 @@
                     <button onmousedown="event.preventDefault();" onclick="execCmd('foreColor', '#3b82f6')" class="px-1.5 py-0.5 text-[11px] font-bold text-white hover:opacity-80 rounded shadow-sm" style="background-color: #3b82f6;" data-i18n="color-blue">蓝</button>
                     <button onmousedown="event.preventDefault();" onclick="execCmd('foreColor', '#22c55e')" class="px-1.5 py-0.5 text-[11px] font-bold text-white hover:opacity-80 rounded shadow-sm" style="background-color: #22c55e;" data-i18n="color-green">绿</button>
                     <button onmousedown="event.preventDefault();" onclick="execCmd('foreColor', '#000000')" class="px-1.5 py-0.5 text-[11px] font-bold text-white hover:opacity-80 rounded shadow-sm" style="background-color: #0f172a;" data-i18n="color-black">黑</button>
+                    <button onmousedown="event.preventDefault();" onclick="execCmd('foreColor', '#ffffff')" class="px-1.5 py-0.5 text-[11px] font-bold text-slate-800 hover:opacity-80 rounded shadow-sm border border-slate-300" style="background-color: #ffffff;" data-i18n="color-white">白</button>
 
                     <div class="h-4 w-[1px] bg-slate-300 dark:bg-slate-600 mx-0.5"></div>
 
                     <button onmousedown="event.preventDefault();" onclick="wrapHTML('<code>', '</code>')" class="px-2 py-0.5 text-xs font-mono text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded border border-slate-200 dark:border-slate-600"><i class="fa-solid fa-code"></i></button>
-                    <button onmousedown="event.preventDefault();" onclick="removeFormat()" class="px-2 py-0.5 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600 rounded border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700"><i class="fa-solid fa-eraser"></i></button>
+                    <button onmousedown="event.preventDefault();" onclick="execCmd('removeFormat')" class="px-2 py-0.5 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600 rounded border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700"><i class="fa-solid fa-eraser"></i></button>
                     <div class="h-4 w-[1px] bg-slate-300 dark:bg-slate-600 mx-0.5"></div>
     
                     <button onmousedown="event.preventDefault(); document.getElementById('local-img-input').click()" class="px-2 py-0.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-slate-700 rounded border border-emerald-200 dark:border-emerald-800 bg-emerald-50/50 dark:bg-slate-700"><i class="fa-regular fa-image"></i> <span data-i18n="fmt-img">图</span></button>
@@ -288,7 +304,8 @@
                 'all-docs': '全文档展示', 'no-data': '无数据', 'trash-empty': '回收站空空如也',
                 'untitled': '无标题', 'original-folder': '原位置:',
                 'fmt-size': '字号', 'sz-1': '极小', 'sz-2': '小号', 'sz-3': '正常', 'sz-4': '大号', 'sz-5': '特大', 'sz-6': '超大', 'sz-7': '极巨',
-                'color-red': '红', 'color-yellow': '黄', 'color-blue': '蓝', 'color-green': '绿', 'color-black': '黑',
+                'fmt-heading': '标题', 'h1': '一级标题', 'h2': '二级标题', 'h3': '三级标题', 'p': '正文',
+                'color-white': '白', 'color-red': '红', 'color-yellow': '黄', 'color-blue': '蓝', 'color-green': '绿', 'color-black': '黑',
                 'fmt-img': '图', 'btn-recover': '恢复', 'btn-empty': '清空', 'ctx-rename': '重命名分类', 'ctx-delete': '安全删除分类',
                 '未分类': '未分类', '工作': '工作', '生活': '生活'
             },
@@ -305,7 +322,8 @@
                 'all-docs': 'All Documents', 'no-data': 'No Data', 'trash-empty': 'Trash is empty',
                 'untitled': 'Untitled', 'original-folder': 'From:',
                 'fmt-size': 'Size', 'sz-1': 'Tiny', 'sz-2': 'Small', 'sz-3': 'Normal', 'sz-4': 'Large', 'sz-5': 'X-Large', 'sz-6': 'XXL', 'sz-7': 'Huge',
-                'color-red': 'R', 'color-yellow': 'Y', 'color-blue': 'B', 'color-green': 'G', 'color-black': 'Bk',
+                'fmt-heading': 'Heading', 'h1': 'Heading 1', 'h2': 'Heading 2', 'h3': 'Heading 3', 'p': 'Normal Text',
+                'color-white': 'W', 'color-red': 'R', 'color-yellow': 'Y', 'color-blue': 'B', 'color-green': 'G', 'color-black': 'Bk',
                 'fmt-img': 'Img', 'btn-recover': 'Restore', 'btn-empty': 'Empty', 'ctx-rename': 'Rename', 'ctx-delete': 'Delete safely',
                 '未分类': 'Uncategorized', '工作': 'Work', '生活': 'Life'
             }
@@ -866,7 +884,7 @@
                 const layerNodes = categories.filter(c => c.parentId === parentId);
                 layerNodes.forEach(cat => {
                     const opt = document.createElement('option');
-                    opt.value = cat.id;
+                    opt.value = opt.value = cat.id;
                     opt.innerHTML = '—'.repeat(depth) + ' ' + t(cat.name);
                     select.appendChild(opt);
                     appendOption(cat.id, depth + 1); 
