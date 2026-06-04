@@ -97,7 +97,7 @@
             </div>
         </div>
             
-        <div class="flex items-center gap-4 text-slate-400 text-base z-10 flex-shrink-0 pr-[160px]" style="-webkit-app-region: no-drag;">
+        <div class="flex items-center gap-4 text-slate-400 text-base z-10 flex-shrink-0 pr-[240px]" style="-webkit-app-region: no-drag;">
             
             <div class="relative flex-shrink-0 z-[70]">
                 <button onclick="toggleSettingsMenu(event)" class="text-slate-300 hover:text-white transition-all hover:rotate-90 duration-300 flex items-center p-1" title="系统设置">
@@ -727,12 +727,13 @@
                 const activeBoxStyle = 'bg-blue-500 border-blue-600 text-white shadow active-note-item';
 
                 if (leftLayoutView === 'list') {
-                    box.className = `w-full h-13 p-1.5 rounded-lg border cursor-pointer flex flex-col justify-between transition-all text-xs break-all relative group ${isSelected ? activeBoxStyle : defaultBoxStyle}`;
+                    // 💡 修改 1：将 p-2 改为 py-1 px-2（上下缩减到 4px，左右保持 8px）
+                    box.className = `w-full py-1 px-2 rounded-lg border cursor-pointer flex flex-col justify-between transition-all text-xs break-all relative group ${isSelected ? activeBoxStyle : defaultBoxStyle}`;
                     box.innerHTML = `
-                        <button class="del-btn opacity-0 group-hover:opacity-100 absolute right-1 top-1 p-0.5 ${isSelected ? 'text-white hover:text-blue-200' : 'text-slate-600 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400'} transition-all z-10" onclick="event.stopPropagation(); deleteNote('${note.id}')"><i class="fa-solid fa-trash-can text-[13px]"></i></button>
-                        <div class="w-full overflow-hidden flex flex-col flex-1 pr-2 justify-center">
-                            <div class="font-black text-[16px] ${isSelected ? 'text-white' : 'text-slate-900 dark:text-slate-100'} line-clamp-1 leading-snug mb-0.5" title="${displayTitle}">${displayTitle}</div>
-                            <p class="text-[14px] ${isSelected ? 'text-blue-100' : 'text-slate-500 dark:text-slate-400'} line-clamp-1 leading-relaxed">${plainText}</p>
+                        <button class="del-btn opacity-0 group-hover:opacity-100 absolute right-1 top-1 p-0.5 ${isSelected ? 'text-white hover:text-blue-200' : 'text-slate-600 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400'} transition-all z-10" onclick="event.stopPropagation(); deleteNote('${note.id}')"><i class="fa-solid fa-trash-can text-[12px]"></i></button>
+                        <div class="w-full overflow-hidden flex flex-col flex-1 pr-4 justify-center">
+                            <div class="font-black text-[14px] ${isSelected ? 'text-white' : 'text-slate-900 dark:text-slate-100'} line-clamp-1 leading-snug mb-0" title="${displayTitle}">${displayTitle}</div>
+                            <p class="text-[12px] ${isSelected ? 'text-blue-100' : 'text-slate-500 dark:text-slate-400'} line-clamp-1 leading-none">${plainText}</p>
                         </div>
                     `;
                 } else {
