@@ -87,3 +87,32 @@ Fock 本项目，同时请帮忙点个 Star，万分感谢
 - 完成设置: 按照安装向导操作
 - 开始使用: 创建你的第一个笔记！
 
+## 步骤 8: 安装桌面端
+- 如图所示，电脑端在网址栏右边有安装图标
+- 手机端在网址栏右边点击三个点，会弹出多个选项，Google浏览器选择：添加到主屏幕。edge浏览器选择：添加至手机，手机端安装过程会慢一些，耐心等待几秒钟。
+
+<img width="610" height="291" alt="PixPin_2026-06-05_11-05-45" src="https://github.com/user-attachments/assets/363f16cd-cddb-4df3-871f-9cdea709981d" />
+
+<img width="442" height="326" alt="PixPin_2026-06-05_11-13-23" src="https://github.com/user-attachments/assets/e6aa24d1-af0c-42b9-974d-bbe0e674c452" />
+
+<img width="338" height="464" alt="PixPin_2026-06-05_11-14-13" src="https://github.com/user-attachments/assets/aa4105ee-76b7-4c24-8b72-4892e2ae872c" />
+
+
+
+## 步骤 9: 桌面端设置快捷呼出键
+- 零代码实现“一键呼出”的终极秘籍：
+- 电脑桌面，找到你的“云端笔记”软件图标。
+- 右键点击该图标，在弹出的菜单中选择 “属性” (Properties)。
+- 在弹出的窗口中，确保你在 “快捷方式” (Shortcut) 这个标签页里。
+- 找到 “快捷键” (Shortcut key) 这一栏（默认写着“无”）
+- 鼠标点击一下那个输入框，然后直接在键盘上按下你想要的快捷键组合
+### 选择键盘字母栏设置快捷键，默认是 Ctrl + Alt + 选中按键，选择键盘右边数字栏 设置快捷建 默认是 单次点击+选中的按键
+- 点击右下角的 “确定” (OK) 保存。
+
+<img width="520" height="740" alt="PixPin_2026-06-05_11-15-41" src="https://github.com/user-attachments/assets/073ad217-6498-4d5d-b54e-82594572032e" />
+
+<img width="574" height="570" alt="PixPin_2026-06-05_11-16-03" src="https://github.com/user-attachments/assets/a9ae7651-5303-4dd9-a859-885de3bc43b6" />
+
+
+
+
