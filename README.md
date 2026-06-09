@@ -76,6 +76,9 @@ Fock 本项目，同时请帮忙点个 Star，万分感谢
 - 变量名称：APP_NAME (固定值）
 - 值：笔记名称随意
 
+  <img width="398" height="383" alt="PixPin_2026-06-10_07-12-05" src="https://github.com/user-attachments/assets/3878e03d-da62-4d30-9154-0c5ccd2de372" />
+
+
 ## 步骤 6：重置部署
 导航到 部署 > 所有部署，最新的部署... 重试部署
 
