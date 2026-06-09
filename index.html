@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>云端记事本</title>
+    <title>云笔记</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -21,8 +22,9 @@
     
     <style>
         body { font-size: 19px; }
-        .panel-large-text { font-size: 16px !important; font-weight: 800 !important; }
-        .sync-btn-font { font-size: 14px !important; font-weight: 900 !important; }
+        /* 💡 将 16px 修改为 14px，使其与归属地的 text-xs 大小完全一致 */
+        .panel-large-text { font-size: 12px !important; font-weight: 800 !important; }
+        .sync-btn-font { font-size: 12px !important; font-weight: 900 !important; }
         
         /* 💡 去掉了标题下划线 border-bottom */
         .md-preview h1 { font-size: 2.6rem; font-weight: 800; padding-bottom: 0.3em; margin-top: 1.6rem; margin-bottom: 1rem; }
@@ -47,9 +49,9 @@
             object-fit: contain;
         }
         .md-preview img:hover {
-            outline: 3px dashed #60a5fa; outline-offset: 2px;
+            outline: 3px dashed #eab308; outline-offset: 2px;
             box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-            cursor: ns-resize;
+            cursor: nwse-resize;
         }
         [contenteditable]:empty:before { content: attr(placeholder); color: #cbd5e1; pointer-events: none; display: block; }
         .resizer { width: 6px; cursor: col-resize; background-color: #e2e8f0; transition: background-color 0.2; position: relative; z-index: 10; }
@@ -79,31 +81,32 @@
         </div>
     </div>
 
-    <header id="app-header" class="bg-slate-800 text-slate-200 py-1 pl-6 flex items-center justify-between flex-shrink-0 select-none border-b border-slate-700 shadow-md relative z-[60]" style="-webkit-app-region: drag;">
+    <header id="app-header" class="bg-slate-800 text-slate-200 py-0.5 px-4 flex items-center select-none border-b border-slate-700 shadow-md relative z-[70]" style="-webkit-app-region: drag;">
+        <div class="flex items-center gap-2 pointer-events-none" style="-webkit-app-region: no-drag;">
+            <i class="fa-solid fa-pen-to-square text-yellow-400 text-1xl"></i>
+            <span class="font-black tracking-wider text-xl lg:text-lg bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-300" data-i18n="app-title">
+                云笔记
+            </span>
+        </div>
+    </header>
+
+    <div id="global-toolbar" class="bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-2 py-1 flex flex-wrap items-center justify-start gap-1 select-none flex-shrink-0 z-[60] relative shadow-sm">
         
-        <div class="flex items-center gap-3 z-10 flex-shrink-0" style="-webkit-app-region: no-drag;">
-            <button onclick="toggleLeftPanel()" class="bg-blue-700 hover:bg-blue-800 text-white font-black px-3 py-1 rounded-xl text-sm transition-all shadow-md flex items-center gap-2 border border-blue-600 mr-2 whitespace-nowrap flex-shrink-0">
-                <i id="left-panel-toggle-icon" class="fa-solid fa-folder-tree text-xs"></i> <span id="btn-toggle-left-text" data-i18n="nav-sidebar">侧栏</span>
+        <div class="flex items-center gap-1.5">
+            <button onclick="toggleLeftPanel()" class="bg-blue-600 hover:bg-blue-700 text-white font-black px-2.5 py-0.5 rounded-lg text-[11px] transition-all shadow-sm flex items-center gap-1.5 whitespace-nowrap flex-shrink-0">
+                <i id="left-panel-toggle-icon" class="fa-solid fa-folder-tree"></i> <span id="btn-toggle-left-text" data-i18n="nav-sidebar">侧栏</span>
             </button>
-        </div>
-        
-        <div class="flex-1 flex justify-center items-center pointer-events-none pr-8">
-            <div class="hidden md:flex items-center gap-2 w-max">
-                <i class="fa-solid fa-pen-to-square text-yellow-400 text-1xl"></i>
-                <span class="font-black tracking-wider text-xl lg:text-lg bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-300" data-i18n="app-title">
-                    云端笔记
-                </span>
-            </div>
-        </div>
-            
-        <div class="flex items-center gap-4 text-slate-400 text-base z-10 flex-shrink-0 pr-[260px]" style="-webkit-app-region: no-drag;">
-            
+
+            <button onclick="toggleRightPanel()" class="bg-red-600 hover:bg-red-700 text-white font-black px-2.5 py-0.5 rounded-lg text-[11px] transition-all shadow-sm flex items-center justify-center gap-1.5 whitespace-nowrap flex-shrink-0">
+                <i id="right-panel-toggle-icon" class="fa-solid fa-clock-rotate-left"></i> <span id="btn-toggle-right-text" data-i18n="nav-history">历史</span>
+            </button>
+
             <div class="relative flex-shrink-0 z-[70]">
-                <button onclick="toggleSettingsMenu(event)" class="text-slate-300 hover:text-white transition-all hover:rotate-90 duration-300 flex items-center p-1" title="系统设置">
-                    <i class="fa-solid fa-gear text-lg"></i>
+                <button onclick="toggleSettingsMenu(event)" class="bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white font-black px-2 py-1 rounded-lg text-xs transition-all shadow-sm flex items-center justify-center gap-1 border border-slate-700 whitespace-nowrap" title="系统设置">
+                    <i class="fa-solid fa-gear"></i>
                 </button>
                 
-                <div id="settings-dropdown" class="hidden absolute right-0 top-full mt-3 w-48 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden z-50 flex flex-col py-1">
+                <div id="settings-dropdown" class="hidden absolute left-0 top-full mt-2 w-48 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden z-50 flex flex-col py-1">
                     <button onclick="toggleLanguage(); closeSettingsMenu();" class="w-full text-left px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-3 font-bold transition-colors">
                         <i class="fa-solid fa-language text-lg text-blue-500 w-4 text-center"></i> <span data-i18n="lang-toggle">切换语言 / EN</span>
                     </button>
@@ -132,36 +135,42 @@
                 </div>
             </div>
 
-            <button onclick="toggleRightPanel()" class="bg-red-700 hover:bg-red-800 text-white font-black px-3 py-1 rounded-xl text-sm transition-all shadow-md flex items-center justify-center gap-2 border border-red-600 whitespace-nowrap flex-shrink-0">
-                <i id="right-panel-toggle-icon" class="fa-solid fa-dumpster-fire text-xs"></i> <span id="btn-toggle-right-text" data-i18n="nav-history">历史</span>
-            </button>
-            
+            <div class="ml-[15px] flex items-center gap-1 bg-emerald-100/50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 px-2.5 py-1 rounded-lg shadow-sm font-black text-xs">
+                <i class="fa-solid fa-pen-nib"></i> <span data-i18n="label-editor">编辑栏</span>
+            </div>
         </div>
-    </header>
+
+        <div class="flex items-center justify-end flex-wrap gap-2 ml-auto">
+            <div class="relative flex items-center w-40 flex-shrink-0">
+                <i class="fa-solid fa-magnifying-glass absolute left-2 text-slate-400 text-[11px]"></i>
+                <input type="text" id="global-search-input" oninput="renderLeftNotesView()" placeholder="搜索标题或内容..." class="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-600 rounded-lg py-1 pl-6 pr-2 text-xs font-bold text-slate-700 dark:text-slate-200 outline-none focus:border-blue-500 transition-all shadow-inner placeholder-slate-400">
+            </div>
+
+            <div class="flex items-center gap-1 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 px-2.5 py-1 rounded-lg shadow-sm">
+                <span class="text-xs font-black text-blue-600 dark:text-blue-400"><i class="fa-solid fa-folder text-blue-500"></i> <span data-i18n="label-category">归属地:</span></span>
+                <select id="note-category-select" onchange="changeNoteCategory(this.value)" class="text-xs font-black text-blue-700 dark:text-blue-300 bg-transparent outline-none cursor-pointer"></select>
+            </div>
+        </div>
+    </div>
 
     <div id="workspace-container" class="flex flex-1 overflow-hidden w-full bg-slate-200 dark:bg-slate-900 transition-colors duration-300">
         
-        <aside id="left-panel" class="bg-slate-50 dark:bg-slate-800 dark:border-slate-700 flex flex-col flex-shrink-0 overflow-hidden border-r border-slate-200 panel-large-text transition-all absolute md:relative z-50 h-full shadow-2xl md:shadow-none" style="width: 220px; min-width: 160px; max-width: 480px;">
-            <div class="p-1.5 border-b border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 flex flex-col gap-1 flex-shrink-0">
-                <div class="flex items-center gap-1.5 px-1">
-                    <button id="btn-new-note" onclick="createNewNote()" class="flex-1 py-1 px-1 flex items-center justify-center gap-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-black transition-all shadow-sm text-xs"><i class="fa-solid fa-file-plus"></i> <span data-i18n="btn-new-note">新建笔记</span></button>
-                    <button onclick="createNewCategory()" class="flex-1 py-1 px-1 flex items-center justify-center gap-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-black transition-all shadow-sm text-xs"><i class="fa-solid fa-folder-plus"></i> <span data-i18n="btn-new-folder">新建分类</span></button>
+        <aside id="left-panel" class="bg-slate-50 dark:bg-slate-800 dark:border-slate-700 flex flex-col flex-shrink-0 overflow-hidden border-r border-slate-200 panel-large-text transition-all absolute md:relative z-50 h-full shadow-2xl md:shadow-none" style="width: 170px; min-width: 130px; max-width: 480px;">
+            
+            <div class="p-1 border-b border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 flex flex-col gap-0.5 flex-shrink-0">
+                
+                <div class="flex items-center gap-1 px-1">
+                    <button id="btn-new-note" onclick="createNewNote()" class="flex-1 py-0.5 px-1 flex items-center justify-center gap-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-black transition-all shadow-sm text-xs"><i class="fa-solid fa-file-lines"></i> <span data-i18n="btn-new-note">新笔记</span></button>
+                    <button onclick="createNewCategory()" class="flex-1 py-0.5 px-1 flex items-center justify-center gap-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-black transition-all shadow-sm text-xs"><i class="fa-solid fa-folder-plus"></i> <span data-i18n="btn-new-folder">新分类</span></button>
                 </div>
                 
-                <div class="px-1 mt-0.5">
-                    <div class="relative flex items-center w-full">
-                        <i class="fa-solid fa-magnifying-glass absolute left-2 text-slate-400 text-[11px]"></i>
-                        <input type="text" id="global-search-input" oninput="renderLeftNotesView()" placeholder="搜索标题或内容..." class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg py-1 pl-6 pr-2 text-xs font-bold text-slate-700 dark:text-slate-200 outline-none focus:border-blue-500 transition-all shadow-inner placeholder-slate-400">
-                    </div>
-                </div>
-                
-                <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-1.5 mb-0 shadow-sm flex-shrink-0 mt-1">
-                    <button onclick="toggleImportExport()" class="w-full flex items-center justify-between bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs px-3 py-1 rounded-lg transition-all cursor-pointer shadow-sm border border-emerald-600">
+                <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-1 mb-0 shadow-sm flex-shrink-0 mt-0.5">
+                    <button onclick="toggleImportExport()" class="w-full flex items-center justify-between bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs px-2 py-0.5 rounded-lg transition-all cursor-pointer shadow-sm border border-emerald-600">
                         <span class="flex items-center gap-1"><i class="fa-solid fa-box-archive text-white"></i> <span data-i18n="btn-import-export">导入与导出</span></span>
                         <i id="import-export-arrow" class="fa-solid fa-chevron-down transition-transform duration-200 text-emerald-100 text-[10px]"></i>
                     </button>
     
-                    <div id="import-export-content" class="hidden flex flex-col gap-1.5 border-t border-slate-100 dark:border-slate-700 pt-1.5 mt-1.5">
+                    <div id="import-export-content" class="hidden flex flex-col gap-1.5 border-t border-slate-100 dark:border-slate-700 pt-1 mt-1">
                         <div class="flex flex-col gap-0.5 bg-white/70 dark:bg-slate-900/50 p-1 rounded-lg border border-slate-200/60 dark:border-slate-700/60">
                             <div class="flex items-center gap-1.5">
                                 <button onclick="triggerImport('md')" class="flex-1 py-1 px-1 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-black transition-all text-center truncate text-xs shadow-sm"><i class="fa-solid fa-file-import"></i> MD</button>
@@ -173,10 +182,10 @@
                             </div>
                             <div class="flex items-center gap-1.5">
                                 <button onclick="triggerFolderImport()" class="flex-1 py-1 px-1 bg-slate-700 hover:bg-slate-800 dark:bg-slate-600 dark:hover:bg-slate-500 text-white rounded-lg font-black transition-all text-center truncate text-xs shadow-sm">
-                                    <i class="fa-solid fa-folder-tree text-amber-400"></i> <span data-i18n="btn-import-folder">导入文件夹</span>
+                                    <i class="fa-solid fa-folder-tree text-amber-400"></i> <span data-i18n="btn-import-folder">导入</span>
                                 </button>
                                 <button onclick="exportCurrentFolder()" class="flex-1 py-1 px-1 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white rounded-lg font-black transition-all text-center truncate text-xs shadow-sm">
-                                    <i class="fa-solid fa-file-zipper text-blue-200"></i> <span data-i18n="btn-export-folder">导出文件夹</span>
+                                    <i class="fa-solid fa-file-zipper text-blue-200"></i> <span data-i18n="btn-export-folder">导出</span>
                                 </button>
                             </div>
                         </div>
@@ -188,7 +197,7 @@
                 <input type="file" id="import-folder-input" webkitdirectory directory multiple class="hidden" onchange="handleFolderImport(event)">
             </div>
             
-            <div id="all-docs-container" class="py-1 px-[9px] border-b border-slate-200 dark:border-slate-700 bg-slate-100/40 dark:bg-slate-800 flex-shrink-0"></div>
+            <div id="all-docs-container" class="py-0.5 px-[9px] border-b border-slate-200 dark:border-slate-700 bg-slate-100/40 dark:bg-slate-800 flex-shrink-0"></div>
 
             <div class="px-3.5 py-2 bg-slate-200/60 dark:bg-slate-900/60 flex items-center justify-between flex-shrink-0 select-none border-b border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-300/60 dark:hover:bg-slate-800 transition-colors" onclick="toggleFolderSection()">
                 <span class="sync-btn-font text-yellow-600 dark:text-yellow-400 font-black flex items-center gap-1.5">
@@ -201,12 +210,12 @@
                 </div>
             </div>
             
-            <div id="category-tree-container" class="p-2 border-b border-slate-200 dark:border-slate-700 bg-slate-100/40 dark:bg-slate-800/40 flex-shrink-0 max-h-72 overflow-y-auto space-y-1"></div>
+            <div id="category-tree-container" class="p-2 border-b border-slate-200 dark:border-slate-700 bg-slate-100/40 dark:bg-slate-800/40 flex-shrink-0 max-h-[30vh] overflow-y-auto space-y-1"></div>
             
             <div class="px-3.5 py-2 bg-slate-200/60 dark:bg-slate-900/60 flex items-center justify-between flex-shrink-0 select-none border-b border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-300/60 dark:hover:bg-slate-800 transition-colors" onclick="toggleContentSection()">
                 <span class="sync-btn-font text-yellow-600 dark:text-yellow-400 font-black flex items-center gap-1.5">
                     <i id="content-section-icon" class="fa-solid fa-chevron-down text-[11px] transition-transform duration-200"></i>
-                    <span data-i18n="label-content">内容展示</span>
+                    <span data-i18n="label-content">笔记集</span>
                 </span>
                 <div class="flex items-center gap-0.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded p-0.5 shadow-inner scale-95 origin-right" onclick="event.stopPropagation()">
                     <button id="view-left-list" onclick="toggleLeftView('list')" class="px-2 py-0.5 text-xs font-black rounded hover:bg-slate-100 dark:hover:bg-slate-700 dark:text-slate-200" style="background-color: #3b82f6;" data-i18n="btn-list">列表</button>
@@ -215,7 +224,7 @@
             </div>
             
             <div id="content-section-container" class="flex-1 relative min-h-0 bg-slate-50/50 dark:bg-slate-800/50 transition-all duration-200">
-                <div id="left-notes-container" class="absolute inset-0 overflow-y-auto p-2 pb-6"></div>
+                <div id="left-notes-container" class="absolute inset-0 overflow-y-scroll p-2 pb-6"></div>
             </div>
             
         </aside>
@@ -224,16 +233,6 @@
         
         <section id="middle-panel" class="bg-white dark:bg-slate-950 flex flex-col flex-1 overflow-hidden min-w-0 md:min-w-[450px] transition-colors duration-300">
             <div class="bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 py-2 flex flex-col gap-2 select-none flex-shrink-0 shadow-sm z-10">
-                <div class="flex items-center justify-between flex-wrap gap-2">
-                    <div class="flex items-center gap-1 bg-emerald-100/50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 px-2.5 py-1 rounded-lg shadow-sm font-black text-xs">
-                        <i class="fa-solid fa-pen-nib"></i> <span data-i18n="label-editor">编辑栏</span>
-                    </div>
-                    <div class="flex items-center gap-1 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 px-2.5 py-1 rounded-lg shadow-sm">
-                        <span class="text-xs font-black text-blue-600 dark:text-blue-400"><i class="fa-solid fa-folder text-blue-500"></i> <span data-i18n="label-category">归属地:</span></span>
-                        <select id="note-category-select" onchange="changeNoteCategory(this.value)" class="text-xs font-black text-blue-700 dark:text-blue-300 bg-transparent outline-none cursor-pointer"></select>
-                    </div>
-                </div>
-                
                 <div id="editor-format-bar" class="flex items-center gap-1 flex-wrap bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-1.5 rounded-lg shadow-inner">
                     <select onchange="if(this.value){execCmd('fontSize', this.value);}" class="px-1.5 py-0.5 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded border border-slate-200 dark:border-slate-600 outline-none cursor-pointer bg-slate-50 dark:bg-slate-700">
                         <option value="" data-i18n="fmt-size">字号</option>
@@ -288,21 +287,21 @@
         
         <div id="resizer-right" class="resizer hidden dark:bg-slate-700"></div>
         
-        <aside id="right-panel" class="hidden bg-slate-50 dark:bg-slate-800 dark:border-slate-700 flex flex-col flex-shrink-0 overflow-hidden border-l border-slate-200 panel-large-text" style="width: 250px; min-width: 200px; max-width: 480px;">
-            <div class="p-4 bg-slate-800 dark:bg-slate-900 text-white flex flex-col gap-3 flex-shrink-0 shadow-md">
+        <aside id="right-panel" class="hidden bg-slate-50 dark:bg-slate-800 dark:border-slate-700 flex flex-col flex-shrink-0 overflow-hidden border-l border-slate-200 panel-large-text" style="width: 170px; min-width: 130px; max-width: 480px;">
+            <div class="p-2 bg-slate-800 dark:bg-slate-900 text-white flex flex-col gap-1.5 flex-shrink-0 shadow-md">
                 <span class="sync-btn-font tracking-wide flex items-center gap-1.5 text-slate-200 text-lg">
                     <i class="fa-solid fa-dumpster-fire text-red-500"></i> <span data-i18n="trash-title">回收站</span> (<span id="trash-count-badge">0</span>)
                 </span>
                 <div class="flex items-center gap-2">
-                    <button onclick="recoverAllTrash()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-black py-2 rounded-xl text-xs transition-all shadow border border-emerald-500 flex items-center justify-center gap-1"><i class="fa-solid fa-trash-arrow-up"></i> <span data-i18n="btn-recover">恢复</span></button>
-                    <button onclick="clearTrashCompletely()" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-black py-2 rounded-xl text-xs transition-all shadow border border-red-500 flex items-center justify-center gap-1"><i class="fa-solid fa-fire"></i> <span data-i18n="btn-empty">清空</span></button>
+                    <button onclick="recoverAllTrash()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-black py-0.5 rounded-xl text-xs transition-all shadow border border-emerald-500 flex items-center justify-center gap-1"><i class="fa-solid fa-trash-arrow-up"></i> <span data-i18n="btn-recover">恢复</span></button>
+                    <button onclick="clearTrashCompletely()" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-black py-0.5 rounded-xl text-xs transition-all shadow border border-red-500 flex items-center justify-center gap-1"><i class="fa-solid fa-fire"></i> <span data-i18n="btn-empty">清空</span></button>
                 </div>
             </div>
             <div id="right-trash-flow" class="flex-1 overflow-y-auto p-2 space-y-2 bg-slate-100/50 dark:bg-slate-800/50"></div>
         </aside>
     </div>
     
-    <div id="custom-context-menu" class="hidden fixed bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xl py-1.5 w-44 z-50 text-xs font-bold text-slate-700 dark:text-slate-200 select-none">
+    <div id="custom-context-menu" class="hidden fixed bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xl py-1.5 w-44 z-[110] text-xs font-bold text-slate-700 dark:text-slate-200 select-none">
         <button onclick="handleContextMenuRename()" class="w-full text-left px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2 font-black"><i class="fa-regular fa-pen-to-square text-blue-500"></i> <span data-i18n="ctx-rename">重命名分类</span></button>
         <button id="ctx-delete-btn" onclick="handleContextMenuDelete()" class="w-full text-left px-4 py-2 hover:bg-red-50 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400 border-t border-slate-100 dark:border-slate-700 flex items-center gap-2 font-black"><i class="fa-regular fa-trash-can text-red-500"></i> <span data-i18n="ctx-delete">安全删除分类</span></button>
     </div>
@@ -316,13 +315,13 @@
                 'nav-logout': '退出登录', 'nav-delete': '注销账号', 'nav-history': '历史',
                 'theme-title': '主题模式', 'theme-light': '浅色模式', 'theme-dark': '深色模式', 'theme-sys': '跟随系统',
                 'lang-toggle': '切换语言 / EN',
-                'nav-sidebar': '侧栏', 'app-title': '云端笔记',
-                'btn-new-note': '新建笔记', 'btn-new-folder': '新建分类',
+                'nav-sidebar': '侧栏', 'app-title': '云笔记',
+                'btn-new-note': '新笔记', 'btn-new-folder': '新分类',
                 'btn-import-export': '导入与导出', 'label-folder': '文件夹',
-                'label-content': '内容展示', 'label-editor': '编辑栏',
+                'label-content': '笔记集', 'label-editor': '编辑栏',
                 'label-category': '归属地:', 'trash-title': '回收站',
                 'btn-list': '列表', 'btn-grid': '图表',
-                'all-docs': '全文档展示', 'no-data': '无数据', 'trash-empty': '回收站空空如也',
+                'all-docs': '全笔记展示', 'no-data': '无数据', 'trash-empty': '回收站空空如也',
                 'untitled': '无标题', 'original-folder': '原位置:',
                 'fmt-size': '字号', 'sz-1': '极小', 'sz-2': '小号', 'sz-3': '正常', 'sz-4': '大号', 'sz-5': '特大', 'sz-6': '超大', 'sz-7': '极巨',
                 'fmt-heading': '标题', 'h1': '一级标题', 'h2': '二级标题', 'h3': '三级标题', 'p': '正文',
@@ -371,9 +370,6 @@
             });
         }
 
-        // ==========================================
-        // 设置菜单收纳逻辑
-        // ==========================================
         function toggleSettingsMenu(e) {
             e.stopPropagation(); 
             document.getElementById('settings-dropdown').classList.toggle('hidden');
@@ -411,9 +407,6 @@
             }
         });
 
-        // ==========================================
-        // 核心数据模型与同步应用逻辑
-        // ==========================================
         let notes = [];
         let trashBin = [];
         let categories = [
@@ -427,11 +420,10 @@
         let currentFilterCategory = "全部"; 
         let activeNoteId = null;
         let saveTimeout = null;
-        let draggedNoteId = null; // 用于记录当前正在拖拽的笔记ID
-        let isFolderSectionExpanded = true; // 记录文件夹区域是否展开
-        let isContentSectionExpanded = true; // 记录内容展示区域是否展开
+        let draggedNoteId = null; 
+        let isFolderSectionExpanded = true; 
+        let isContentSectionExpanded = true; 
 
-        // 控制内容展示区域折叠/展开的函数
         function toggleContentSection() {
             isContentSectionExpanded = !isContentSectionExpanded;
             const container = document.getElementById('content-section-container');
@@ -446,7 +438,6 @@
             }
         }
 
-        // 控制文件夹区域折叠/展开的函数
         function toggleFolderSection() {
             isFolderSectionExpanded = !isFolderSectionExpanded;
             const container = document.getElementById('category-tree-container');
@@ -578,6 +569,17 @@
                 if (response.status === 401) { logout(); return; }
                 if (!response.ok) throw new Error('网络响应异常');
                 const data = await response.json();
+                
+                // 💡 新增：如果云端传回了自定义名称，则动态修改网页标题和顶栏名字
+                if (data.appName) {
+                    document.title = data.appName; // 修改浏览器标签页名字
+                    const titleEl = document.querySelector('[data-i18n="app-title"]');
+                    if (titleEl) titleEl.innerText = data.appName; // 修改左上角顶栏名字
+                    // 同时更新翻译字典，防止切换语言时被覆盖
+                    if (dict.zh) dict.zh['app-title'] = data.appName;
+                    if (dict.en) dict.en['app-title'] = data.appName;
+                }
+
                 if (data.notes) notes = data.notes;
                 if (data.categories) {
                     if (data.categories.length > 0 && typeof data.categories[0] === 'string') {
@@ -654,6 +656,9 @@
             return ids;
         }
 
+        // ==========================================
+        // 💡 渲染文件夹树：包含了统一的文件夹和笔记拖拽逻辑
+        // ==========================================
         function renderCategoryTree() {
             const container = document.getElementById('category-tree-container'); 
             container.innerHTML = '';
@@ -665,132 +670,139 @@
             const defaultStyle = 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 shadow-sm';
 
             const allBtn = document.createElement('div');
-            allBtn.className = `px-3 py-1 rounded-lg border flex items-center gap-1 cursor-pointer transition-all text-xs font-black ${currentFilterCategory === '全部' ? activeStyle : defaultStyle}`;
+            allBtn.className = `px-2.5 py-0.5 rounded-lg border flex items-center gap-1 cursor-pointer transition-all text-xs font-black ${currentFilterCategory === '全部' ? activeStyle : defaultStyle}`;
             allBtn.innerHTML = `<i class="fa-solid fa-list-check text-[12px]"></i> ${t('all-docs')}`;
             allBtn.onclick = () => { currentFilterCategory = "全部"; refreshAllViews(); };
-            
-            if(allDocsContainer) {
-                allDocsContainer.appendChild(allBtn);
-            }
+            if(allDocsContainer) allDocsContainer.appendChild(allBtn);
 
             const treeRootWrapper = document.createElement('div');
             treeRootWrapper.className = treeLayoutView === 'grid' ? "grid grid-cols-3 gap-1 w-full" : "space-y-1 w-full";
 
             function buildTreeNodes(parentId, level) {
                 const currentLevelNodes = categories.filter(c => c.parentId === parentId);
-                
                 currentLevelNodes.forEach(cat => {
                     const isSelected = currentFilterCategory === cat.id;
-                    const isExpanded = leftExpandedFolders[cat.id] !== false; 
+                    const isExpanded = leftExpandedFolders[cat.id] !== false;
                     const hasChildren = categories.some(c => c.parentId === cat.id);
-                    
                     const allCatIds = getAllCategoryIds(cat.id);
                     const noteCount = notes.filter(n => allCatIds.includes(n.category)).length;
                     
                     const cell = document.createElement('div');
-                    const cellClass = isSelected ? activeStyle : defaultStyle;
+                    const paddingLeft = `${level * 12 + 6}px`;
+                    cell.className = `py-1 px-2.5 rounded-lg border cursor-pointer transition-all flex items-center justify-between relative h-6 folder-drop-target ${isSelected ? activeStyle : defaultStyle}`;
+                    cell.style.paddingLeft = paddingLeft;
                     
-                    let folderIconColor = 'text-amber-500'; 
-                    if (level === 1) folderIconColor = 'text-blue-500'; 
-                    else if (level === 2) folderIconColor = 'text-emerald-500'; 
-                    else if (level >= 3) folderIconColor = 'text-purple-500'; 
+                    // --- 恢复：根据文件夹层级动态分配颜色 ---
+                    let folderIconColor = 'text-amber-500';         // 1级目录（最顶层）：黄色
+                    if (level === 1) folderIconColor = 'text-blue-500';       // 2级目录：蓝色
+                    else if (level === 2) folderIconColor = 'text-emerald-500'; // 3级目录：绿色
+                    else if (level >= 3) folderIconColor = 'text-purple-500';   // 4级及更深：紫色
                     
-                    let iconHtml = `<i class="fa-solid fa-folder ${folderIconColor} text-[12px] shrink-0"></i>`;
-                    if (hasChildren) {
-                        iconHtml = isExpanded 
-                            ? `<i class="fa-solid fa-caret-down ${isSelected ? 'text-blue-100' : 'text-slate-400 dark:text-slate-500'} text-[10px] w-3 shrink-0"></i><i class="fa-solid fa-folder-open ${folderIconColor} text-[12px] shrink-0"></i>`
-                            : `<i class="fa-solid fa-caret-right ${isSelected ? 'text-blue-100' : 'text-slate-400 dark:text-slate-500'} text-[10px] w-3 shrink-0"></i><i class="fa-solid fa-folder ${folderIconColor} text-[12px] shrink-0"></i>`;
-                    } else {
-                        iconHtml = `<span class="w-3 inline-block shrink-0"></span><i class="fa-solid fa-folder ${folderIconColor} text-[12px] shrink-0"></i>`;
-                    }
+                    const iconHtml = hasChildren ? 
+                        `<i class="fa-solid ${isExpanded ? 'fa-caret-down' : 'fa-caret-right'} text-[10px] w-3 shrink-0 opacity-50"></i><i class="fa-solid fa-folder ${folderIconColor} text-[12px] shrink-0"></i>` : 
+                        `<span class="w-3 inline-block shrink-0"></span><i class="fa-solid fa-folder ${folderIconColor} text-[12px] shrink-0"></i>`;
 
-                    if (treeLayoutView === 'grid') {
-                        cell.className = `p-1.5 rounded-lg border cursor-pointer transition-all flex flex-col justify-between relative h-9 ${cellClass}`;
-                        cell.innerHTML = `
-                            <div class="truncate w-full pr-1">
-                                <div class="flex items-center gap-1.5 truncate">
-                                    ${iconHtml}
-                                    <span class="font-extrabold text-[12px] truncate">${t(cat.name)}</span>
-                                </div>
-                                <span class="text-[10px] block mt-0.5 font-bold ${isSelected ? 'opacity-100 text-blue-100' : 'opacity-60'}">(${noteCount})</span>
-                            </div>
-                        `;
-                    } else {
-                        const paddingLeft = `${level * 12 + 6}px`;
-                        cell.className = `py-1 px-1.5 rounded-lg border cursor-pointer transition-all flex items-center justify-between relative h-6 ${cellClass}`;
-                        cell.style.paddingLeft = paddingLeft;
-                        cell.innerHTML = `
-                            <div class="flex items-center gap-1.5 truncate flex-1 pr-1">
-                                ${iconHtml}
-                                <span class="font-extrabold text-[12px] truncate">${t(cat.name)}</span>
-                            </div>
-                            <span class="text-[10px] font-bold ${isSelected ? 'opacity-100 text-blue-100' : 'opacity-60'} shrink-0">(${noteCount})</span>
-                        `;
-                    }
+                    cell.innerHTML = `
+                        <div class="flex items-center gap-1.5 truncate flex-1 pr-1">
+                            ${iconHtml}
+                            <span class="font-extrabold text-[12px] truncate">${t(cat.name)}</span>
+                        </div>
+                        <span class="text-[10px] font-bold ${isSelected ? 'opacity-100 text-blue-100' : 'opacity-60'} shrink-0">(${noteCount})</span>
+                    `;
 
-                    cell.onclick = (e) => {
-                        if (e.target.closest('.fa-caret-down') || e.target.closest('.fa-caret-right')) {
-                            leftExpandedFolders[cat.id] = !isExpanded;
-                            saveCloudData();
-                            refreshAllViews();
-                        } else {
-                            currentFilterCategory = cat.id;
-                            leftExpandedFolders[cat.id] = true; 
-                            saveCloudData();
-                            refreshAllViews();
-                        }
+                    // 💡 文件夹拖拽实现（完美区分文件夹互相嵌套和笔记分类）
+                    cell.setAttribute('draggable', 'true');
+                    cell.ondragstart = (e) => {
+                        e.dataTransfer.setData('text/folder-id', cat.id);
+                        setTimeout(() => cell.classList.add('opacity-40'), 0);
                     };
-                   
-                    // --- 新增：文件夹拖放接收逻辑 ---
-                    cell.classList.add('folder-drop-target'); // 打个标记，方便清理样式
+                    cell.ondragend = () => {
+                        cell.classList.remove('opacity-40');
+                        document.querySelectorAll('.folder-drop-target').forEach(el => el.classList.remove('bg-blue-100', 'dark:bg-blue-900', 'border-blue-400', 'border-dashed'));
+                    };
                     cell.ondragover = (e) => {
-                        if (draggedNoteId) {
-                            e.preventDefault(); // 必须阻止默认行为，允许元素放入
-                            cell.classList.add('bg-blue-100', 'dark:bg-blue-900', 'border-blue-400', 'border-dashed'); // 移入时高亮变色
-                        }
+                        e.preventDefault(); // 必须保留，这是允许 ondrop 触发的前提
+                        cell.classList.add('bg-blue-100', 'dark:bg-blue-900', 'border-blue-400', 'border-dashed');
                     };
-                    cell.ondragleave = (e) => {
+                    cell.ondragleave = () => {
                         cell.classList.remove('bg-blue-100', 'dark:bg-blue-900', 'border-blue-400', 'border-dashed');
                     };
                     cell.ondrop = (e) => {
                         e.preventDefault();
                         cell.classList.remove('bg-blue-100', 'dark:bg-blue-900', 'border-blue-400', 'border-dashed');
+                        
+                        // 情况A：如果识别到拖拽的是笔记文件
                         if (draggedNoteId) {
-                            // 找到拖拽的笔记，修改它的 category
                             const idx = notes.findIndex(n => n.id === draggedNoteId);
                             if (idx !== -1 && notes[idx].category !== cat.id) {
                                 notes[idx].category = cat.id; 
-                                saveCloudData();
-                                refreshAllViews(); // 刷新视图，你会看到侧边栏数量和列表瞬间变化
+                                saveCloudData(); refreshAllViews();
+                            }
+                        } 
+                        // 情况B：如果拖拽的是文件夹本身
+                        else {
+                            const sourceId = e.dataTransfer.getData('text/folder-id');
+                            if (sourceId && sourceId !== cat.id) {
+                                // 安全校验 1：系统默认目录不可被移动（未分类、工作、生活）
+                                if (sourceId === '未分类' || sourceId === '工作' || sourceId === '生活') {
+                                    alert('系统默认分类目录不可改变层级！');
+                                    return;
+                                }
+
+                                // 安全校验 2：防死循环检测（不能把父辈文件夹拖进自己的子文件夹中）
+                                let isCircular = false;
+                                function checkChild(targetId) {
+                                    const children = categories.filter(c => c.parentId === targetId);
+                                    if (children.some(c => c.id === cat.id)) { isCircular = true; return; }
+                                    children.forEach(c => checkChild(c.id));
+                                }
+                                checkChild(sourceId);
+
+                                if (!isCircular) {
+                                    const sourceCat = categories.find(c => c.id === sourceId);
+                                    if (sourceCat) {
+                                        sourceCat.parentId = cat.id; // 更新父ID归属成功
+                                        saveCloudData(); refreshAllViews();
+                                    }
+                                } else {
+                                    alert("🚨 逻辑错误：不能将父级目录移动到它自身的子目录下！");
+                                }
                             }
                         }
                     };
-                    // -----------------------------
- 
+
+                    cell.onclick = (e) => {
+                        if (e.target.closest('.fa-caret-down') || e.target.closest('.fa-caret-right')) {
+                            leftExpandedFolders[cat.id] = !isExpanded;
+                            saveCloudData(); refreshAllViews();
+                        } else {
+                            currentFilterCategory = cat.id;
+                            leftExpandedFolders[cat.id] = true;
+                            saveCloudData(); refreshAllViews();
+                        }
+                    };
+
                     bindCategoryContextMenu(cell, cat.id);
                     treeRootWrapper.appendChild(cell);
-
-                    if (hasChildren && isExpanded) {
-                        buildTreeNodes(cat.id, level + 1);
-                    }
+                    if (hasChildren && isExpanded) buildTreeNodes(cat.id, level + 1);
                 });
             }
-
             buildTreeNodes(null, 0);
             container.appendChild(treeRootWrapper);
         }
-        
+
+        // ==========================================
+        // 💡 渲染左侧笔记流：删除了大的垃圾桶，改为 text-[9px] 极小图标
+        // ==========================================
         function renderLeftNotesView() {
             const container = document.getElementById('left-notes-container'); container.innerHTML = '';
             let displayNotes = notes;
     
-            // 1. 先按分类目录过滤
             if (currentFilterCategory !== "全部") { 
                 const targetIds = getAllCategoryIds(currentFilterCategory);
                 displayNotes = notes.filter(n => targetIds.includes(n.category)); 
             }
 
-            // 💡 2. 新增：按搜索框关键字过滤（同时搜索标题和内容，忽略大小写）
             const searchInput = document.getElementById('global-search-input');
             if (searchInput && searchInput.value.trim() !== '') {
                 const keyword = searchInput.value.trim().toLowerCase();
@@ -801,7 +813,6 @@
                 });
             }
     
-            // 💡 改为直接使用数组的物理顺序，不再强制按时间排序，让拖拽排序生效
             const sorted = displayNotes;
             if (sorted.length === 0) { container.innerHTML = `<p class="text-slate-400 text-center text-sm py-4 font-bold">${t('no-data')}</p>`; return; }
     
@@ -819,55 +830,46 @@
                 const defaultBoxStyle = 'bg-white dark:bg-slate-800 border-emerald-400 dark:border-emerald-600 hover:bg-emerald-50 dark:hover:bg-slate-700 shadow-sm';
                 const activeBoxStyle = 'bg-blue-500 border-blue-600 text-white shadow active-note-item';
 
-                if (leftLayoutView === 'list') {
+               if (leftLayoutView === 'list') {
                     box.className = `w-full py-1 px-2 rounded-lg border cursor-pointer flex flex-col justify-between transition-all text-xs break-all relative group ${isSelected ? activeBoxStyle : defaultBoxStyle}`;
                     box.innerHTML = `
-                        <button class="del-btn absolute right-1 top-1 p-0.5 ${isSelected ? 'text-white hover:text-red-200' : 'text-red-500 hover:text-red-700'} transition-all z-10" onclick="confirmDelete(event, '${note.id}')"><i class="fa-solid fa-trash-can text-[12px]"></i></button>
+                        <button class="del-btn absolute right-1 top-1 p-0.5 ${isSelected ? 'block text-white hover:text-red-200' : 'hidden'} transition-all z-10" onclick="confirmDelete(event, '${note.id}')"><i class="fa-solid fa-trash-can text-[9px]"></i></button>
                         <div class="w-full overflow-hidden flex flex-col flex-1 pr-4 justify-center">
-                            <div class="font-black text-[14px] ${isSelected ? 'text-white' : 'text-slate-900 dark:text-slate-100'} line-clamp-1 leading-snug mb-0" title="${displayTitle}">${displayTitle}</div>
+                            <div class="font-black text-[12px] ${isSelected ? 'text-yellow-200' : 'text-yellow-600 dark:text-yellow-400'} line-clamp-1 leading-snug mb-0" title="${displayTitle}">${displayTitle}</div>
                             <p class="text-[12px] ${isSelected ? 'text-blue-100' : 'text-slate-500 dark:text-slate-400'} line-clamp-1 leading-none">${plainText}</p>
                         </div>
                     `;
                 } else {
                     box.className = `w-full h-[72px] p-1.5 rounded-lg border cursor-pointer flex flex-col justify-between transition-all text-xs break-all relative group ${isSelected ? activeBoxStyle : defaultBoxStyle}`;
                     box.innerHTML = `
-                        <button class="del-btn absolute right-1 top-1 p-0.5 ${isSelected ? 'text-white hover:text-red-200' : 'text-red-500 hover:text-red-700'} transition-all z-10" onclick="confirmDelete(event, '${note.id}')"><i class="fa-solid fa-trash-can text-[11px]"></i></button>
+                        <button class="del-btn absolute right-1 top-1 p-0.5 ${isSelected ? 'block text-white hover:text-red-200' : 'hidden'} transition-all z-10" onclick="confirmDelete(event, '${note.id}')"><i class="fa-solid fa-trash-can text-[9px]"></i></button>
                         <div class="w-full overflow-hidden flex flex-col flex-1 justify-center">
-                            <div class="font-black text-[12px] ${isSelected ? 'text-white' : 'text-slate-950 dark:text-slate-50'} line-clamp-1 leading-tight mb-1" title="${displayTitle}">${displayTitle}</div>
+                            <div class="font-black text-[10px] ${isSelected ? 'text-yellow-200' : 'text-yellow-600 dark:text-yellow-400'} line-clamp-1 leading-tight mb-1" title="${displayTitle}">${displayTitle}</div>
                             <p class="text-[10px] ${isSelected ? 'text-blue-100' : 'text-slate-500 dark:text-slate-400'} line-clamp-2 leading-tight">${plainText}</p>
                         </div>
                     `;
                 }
 
-                // --- 新增：笔记拖拽与排序逻辑 ---
                 box.draggable = true;
-                
-                // 开始拖拽：记录ID，变半透明
                 box.ondragstart = (e) => {
                     draggedNoteId = note.id;
                     e.dataTransfer.effectAllowed = 'move';
                     setTimeout(() => box.classList.add('opacity-40', 'scale-95'), 0);
                 };
-                
-                // 拖拽结束：清理样式
-                box.ondragend = (e) => {
+                box.ondragend = () => {
                     draggedNoteId = null;
                     box.classList.remove('opacity-40', 'scale-95');
                     document.querySelectorAll('.folder-drop-target').forEach(el => el.classList.remove('bg-blue-100', 'dark:bg-blue-900', 'border-blue-400', 'border-dashed'));
                 };
-                
-                // 拖拽悬停在其他笔记上方：显示蓝色的顶部边框作为插入提示
                 box.ondragover = (e) => {
                     if (draggedNoteId && draggedNoteId !== note.id) {
                         e.preventDefault(); 
                         box.classList.add('border-t-2', 'border-blue-500'); 
                     }
                 };
-                box.ondragleave = (e) => {
+                box.ondragleave = () => {
                     box.classList.remove('border-t-2', 'border-blue-500');
                 };
-                
-                // 松开鼠标：执行位置互换
                 box.ondrop = (e) => {
                     e.preventDefault();
                     box.classList.remove('border-t-2', 'border-blue-500');
@@ -875,16 +877,13 @@
                         const fromIdx = notes.findIndex(n => n.id === draggedNoteId);
                         const toIdx = notes.findIndex(n => n.id === note.id);
                         if (fromIdx !== -1 && toIdx !== -1) {
-                            // 从原位置抽离，并插入到目标位置
                             const [movedItem] = notes.splice(fromIdx, 1);
                             const newToIdx = notes.findIndex(n => n.id === note.id);
                             notes.splice(newToIdx, 0, movedItem);
-                            saveCloudData();
-                            renderLeftNotesView();
+                            saveCloudData(); renderLeftNotesView();
                         }
                     }
                 };
-                // -----------------------------
                 gridWrapper.appendChild(box);
             });
             container.appendChild(gridWrapper);
@@ -898,17 +897,28 @@
                 return; 
             }
             trashBin.forEach((note) => {
-                const card = document.createElement('div'); card.className = "bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-3 rounded-xl relative group text-xs shadow-sm hover:shadow transition-all mb-2";
+                // 💡 优化 1：缩小卡片上下宽度（p-3 变 py-1 px-2，mb-2 变 mb-1），并赋予点击小手势 cursor-pointer
+                const card = document.createElement('div'); card.className = "bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 py-1 px-2 rounded-lg relative group text-xs shadow-sm hover:shadow transition-all mb-1 cursor-pointer";
+                
+                // 💡 优化 2：实现点击删除笔记立即将内容载入中央编辑栏预览的功能
+                card.onclick = (e) => {
+                    // 如果点击的不是右侧的操作按钮，才触发预览
+                    if (!e.target.closest('button')) {
+                        document.getElementById('note-title-input').value = "[回收站预览] " + (note.title || t('untitled'));
+                        document.getElementById('note-editor-richtext').innerHTML = note.content;
+                    }
+                };
+
                 const catObj = categories.find(c => c.id === note.category) || {name: '未分类'};
                 const displayTitle = note.title || t('untitled');
                 card.innerHTML = `
                     <div class="pr-16 truncate">
-                        <div class="font-bold text-slate-900 dark:text-slate-100 truncate mb-1 text-sm">${displayTitle}</div>
+                        <div class="font-bold text-slate-900 dark:text-slate-100 truncate mb-0 text-sm">${displayTitle}</div>
                         <span class="text-[11px] text-slate-500 dark:text-slate-400 font-medium block flex items-center gap-1"><i class="fa-solid fa-folder-open text-slate-400"></i> ${t('original-folder')} ${t(catObj.name)}</span>
                     </div>
-                    <div class="absolute right-2 top-2 flex gap-1.5 opacity-60 group-hover:opacity-100 transition-opacity">
-                        <button onclick="recoverDeletedFile('${note.id}')" title="恢复" class="p-1.5 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 rounded-lg text-emerald-600 dark:text-emerald-400 font-bold"><i class="fa-solid fa-rotate-left"></i></button>
-                        <button onclick="permanentlyDeleteFile('${note.id}')" title="彻底删除" class="p-1.5 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg text-red-600 dark:text-red-400"><i class="fa-solid fa-xmark"></i></button>
+                    <div class="absolute right-1 top-1/2 -translate-y-1/2 flex gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
+                        <button onclick="recoverDeletedFile('${note.id}'); event.stopPropagation();" title="恢复" class="p-1 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 rounded-lg text-emerald-600 dark:text-emerald-400 font-bold"><i class="fa-solid fa-rotate-left text-[10px]"></i></button>
+                        <button onclick="permanentlyDeleteFile('${note.id}'); event.stopPropagation();" title="彻底删除" class="p-1 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg text-red-600 dark:text-red-400"><i class="fa-solid fa-xmark text-[10px]"></i></button>
                     </div>
                 `;
                 container.appendChild(card);
@@ -918,7 +928,6 @@
         function createNewNote() {
             const defaultCat = currentFilterCategory !== "全部" ? currentFilterCategory : "未分类";
             const newDoc = { id: 'md_' + Date.now(), title: '', content: '', category: defaultCat, updatedAt: Date.now() };
-            // 💡 改用 unshift，让新插入的笔记永远排在数组最顶端（第一位）
             notes.unshift(newDoc); 
             saveCloudData(); openNote(newDoc.id);
         }
@@ -933,18 +942,10 @@
             }
         }
         
-        // 💡 新增的删除拦截确认函数
         function confirmDelete(event, id) {
-            // 阻止冒泡，防止触发外层 div 的点击打开笔记事件
             event.stopPropagation();
-            
-            // 弹出确认框
             const isConfirmed = confirm("🚨 确定要将这条笔记移入回收站吗？");
-            
-            // 只有点击确定，才执行原有的删除逻辑
-            if (isConfirmed) {
-                deleteNote(id);
-            }
+            if (isConfirmed) { deleteNote(id); }
         }
 
         function deleteNote(id) {
@@ -958,15 +959,25 @@
         function changeNoteCategory(newCatId) { const idx = notes.findIndex(n => n.id === activeNoteId); if (idx !== -1) { notes[idx].category = newCatId; saveCloudData(); refreshAllViews(); } }
         
         function handleEditorInput() { 
-            if (!activeNoteId) return; if (saveTimeout) clearTimeout(saveTimeout);
+            if (!activeNoteId) return; 
+            
+            // 💡 1. 立即更新本地数据并重刷列表，实现打字时标题和内容“秒同步”
+            const idx = notes.findIndex(n => n.id === activeNoteId);
+            if (idx !== -1) {
+                notes[idx].title = document.getElementById('note-title-input').value;
+                notes[idx].content = document.getElementById('note-editor-richtext').innerHTML;
+            }
+            renderLeftNotesView(); // 实时渲染左侧列表文字，不再等待 1.5 秒
+
+            // 💡 2. 云端同步和时间戳更新依然使用防抖延迟，防止打字时频繁请求服务器或频繁打乱排序
+            if (saveTimeout) clearTimeout(saveTimeout);
             saveTimeout = setTimeout(() => {
-                const idx = notes.findIndex(n => n.id === activeNoteId);
-                if (idx !== -1) {
-                    notes[idx].title = document.getElementById('note-title-input').value;
-                    notes[idx].content = document.getElementById('note-editor-richtext').innerHTML;
-                    notes[idx].updatedAt = Date.now(); 
-                    saveCloudData(); renderLeftNotesView(); 
+                const idx2 = notes.findIndex(n => n.id === activeNoteId);
+                if (idx2 !== -1) {
+                    notes[idx2].updatedAt = Date.now(); // 停止打字后才真正更新时间戳完成最终重排
                 }
+                saveCloudData();
+                renderLeftNotesView(); 
             }, 1500); 
         }
         
@@ -1079,11 +1090,12 @@
             const leftPanel = document.getElementById('left-panel'); const resizerLeft = document.getElementById('resizer-left');
             const rightPanel = document.getElementById('right-panel'); const resizerRight = document.getElementById('resizer-right');
             resizerLeft.addEventListener('mousedown', function(e) { e.preventDefault(); resizerLeft.classList.add('resizing'); document.body.classList.add('no-select'); document.addEventListener('mousemove', resizeLeft); document.addEventListener('mouseup', stopResizeLeft); });
-            function resizeLeft(e) { let newWidth = e.clientX - container.getBoundingClientRect().left; if (newWidth >= 160 && newWidth <= 480) leftPanel.style.width = newWidth + 'px'; }
+            function resizeLeft(e) { let newWidth = e.clientX - container.getBoundingClientRect().left; if (newWidth >= 130 && newWidth <= 480) leftPanel.style.width = newWidth + 'px'; }
             function stopResizeLeft() { resizerLeft.classList.remove('resizing'); document.body.classList.remove('no-select'); document.removeEventListener('mousemove', resizeLeft); document.removeEventListener('mouseup', stopResizeLeft); }
             
             resizerRight.addEventListener('mousedown', function(e) { e.preventDefault(); resizerRight.classList.add('resizing'); document.body.classList.add('no-select'); document.addEventListener('mousemove', resizeRight); document.addEventListener('mouseup', stopResizeRight); });
-            function resizeRight(e) { let newWidth = container.getBoundingClientRect().right - e.clientX; if (newWidth >= 270 && newWidth <= 480) rightPanel.style.width = newWidth + 'px'; }
+            // 💡 将 newWidth >= 270 改为 newWidth >= 160
+            function resizeRight(e) { let newWidth = container.getBoundingClientRect().right - e.clientX; if (newWidth >= 130 && newWidth <= 480) rightPanel.style.width = newWidth + 'px'; }
             function stopResizeRight() { resizerRight.classList.remove('resizing'); document.body.classList.remove('no-select'); document.removeEventListener('mousemove', resizeRight); document.removeEventListener('mouseup', stopResizeRight); }
         }
 
@@ -1095,9 +1107,7 @@
                let startY = 0;
                let startHeight = 0;
 
-              const getClientY = (e) => {
-                     return e.touches ? e.touches[0].clientY : e.clientY;
-              };
+              const getClientY = (e) => { return e.touches ? e.touches[0].clientY : e.clientY; };
 
               const startResize = (e) => {
                      if (e.target.tagName === 'IMG') {
@@ -1108,7 +1118,7 @@
                          startY = getClientY(e);
                          startHeight = activeImage.clientHeight || activeImage.offsetHeight;
             
-                         if (!e.touches) document.body.style.cursor = 'ns-resize'; 
+                         if (!e.touches) document.body.style.cursor = 'nwse-resize';
             
                          if (e.touches) {
                              document.addEventListener('touchmove', resizeImg, { passive: false });
@@ -1125,25 +1135,20 @@
 
               function resizeImg(e) {
                      if (activeImage) {
-                         if (e.touches) {
-                             if (e.cancelable) e.preventDefault(); 
-                         }
-            
+                         if (e.touches) { if (e.cancelable) e.preventDefault(); }
                          const dy = getClientY(e) - startY;
                          activeImage.style.height = (startHeight + dy) + 'px';
                          activeImage.style.width = 'auto';
                      }
-               }
+                }
 
                function stopResizeImg() {
                       activeImage = null;
                       document.body.style.cursor = 'default';
-        
                        document.removeEventListener('mousemove', resizeImg);
                        document.removeEventListener('mouseup', stopResizeImg);
                        document.removeEventListener('touchmove', resizeImg);
                        document.removeEventListener('touchend', stopResizeImg);
-        
                        handleEditorInput(); 
                }
 
@@ -1166,40 +1171,27 @@
         function triggerImport(type) { if (type === 'md') document.getElementById('import-md-input').click(); if (type === 'txt') document.getElementById('import-txt-input').click(); }
         function triggerFolderImport() { document.getElementById('import-folder-input').click(); }
         
-        // ==========================================
-        // 核心新功能：将当前选中的文件夹递归打包成 ZIP 导出
-        // ==========================================
         async function exportCurrentFolder() {
-            if (currentFilterCategory === "全部") {
-                alert("请先在左侧选择一个特定的分类文件夹后再导出！");
-                return;
-            }
-
+            if (currentFilterCategory === "全部") { alert("请先在左侧选择一个特定的分类文件夹后再导出！"); return; }
             const currentCatObj = categories.find(c => c.id === currentFilterCategory);
             if (!currentCatObj) return;
 
-            // 提示用户正在打包
             const originalBtnText = document.querySelector('button[onclick="exportCurrentFolder()"]').innerHTML;
             document.querySelector('button[onclick="exportCurrentFolder()"]').innerHTML = `<i class="fa-solid fa-spinner fa-spin text-blue-200"></i> 打包中...`;
 
             try {
                 const zip = new JSZip();
-                
-                // 递归抓取文件并按层级放入 ZIP 的函数
                 function addFilesToZip(folderId, currentZipFolder) {
-                    // 1. 把属于当前层级的笔记转换为 MD 并写入
                     const notesInFolder = notes.filter(n => n.category === folderId);
                     notesInFolder.forEach(note => {
                         let mdContent = note.content;
-                        // 如果有 HTML 标签，则尝试用 Turndown 转换为纯 Markdown
                         if (typeof TurndownService !== 'undefined' && note.content.includes('<')) {
                             mdContent = new TurndownService().turndown(note.content);
                         }
-                        const safeTitle = (note.title || t('untitled')).replace(/[\\/:*?"<>|]/g, "_"); // 清理非法文件名字符
+                        const safeTitle = (note.title || t('untitled')).replace(/[\\/:*?"<>|]/g, "_");
                         currentZipFolder.file(`${safeTitle}.md`, mdContent);
                     });
 
-                    // 2. 找到所有子文件夹，递归创建目录并继续抓取
                     const subFolders = categories.filter(c => c.parentId === folderId);
                     subFolders.forEach(sub => {
                         const safeDirName = sub.name.replace(/[\\/:*?"<>|]/g, "_");
@@ -1208,12 +1200,10 @@
                     });
                 }
 
-                // 创建以当前文件夹命名的根目录，并开始递归
                 const rootFolderName = currentCatObj.name.replace(/[\\/:*?"<>|]/g, "_");
                 const rootZip = zip.folder(rootFolderName);
                 addFilesToZip(currentFilterCategory, rootZip);
 
-                // 生成 ZIP 文件并触发浏览器下载
                 const content = await zip.generateAsync({ type: "blob" });
                 const url = window.URL.createObjectURL(content);
                 const a = document.createElement("a");
@@ -1226,7 +1216,6 @@
                 console.error("打包导出失败:", error);
                 alert("导出失败，请检查控制台报错。");
             } finally {
-                // 恢复按钮原状
                 document.querySelector('button[onclick="exportCurrentFolder()"]').innerHTML = originalBtnText;
             }
         }
@@ -1248,7 +1237,6 @@
             const files = event.target.files; if (!files || files.length === 0) return;
             let loaded = 0; let firstId = null;
             const validFiles = Array.from(files).filter(f => f.name.endsWith('.md') || f.name.endsWith('.txt'));
-            
             if(validFiles.length === 0) return;
 
             validFiles.forEach(file => {
@@ -1312,25 +1300,17 @@
         function handleLocalImageUpload(event) {
                const file = event.target.files[0];
                if (!file) return;
-
-               if (!file.type.startsWith('image/')) {
-                   alert('请选择图片类型的文件！');
-                   return;
-               }
+               if (!file.type.startsWith('image/')) { alert('请选择图片类型的文件！'); return; }
 
                const reader = new FileReader();
                reader.onload = function(e) {
-                      const base64Image = e.target.result;
-        
+                    const base64Image = e.target.result;
                     const editor = document.getElementById('note-editor-richtext');
                     if (editor) {
                         editor.focus();
                         document.execCommand('insertImage', false, base64Image);
-                    } else {
-                         console.error("找不到编辑器 ID，请检查 HTML 中的 ID 是否为 note-editor-richtext");
                     }
                };
-    
                reader.readAsDataURL(file);
                event.target.value = '';
         }
@@ -1338,19 +1318,13 @@
        function toggleImportExport() {
               const content = document.getElementById('import-export-content');
               const arrow = document.getElementById('import-export-arrow');
-    
               if (content.classList.contains('hidden')) {
-                  content.classList.remove('hidden'); 
-                  arrow.classList.add('rotate-180');  
+                  content.classList.remove('hidden'); arrow.classList.add('rotate-180');  
               } else {
-                   content.classList.add('hidden');    
-                   arrow.classList.remove('rotate-180'); 
+                   content.classList.add('hidden'); arrow.classList.remove('rotate-180'); 
               }
         }
 
-        // ==========================================
-        // 3. PWA Service Worker 注册
-        // ==========================================
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js')
@@ -1359,5 +1333,9 @@
             });
         }
     </script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"c67fd155821c4d4bb15f60ba3dc67861","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"c67fd155821c4d4bb15f60ba3dc67861","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"c67fd155821c4d4bb15f60ba3dc67861","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"c67fd155821c4d4bb15f60ba3dc67861","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
