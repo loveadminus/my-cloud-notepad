@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -21,16 +20,30 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     
     <style>
-        body { font-size: 19px; }
+        /* 💡 将整个软件的兜底字号改为 16px */
+        body { font-size: 16px; }
+        
+        /* 💡 强制编辑器内的裸文本默认也是 16px */
+        .md-preview { font-size: 16px; }
         /* 💡 将 16px 修改为 14px，使其与归属地的 text-xs 大小完全一致 */
         .panel-large-text { font-size: 12px !important; font-weight: 800 !important; }
         .sync-btn-font { font-size: 12px !important; font-weight: 900 !important; }
         
         /* 💡 去掉了标题下划线 border-bottom */
-        .md-preview h1 { font-size: 2.6rem; font-weight: 800; padding-bottom: 0.3em; margin-top: 1.6rem; margin-bottom: 1rem; }
-        .md-preview h2 { font-size: 2.1rem; font-weight: 700; padding-bottom: 0.3em; margin-top: 1.4rem; margin-bottom: 0.8rem; }
-        .md-preview h3 { font-size: 1.8rem; font-weight: 600; margin-top: 1.2rem; margin-bottom: 0.6rem; }
-        .md-preview p, .md-preview div { margin-bottom: 0.3rem; line-height: 1.3; font-size: 18px; }
+        /* 💡 强制覆盖内部的 font 标签，确保各级标题尺寸绝对生效 */
+        .md-preview h1, .md-preview h1 *, .md-preview h1 font { font-size: 2.6rem !important; font-weight: 800 !important; line-height: 1.3 !important; }
+        .md-preview h2, .md-preview h2 *, .md-preview h2 font { font-size: 2.1rem !important; font-weight: 700 !important; line-height: 1.3 !important; }
+        .md-preview h3, .md-preview h3 *, .md-preview h3 font { font-size: 1.8rem !important; font-weight: 600 !important; line-height: 1.3 !important; }
+        .md-preview p, .md-preview div { margin-bottom: 0.3rem; line-height: 1.3; font-size: 16px; }
+
+        /* 💡 强制接管 Tailwind 屏蔽的字号标签，保证字号下拉菜单 100% 生效 */
+        .md-preview font[size="1"] { font-size: 10px !important; }
+        .md-preview font[size="2"] { font-size: 13px !important; }
+        .md-preview font[size="3"] { font-size: 16px !important; }
+        .md-preview font[size="4"] { font-size: 18px !important; }
+        .md-preview font[size="5"] { font-size: 24px !important; }
+        .md-preview font[size="6"] { font-size: 32px !important; }
+        .md-preview font[size="7"] { font-size: 48px !important; }
         
         /* 💡 重新唤醒 Tailwind 默认屏蔽的列表样式 */
         .md-preview ul { list-style-type: disc !important; margin-left: 1.5rem !important; padding-left: 0.5rem; margin-bottom: 0.5rem; }
@@ -155,7 +168,7 @@
 
     <div id="workspace-container" class="flex flex-1 overflow-hidden w-full bg-slate-200 dark:bg-slate-900 transition-colors duration-300">
         
-        <aside id="left-panel" class="bg-slate-50 dark:bg-slate-800 dark:border-slate-700 flex flex-col flex-shrink-0 overflow-hidden border-r border-slate-200 panel-large-text transition-all absolute md:relative z-50 h-full shadow-2xl md:shadow-none" style="width: 170px; min-width: 130px; max-width: 480px;">
+        <aside id="left-panel" class="bg-slate-50 dark:bg-slate-800 dark:border-slate-700 flex flex-col flex-shrink-0 overflow-hidden border-r border-slate-200 panel-large-text transition-all relative z-50 h-full" style="width: 170px; min-width: 130px; max-width: 480px;">
             
             <div class="p-1 border-b border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 flex flex-col gap-0.5 flex-shrink-0">
                 
@@ -224,7 +237,7 @@
             </div>
             
             <div id="content-section-container" class="flex-1 relative min-h-0 bg-slate-50/50 dark:bg-slate-800/50 transition-all duration-200">
-                <div id="left-notes-container" class="absolute inset-0 overflow-y-scroll p-2 pb-6"></div>
+                <div id="left-notes-container" class="absolute inset-0 overflow-y-scroll p-2 pb-18"></div>
             </div>
             
         </aside>
@@ -236,22 +249,22 @@
                 <div id="editor-format-bar" class="flex items-center gap-1 flex-wrap bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-1.5 rounded-lg shadow-inner">
                     <select onchange="if(this.value){execCmd('fontSize', this.value);}" class="px-1.5 py-0.5 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded border border-slate-200 dark:border-slate-600 outline-none cursor-pointer bg-slate-50 dark:bg-slate-700">
                         <option value="" data-i18n="fmt-size">字号</option>
-                        <option value="1" data-i18n="sz-1">极小</option>
-                        <option value="2" data-i18n="sz-2">小号</option>
-                        <option value="3" data-i18n="sz-3">正常</option>
-                        <option value="4" data-i18n="sz-4">大号</option>
-                        <option value="5" data-i18n="sz-5">特大</option>
-                        <option value="6" data-i18n="sz-6">超大</option>
-                        <option value="7" data-i18n="sz-7">极巨</option>
+                        <option value="1" data-i18n="sz-1">1号 (10px)</option>
+                        <option value="2" data-i18n="sz-2">2号 (13px)</option>
+                        <option value="3" data-i18n="sz-3">3号 (16px 正常)</option>
+                        <option value="4" data-i18n="sz-4">4号 (18px)</option>
+                        <option value="5" data-i18n="sz-5">5号 (24px)</option>
+                        <option value="6" data-i18n="sz-6">6号 (32px)</option>
+                        <option value="7" data-i18n="sz-7">7号 (48px)</option>
                     </select>
                     <div class="h-4 w-[1px] bg-slate-300 dark:bg-slate-600 mx-0.5"></div>
 
                     <select onchange="if(this.value){execCmd('formatBlock', this.value);}" class="px-1.5 py-0.5 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded border border-slate-200 dark:border-slate-600 outline-none cursor-pointer bg-slate-50 dark:bg-slate-700">
                         <option value="" data-i18n="fmt-heading">标题</option>
-                        <option value="H1" data-i18n="h1">一级标题</option>
-                        <option value="H2" data-i18n="h2">二级标题</option>
-                        <option value="H3" data-i18n="h3">三级标题</option>
-                        <option value="P" data-i18n="p">正文</option>
+                        <option value="<H1>" data-i18n="h1">一级标题</option>
+                        <option value="<H2>" data-i18n="h2">二级标题</option>
+                        <option value="<H3>" data-i18n="h3">三级标题</option>
+                        <option value="<P>" data-i18n="p">正文</option>
                     </select>
                     <div class="h-4 w-[1px] bg-slate-300 dark:bg-slate-600 mx-0.5"></div>
                     
@@ -260,14 +273,15 @@
                     <div class="h-4 w-[1px] bg-slate-300 dark:bg-slate-600 mx-0.5"></div>
     
                     <button onmousedown="event.preventDefault();" onclick="execCmd('bold')" class="px-2 py-0.5 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded border border-slate-200 dark:border-slate-600"><i class="fa-solid fa-bold"></i></button>
-    
+
+                    <button onmousedown="event.preventDefault();" onclick="execCmd('underline')" class="px-2 py-0.5 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded border border-slate-200 dark:border-slate-600"><i class="fa-solid fa-underline"></i></button>
+                    <button onmousedown="event.preventDefault();" onclick="execCmd('foreColor', '#000000')" class="px-1.5 py-0.5 text-[11px] font-bold text-white hover:opacity-80 rounded shadow-sm" style="background-color: #0f172a;" data-i18n="color-black">黑</button>
+                    <button onmousedown="event.preventDefault();" onclick="execCmd('foreColor', '#ffffff')" class="px-1.5 py-0.5 text-[11px] font-bold text-slate-800 hover:opacity-80 rounded shadow-sm border border-slate-300" style="background-color: #ffffff;" data-i18n="color-white">白</button>
                     <button onmousedown="event.preventDefault();" onclick="execCmd('foreColor', '#ef4444')" class="px-1.5 py-0.5 text-[11px] font-bold text-white hover:opacity-80 rounded shadow-sm" style="background-color: #ef4444;" data-i18n="color-red">红</button>
                     <button onmousedown="event.preventDefault();" onclick="execCmd('foreColor', '#eab308')" class="px-1.5 py-0.5 text-[11px] font-bold text-white hover:opacity-80 rounded shadow-sm" style="background-color: #eab308;" data-i18n="color-yellow">黄</button>
                     <button onmousedown="event.preventDefault();" onclick="execCmd('foreColor', '#3b82f6')" class="px-1.5 py-0.5 text-[11px] font-bold text-white hover:opacity-80 rounded shadow-sm" style="background-color: #3b82f6;" data-i18n="color-blue">蓝</button>
                     <button onmousedown="event.preventDefault();" onclick="execCmd('foreColor', '#22c55e')" class="px-1.5 py-0.5 text-[11px] font-bold text-white hover:opacity-80 rounded shadow-sm" style="background-color: #22c55e;" data-i18n="color-green">绿</button>
-                    <button onmousedown="event.preventDefault();" onclick="execCmd('foreColor', '#000000')" class="px-1.5 py-0.5 text-[11px] font-bold text-white hover:opacity-80 rounded shadow-sm" style="background-color: #0f172a;" data-i18n="color-black">黑</button>
-                    <button onmousedown="event.preventDefault();" onclick="execCmd('foreColor', '#ffffff')" class="px-1.5 py-0.5 text-[11px] font-bold text-slate-800 hover:opacity-80 rounded shadow-sm border border-slate-300" style="background-color: #ffffff;" data-i18n="color-white">白</button>
-
+                    
                     <div class="h-4 w-[1px] bg-slate-300 dark:bg-slate-600 mx-0.5"></div>
 
                     <button onmousedown="event.preventDefault();" onclick="wrapHTML('<code>', '</code>')" class="px-2 py-0.5 text-xs font-mono text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded border border-slate-200 dark:border-slate-600"><i class="fa-solid fa-code"></i></button>
@@ -276,11 +290,11 @@
     
                     <button onmousedown="event.preventDefault(); document.getElementById('local-img-input').click()" class="px-2 py-0.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-slate-700 rounded border border-emerald-200 dark:border-emerald-800 bg-emerald-50/50 dark:bg-slate-700"><i class="fa-regular fa-image"></i> <span data-i18n="fmt-img">图</span></button>
                 </div>
-                <input type="file" id="local-img-input" accept="image/*" class="hidden" onchange="handleLocalImageUpload(event)">
+                <input type="file" id="local-img-input" accept="image/*" multiple class="hidden" onchange="handleLocalImageUpload(event)">
             </div>
             
             <div class="flex-1 flex flex-col p-5 overflow-y-auto w-full bg-white dark:bg-slate-950 relative">
-                <input id="note-title-input" oninput="handleEditorInput()" type="text" placeholder="此处输入新随笔标题..." class="w-full font-black text-2xl border-none outline-none mb-3 text-slate-900 dark:text-slate-100 placeholder-slate-300 dark:placeholder-slate-600 bg-transparent flex-shrink-0">
+                <input id="note-title-input" oninput="handleEditorInput()" type="text" placeholder="此处输入新随笔标题..." class="w-full font-black text-2xl border-0 border-b-2 border-dashed border-slate-300 dark:border-slate-700 outline-none pb-3 mb-3 text-slate-900 dark:text-slate-100 placeholder-slate-300 dark:placeholder-slate-600 bg-transparent flex-shrink-0">
                 <div id="note-editor-richtext" contenteditable="true" oninput="handleEditorInput()" placeholder="在这里直接排版书写..." class="md-preview w-full flex-1 outline-none text-slate-800 dark:text-slate-200 break-words"></div>
             </div>
         </section>
@@ -323,7 +337,7 @@
                 'btn-list': '列表', 'btn-grid': '图表',
                 'all-docs': '全笔记展示', 'no-data': '无数据', 'trash-empty': '回收站空空如也',
                 'untitled': '无标题', 'original-folder': '原位置:',
-                'fmt-size': '字号', 'sz-1': '极小', 'sz-2': '小号', 'sz-3': '正常', 'sz-4': '大号', 'sz-5': '特大', 'sz-6': '超大', 'sz-7': '极巨',
+                'fmt-size': '字号', 'sz-1': '1号 (10px)', 'sz-2': '2号 (13px)', 'sz-3': '3号 (16px)', 'sz-4': '4号 (18px 正常)', 'sz-5': '5号 (24px)', 'sz-6': '6号 (32px)', 'sz-7': '7号 (48px)',
                 'fmt-heading': '标题', 'h1': '一级标题', 'h2': '二级标题', 'h3': '三级标题', 'p': '正文',
                 'color-white': '白', 'color-red': '红', 'color-yellow': '黄', 'color-blue': '蓝', 'color-green': '绿', 'color-black': '黑',
                 'fmt-img': '图', 'btn-recover': '恢复', 'btn-empty': '清空', 'ctx-rename': '重命名分类', 'ctx-delete': '安全删除分类',
@@ -342,7 +356,7 @@
                 'btn-list': 'List', 'btn-grid': 'Grid',
                 'all-docs': 'All Documents', 'no-data': 'No Data', 'trash-empty': 'Trash is empty',
                 'untitled': 'Untitled', 'original-folder': 'From:',
-                'fmt-size': 'Size', 'sz-1': 'Tiny', 'sz-2': 'Small', 'sz-3': 'Normal', 'sz-4': 'Large', 'sz-5': 'X-Large', 'sz-6': 'XXL', 'sz-7': 'Huge',
+                'fmt-size': 'Size', 'sz-1': 'Sz 1 (10px)', 'sz-2': 'Sz 2 (13px)', 'sz-3': 'Sz 3 (16px)', 'sz-4': 'Sz 4 (18px Normal)', 'sz-5': 'Sz 5 (24px)', 'sz-6': 'Sz 6 (32px)', 'sz-7': 'Sz 7 (48px)',
                 'fmt-heading': 'Heading', 'h1': 'Heading 1', 'h2': 'Heading 2', 'h3': 'Heading 3', 'p': 'Normal Text',
                 'color-white': 'W', 'color-red': 'R', 'color-yellow': 'Y', 'color-blue': 'B', 'color-green': 'G', 'color-black': 'Bk',
                 'fmt-img': 'Img', 'btn-recover': 'Restore', 'btn-empty': 'Empty', 'ctx-rename': 'Rename', 'ctx-delete': 'Delete safely',
@@ -409,6 +423,7 @@
 
         let notes = [];
         let trashBin = [];
+        let isCloudDataLoaded = false; // 🔒 新增：云端防覆盖安全锁
         let categories = [
             { id: "未分类", name: "未分类", parentId: null },
             { id: "工作", name: "工作", parentId: null },
@@ -570,12 +585,10 @@
                 if (!response.ok) throw new Error('网络响应异常');
                 const data = await response.json();
                 
-                // 💡 新增：如果云端传回了自定义名称，则动态修改网页标题和顶栏名字
                 if (data.appName) {
-                    document.title = data.appName; // 修改浏览器标签页名字
+                    document.title = data.appName; 
                     const titleEl = document.querySelector('[data-i18n="app-title"]');
-                    if (titleEl) titleEl.innerText = data.appName; // 修改左上角顶栏名字
-                    // 同时更新翻译字典，防止切换语言时被覆盖
+                    if (titleEl) titleEl.innerText = data.appName; 
                     if (dict.zh) dict.zh['app-title'] = data.appName;
                     if (dict.en) dict.en['app-title'] = data.appName;
                 }
@@ -592,20 +605,30 @@
                 if (data.trashBin) trashBin = data.trashBin;
                 if (data.folderTreeRelations) folderTreeRelations = data.folderTreeRelations;
                 if (data.leftExpandedFolders) leftExpandedFolders = data.leftExpandedFolders;
+                
+                // 💡 只有完整且成功地获取了云端数据，才解开安全锁！
+                isCloudDataLoaded = true; 
+                
+                refreshAllViews();
+                if (notes.length > 0) {
+                    const sorted = [...notes].sort((a,b) => b.updatedAt - a.updatedAt);
+                    openNote(sorted[0].id);
+                } else {
+                    createNewNote(); // 只有真的是新用户，且网络没问题，才创建新笔记
+                }
             } catch (error) {
-                console.log("数据拉取失败或首次使用", error);
-            }
-            refreshAllViews();
-            if (notes.length > 0) {
-                const sorted = [...notes].sort((a,b) => b.updatedAt - a.updatedAt);
-                openNote(sorted[0].id);
-            } else {
-                createNewNote();
+                console.error("数据拉取失败", error);
+                // 🚨 如果断网或CF抽风，绝对禁止新建空笔记，并锁定编辑器防止误操作！
+                alert("🚨 云端数据加载失败！为防止数据被异常覆盖，已锁定自动保存功能。请检查网络并重启软件。");
+                document.getElementById('note-editor-richtext').innerHTML = "<h2 style='color:red; text-align:center; margin-top:20px;'>⚠️ 数据加载失败，请重启软件重试！</h2>";
+                document.getElementById('note-editor-richtext').setAttribute('contenteditable', 'false');
             }
         }
         
         async function saveCloudData() {
-            if(!cfUser) return;
+            // 💡 如果防覆盖安全锁没有解开，直接拒绝保存操作，保护云端数据！
+            if(!cfUser || !isCloudDataLoaded) return; 
+            
             const allData = {
                 notes: notes,
                 categories: categories,
@@ -710,9 +733,12 @@
                         <span class="text-[10px] font-bold ${isSelected ? 'opacity-100 text-blue-100' : 'opacity-60'} shrink-0">(${noteCount})</span>
                     `;
 
-                    // 💡 文件夹拖拽实现（完美区分文件夹互相嵌套和笔记分类）
+                    // 💡 适配 PakePlus (WebView2) 的文件夹拖拽与归档
                     cell.setAttribute('draggable', 'true');
                     cell.ondragstart = (e) => {
+                        e.dataTransfer.effectAllowed = 'move';
+                        // 🔥 核心修复1：PakePlus 必须设置标准的 text/plain 数据，否则系统会直接屏蔽拖拽手势
+                        e.dataTransfer.setData('text/plain', JSON.stringify({ type: 'folder', id: cat.id }));
                         e.dataTransfer.setData('text/folder-id', cat.id);
                         setTimeout(() => cell.classList.add('opacity-40'), 0);
                     };
@@ -721,7 +747,8 @@
                         document.querySelectorAll('.folder-drop-target').forEach(el => el.classList.remove('bg-blue-100', 'dark:bg-blue-900', 'border-blue-400', 'border-dashed'));
                     };
                     cell.ondragover = (e) => {
-                        e.preventDefault(); // 必须保留，这是允许 ondrop 触发的前提
+                        e.preventDefault(); // 🔥 核心修复2：必须无条件阻止默认事件，允许 Drop
+                        e.dataTransfer.dropEffect = 'move';
                         cell.classList.add('bg-blue-100', 'dark:bg-blue-900', 'border-blue-400', 'border-dashed');
                     };
                     cell.ondragleave = () => {
@@ -731,46 +758,49 @@
                         e.preventDefault();
                         cell.classList.remove('bg-blue-100', 'dark:bg-blue-900', 'border-blue-400', 'border-dashed');
                         
-                        // 情况A：如果识别到拖拽的是笔记文件
-                        if (draggedNoteId) {
-                            const idx = notes.findIndex(n => n.id === draggedNoteId);
+                        // 解析从 PakePlus 底层传回来的安全数据
+                        let dropData = { type: null, id: null };
+                        try {
+                            const plainText = e.dataTransfer.getData('text/plain');
+                            if (plainText) dropData = JSON.parse(plainText);
+                        } catch (err) {}
+
+                        const sourceNoteId = dropData.type === 'note' ? dropData.id : draggedNoteId;
+                        const sourceFolderId = dropData.type === 'folder' ? dropData.id : e.dataTransfer.getData('text/folder-id');
+
+                        // 情况A：如果拖拽的是笔记文件 -> 归档到该文件夹
+                        if (sourceNoteId) {
+                            const idx = notes.findIndex(n => n.id === sourceNoteId);
                             if (idx !== -1 && notes[idx].category !== cat.id) {
                                 notes[idx].category = cat.id; 
                                 saveCloudData(); refreshAllViews();
                             }
                         } 
-                        // 情况B：如果拖拽的是文件夹本身
-                        else {
-                            const sourceId = e.dataTransfer.getData('text/folder-id');
-                            if (sourceId && sourceId !== cat.id) {
-                                // 安全校验 1：系统默认目录不可被移动（未分类、工作、生活）
-                                if (sourceId === '未分类' || sourceId === '工作' || sourceId === '生活') {
-                                    alert('系统默认分类目录不可改变层级！');
-                                    return;
-                                }
+                        // 情况B：如果拖拽的是文件夹本身 -> 目录树互相嵌套
+                        else if (sourceFolderId && sourceFolderId !== cat.id) {
+                            if (sourceFolderId === '未分类' || sourceFolderId === '工作' || sourceFolderId === '生活') {
+                                alert('系统默认分类目录不可改变层级！'); return;
+                            }
 
-                                // 安全校验 2：防死循环检测（不能把父辈文件夹拖进自己的子文件夹中）
-                                let isCircular = false;
-                                function checkChild(targetId) {
-                                    const children = categories.filter(c => c.parentId === targetId);
-                                    if (children.some(c => c.id === cat.id)) { isCircular = true; return; }
-                                    children.forEach(c => checkChild(c.id));
-                                }
-                                checkChild(sourceId);
+                            let isCircular = false;
+                            function checkChild(targetId) {
+                                const children = categories.filter(c => c.parentId === targetId);
+                                if (children.some(c => c.id === cat.id)) { isCircular = true; return; }
+                                children.forEach(c => checkChild(c.id));
+                            }
+                            checkChild(sourceFolderId);
 
-                                if (!isCircular) {
-                                    const sourceCat = categories.find(c => c.id === sourceId);
-                                    if (sourceCat) {
-                                        sourceCat.parentId = cat.id; // 更新父ID归属成功
-                                        saveCloudData(); refreshAllViews();
-                                    }
-                                } else {
-                                    alert("🚨 逻辑错误：不能将父级目录移动到它自身的子目录下！");
+                            if (!isCircular) {
+                                const sourceCat = categories.find(c => c.id === sourceFolderId);
+                                if (sourceCat) {
+                                    sourceCat.parentId = cat.id;
+                                    saveCloudData(); refreshAllViews();
                                 }
+                            } else {
+                                alert("🚨 逻辑错误：不能将父级目录移动到它自身的子目录下！");
                             }
                         }
                     };
-
                     cell.onclick = (e) => {
                         if (e.target.closest('.fa-caret-down') || e.target.closest('.fa-caret-right')) {
                             leftExpandedFolders[cat.id] = !isExpanded;
@@ -850,10 +880,13 @@
                     `;
                 }
 
-                box.draggable = true;
+                // 💡 适配 PakePlus (WebView2) 的笔记上下排序拖拽
+                box.setAttribute('draggable', 'true');
                 box.ondragstart = (e) => {
                     draggedNoteId = note.id;
                     e.dataTransfer.effectAllowed = 'move';
+                    // 🔥 核心修复：注入 text/plain 标准通讯协议，给 PakePlus 开绿灯
+                    e.dataTransfer.setData('text/plain', JSON.stringify({ type: 'note', id: note.id }));
                     setTimeout(() => box.classList.add('opacity-40', 'scale-95'), 0);
                 };
                 box.ondragend = () => {
@@ -862,8 +895,10 @@
                     document.querySelectorAll('.folder-drop-target').forEach(el => el.classList.remove('bg-blue-100', 'dark:bg-blue-900', 'border-blue-400', 'border-dashed'));
                 };
                 box.ondragover = (e) => {
+                    e.preventDefault(); // 🔥 无条件阻断系统级事件拦截
+                    e.dataTransfer.dropEffect = 'move';
+                    // 仅在确认是笔记拖拽时才显示蓝色提示线
                     if (draggedNoteId && draggedNoteId !== note.id) {
-                        e.preventDefault(); 
                         box.classList.add('border-t-2', 'border-blue-500'); 
                     }
                 };
@@ -873,8 +908,19 @@
                 box.ondrop = (e) => {
                     e.preventDefault();
                     box.classList.remove('border-t-2', 'border-blue-500');
-                    if (draggedNoteId && draggedNoteId !== note.id) {
-                        const fromIdx = notes.findIndex(n => n.id === draggedNoteId);
+                    
+                    // 安全提取数据：防止 PakePlus 跨进程时丢失变量
+                    let dropNoteId = draggedNoteId;
+                    try {
+                        const plainText = e.dataTransfer.getData('text/plain');
+                        if (plainText) {
+                            const data = JSON.parse(plainText);
+                            if (data.type === 'note') dropNoteId = data.id;
+                        }
+                    } catch(err) {}
+
+                    if (dropNoteId && dropNoteId !== note.id) {
+                        const fromIdx = notes.findIndex(n => n.id === dropNoteId);
                         const toIdx = notes.findIndex(n => n.id === note.id);
                         if (fromIdx !== -1 && toIdx !== -1) {
                             const [movedItem] = notes.splice(fromIdx, 1);
@@ -1153,13 +1199,25 @@
                }
 
                editor.addEventListener('paste', (e) => {
+                     e.preventDefault(); // 💡 核心：强行拦截浏览器默认那糟糕的粘贴行为
+
+                     // 1. 先检查是不是粘贴的图片
+                     let hasImage = false;
                      const items = (e.clipboardData || window.clipboardData).items;
                      for (let i = 0; i < items.length; i++) {
                            if (items[i].type.indexOf("image") !== -1) {
-                               e.preventDefault(); const reader = new FileReader();
+                               hasImage = true;
+                               const reader = new FileReader();
                                reader.onload = (event) => execCmd('insertImage', event.target.result);
                                reader.readAsDataURL(items[i].getAsFile());
                            }
+                     }
+
+                     // 2. 如果粘贴的不是图片，那就当成文字处理，强制剥离所有格式（去除白底黑字干扰）
+                     if (!hasImage) {
+                         const text = (e.originalEvent || e).clipboardData.getData('text/plain');
+                         document.execCommand('insertText', false, text);
+                         handleEditorInput(); // 触发自动保存
                      }
                 });
          }
@@ -1298,21 +1356,28 @@
         }
          
         function handleLocalImageUpload(event) {
-               const file = event.target.files[0];
-               if (!file) return;
-               if (!file.type.startsWith('image/')) { alert('请选择图片类型的文件！'); return; }
+               const files = event.target.files;
+               if (!files || files.length === 0) return;
 
-               const reader = new FileReader();
-               reader.onload = function(e) {
-                    const base64Image = e.target.result;
-                    const editor = document.getElementById('note-editor-richtext');
-                    if (editor) {
-                        editor.focus();
+               const editor = document.getElementById('note-editor-richtext');
+               if (editor) editor.focus(); // 先让编辑器获取焦点
+
+               // 💡 使用 Array.from 遍历你选中的所有图片文件，逐一处理插入
+               Array.from(files).forEach(file => {
+                   if (!file.type.startsWith('image/')) { 
+                       alert(`文件 [${file.name}] 不是图片类型，已跳过！`); 
+                       return; 
+                   }
+                   const reader = new FileReader();
+                   reader.onload = function(e) {
+                        const base64Image = e.target.result;
                         document.execCommand('insertImage', false, base64Image);
-                    }
-               };
-               reader.readAsDataURL(file);
-               event.target.value = '';
+                        handleEditorInput(); // 触发自动保存
+                   };
+                   reader.readAsDataURL(file);
+               });
+
+               event.target.value = ''; // 清空选中状态，方便下次选同样的图
         }
 
        function toggleImportExport() {
